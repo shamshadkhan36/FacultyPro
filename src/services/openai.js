@@ -1,17 +1,18 @@
-﻿// FacultyPro OpenAI Service & Point-to-Point Reasoning Engine
+﻿// FacilityPro MEP OpenAI Service & Point-to-Point Engineering Engine
+// Specialized in HVAC, Plumbing, Electrical, and Fire Fighting Systems
 
 const STORAGE_KEYS = {
-  API_KEY: 'facultypro_openai_api_key',
-  MODEL: 'facultypro_openai_model',
-  TEMPERATURE: 'facultypro_temperature',
-  FACULTY_PERSONA: 'facultypro_persona'
+  API_KEY: 'facilitypro_openai_api_key',
+  MODEL: 'facilitypro_openai_model',
+  TEMPERATURE: 'facilitypro_temperature',
+  FACULTY_PERSONA: 'facilitypro_persona'
 };
 
 export const AVAILABLE_MODELS = [
-  { id: 'gpt-4o', name: 'GPT-4o (Omni) — Recommended', speed: 'Ultra Fast', reasoning: 'Maximum' },
-  { id: 'gpt-4o-mini', name: 'GPT-4o Mini — Fast & Lightweight', speed: 'Instant', reasoning: 'High' },
-  { id: 'gpt-4-turbo', name: 'GPT-4 Turbo — Deep Analysis', speed: 'Moderate', reasoning: 'Very High' },
-  { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo — Standard', speed: 'Fast', reasoning: 'Standard' },
+  { id: 'gpt-4o', name: 'GPT-4o (Omni) — Recommended for MEP Calculations', speed: 'Ultra Fast', reasoning: 'Maximum' },
+  { id: 'gpt-4o-mini', name: 'GPT-4o Mini — Fast Troubleshooting', speed: 'Instant', reasoning: 'High' },
+  { id: 'gpt-4-turbo', name: 'GPT-4 Turbo — Deep Engineering Design', speed: 'Moderate', reasoning: 'Very High' },
+  { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo — Quick Reference', speed: 'Fast', reasoning: 'Standard' },
 ];
 
 export const getStoredApiKey = () => {
@@ -34,32 +35,37 @@ export const setStoredModel = (model) => {
   localStorage.setItem(STORAGE_KEYS.MODEL, model);
 };
 
-export const getPointToPointSystemPrompt = (facultyName = 'Dr. Arthur Vance', specialty = 'STEM & Applied Science') => {
-  return `You are ${facultyName}, an elite verified Professor and domain authority on the FacultyPro platform specializing in ${specialty}.
-Your mission is to provide rigorous, crystal-clear, point-to-point answers to the user's question with ZERO fluff or filler words.
+export const getPointToPointSystemPrompt = (expertName = 'Eng. David Sterling, PE', specialty = 'HVAC & MEP Engineering') => {
+  return `You are ${expertName}, a Senior Licensed Professional MEP Engineer (PE) and Facility Consultant on the FacilityPro platform specializing in ${specialty}.
+Your mission is to provide rigorous, code-compliant, crystal-clear, point-to-point engineering solutions for Facility Management and MEP Systems across:
+1. HVAC (Heating, Ventilation, Air Conditioning, Chillers, VRF, AHU, Cooling Towers, Ducting, Psychrometrics)
+2. Plumbing (Water Supply, Booster Pumps, Drainage, Water Hammer, PRVs, Sewage Treatment, Stormwater)
+3. Electrical (Transformers, Switchgears, DG Sets, Short Circuit, Earthing, Power Factor, UPS, Substation)
+4. Fire Fighting (Fire Sprinklers, NFPA Codes 13/14/20/72, Fire Pumps, Hydrants, Smoke Evacuation, Clean Agents)
 
-Always format your response cleanly in Markdown using this strict Point-to-Point template:
+Strictly enforce compliance with industry engineering standards: ASHRAE, NFPA, NEC (NFPA 70), IEC, IPC, UPC, SMACNA, ASPE, and IEEE.
+Always format your response cleanly in Markdown using this strict Point-to-Point template with ZERO fluff or filler words:
 
-### 🎯 Executive Summary
-[Direct 1-2 sentence core answer/conclusion answering the question immediately]
+### 🎯 Direct Engineering Summary
+[Direct 1-2 sentence core diagnosis, calculation result, or code requirement addressing the problem immediately]
 
-### 📌 Point-by-Point Structured Breakdown
-1. **Direct Mechanism / Core Concept**: [Precise logical explanation without preamble]
-2. **Key Governing Principles**: [Fundamental laws, statutes, physiological paths, or algorithms involved]
-3. **Step-by-Step Resolution / Proof**: [Exact step-by-step mathematical derivation, code logic, diagnostic criteria, or legal analysis]
-4. **Edge Cases & Critical Boundaries**: [Crucial exceptions, parameter bounds, or complications]
+### 📌 Point-by-Point Step-by-Step Technical Breakdown
+1. **Root Cause / Core Mechanism**: [Precise thermodynamic, hydraulic, electrical, or fire protection principle without fluff]
+2. **Standard Code & Design Basis**: [Exact applicable standard clause e.g. ASHRAE 90.1, NFPA 13 § 19.3, NEC Article 450, IPC § 604]
+3. **Step-by-Step Resolution / Sizing Calculation**: [Exact step-by-step mathematical sizing, pressure-drop derivation, electrical parameters, or valve settings]
+4. **Site Boundaries & Critical Safety Thresholds**: [Crucial pressure limits, temperature approach thresholds, breaker trip settings, or hazardous parameters]
 
-### 🔬 Core Reference, Formula or Code
-[Provide clean math equations, code blocks with syntax highlighting, or statutory/medical references]
+### 🔬 Governing Formulas, Engineering Math & Code Reference
+[Provide clean mathematical equations with variables defined, hydraulic/electrical formulas, or code table references]
 
-### 🎓 Verified Faculty Insight & Common Pitfalls
-- **Common Misconception**: [What 90% of students/professionals get wrong on this topic]
-- **Faculty Recommendation**: [Professional guidance for exams, peer review, or implementation]
+### 🎓 Verified MEP Consultant Insight & Common Site Mistakes
+- **Common Field Error**: [What 90% of site contractors/facility technicians get wrong on this issue]
+- **Consultant Recommendation**: [Actionable advice for plant room maintenance, preventive testing, or authority submission]
 
-### ✅ Action Checklist & Summary
-- [x] Primary takeaway
-- [x] Immediate next step or diagnostic verification
-- [x] Key formula/principle to memorize`;
+### ✅ Action Checklist & Verification Protocol
+- [x] Primary diagnostic check or valve/breaker inspection
+- [x] Standard code compliance test
+- [x] Operational log baseline verification`;
 };
 
 // Intelligent simulated response generator for out-of-the-box demo mode
@@ -75,94 +81,104 @@ export const generateSimulatedResponse = async (question, faculty, onChunk) => {
   let misconception = '';
   let recommendation = '';
 
-  if (qLower.includes('quantum') || qLower.includes('entangle') || qLower.includes('bell')) {
-    topicSummary = 'Quantum entanglement is a phenomenon where two or more particles share a single composite quantum wave function such that measurement of one instantaneously correlates with the other, regardless of spatial separation, without violating relativistic causality (no-communication theorem).';
-    point1 = '**Wave Function Non-Separability**: Entangled states (e.g. Bell state |Ψ⁺⟩ = (|01⟩ + |10⟩)/√2) cannot be factored into product states |ψA⟩ ⊗ |ψB⟩.';
-    point2 = '**Von Neumann Entropy & Non-Locality**: Local reduced density matrices have maximum von Neumann entropy S(ρA) = 1, despite the global system being in a pure state S(ρAB) = 0.';
-    point3 = '**CHSH Inequality Violation**: Bell theorem demonstrates that quantum mechanics violates local hidden variable constraints (CHSH parameter S ≤ 2 is violated up to 2√2 ≈ 2.828 Tsirelson bound).';
-    point4 = '**No-Signaling Theorem Compliance**: Local measurement results are intrinsically random; hence, no superluminal information transfer can occur without a classical communication channel.';
+  // 1. HVAC Queries
+  if (qLower.includes('hvac') || qLower.includes('chiller') || qLower.includes('vrf') || qLower.includes('vrv') || qLower.includes('ahu') || qLower.includes('cooling tower') || qLower.includes('duct') || qLower.includes('refrigeran') || qLower.includes('cfm') || qLower.includes('psychrometric')) {
+    topicSummary = 'Centrifugal and screw chiller condenser approach temperature elevation indicates tube scaling or non-condensable gas accumulation, pushing compressor operation beyond the aerodynamic surge boundary and degrading COP.';
+    point1 = '**Approach Temperature & Condenser Heat Rejection**: Condenser Approach = Saturation Temperature - Leaving Condenser Water Temperature. Approach exceeding 3.0°F (normal 1.0°F - 2.0°F) proves severe calcium/silica scaling on tube surfaces.';
+    point2 = '**Aerodynamic Surge Dynamics**: Elevated head pressure (lift) reduces refrigerant mass flow below the critical compressor impeller surge line, resulting in periodic flow reversal, acoustic barking, and thrust bearing vibration.';
+    point3 = '**Cooling Tower & Water Chemistry**: Insufficient cooling tower blowdown raises Cycles of Concentration (COC > 5), causing calcium carbonate precipitation on copper tubes (scaling resistance R_f > 0.00025 hr·ft²·°F/BTU).';
+    point4 = '**Corrective Protocol (ASHRAE Guideline 22)**: (1) Run non-condensable purge compressor, (2) Calibrate water delta-T sensor accuracy, (3) Perform mechanical nylon-brush tube punching or mild sulfamic acid chemical descaling during scheduled shutdown.';
     formulaOrCode = `\`\`\`text
-Bell State: |Φ⁺⟩ = (|00⟩ + |11⟩) / √2
-CHSH Correlation: S = |E(a,b) - E(a,b') + E(a',b) + E(a',b')| ≤ 2√2
+Heat Rejection: Q_cond (BTU/hr) = 500 * GPM * (T_leaving - T_entering)
+Sensible Air Heat: Q_sensible = 1.08 * CFM * Delta_T
+Approach Temp: T_approach = T_sat_refrigerant - T_leaving_water (Target: < 2.0°F)
 \`\`\``;
-    misconception = 'Assuming entanglement allows instant faster-than-light data transmission. Measurement collapses state correlations, but the outcome appears purely random to the local observer until classical verification is exchanged.';
-    recommendation = 'Focus on the density matrix formulation rather than state vectors when analyzing mixed-state decoherence.';
-  } else if (qLower.includes('differential') || qLower.includes('dy/dx') || qLower.includes('calculus') || qLower.includes('math')) {
-    topicSummary = 'The differential equation dy/dx = y/x is a first-order separable and homogeneous ordinary differential equation whose general solution family is the linear ray y(x) = C·x, representing straight lines passing through the origin.';
-    point1 = '**Separation of Variables**: Rearrange differential terms to isolate dependent and independent variables: (1/y) dy = (1/x) dx.';
-    point2 = '**Integration of Both Sides**: Integrate ∫ (1/y) dy = ∫ (1/x) dx, yielding ln|y| = ln|x| + C₁ where C₁ is the constant of integration.';
-    point3 = '**Exponentiation & Linear Family**: Exponentiating both sides gives |y| = e^(C₁) · |x| => y(x) = C · x, where C = ±e^(C₁) ∈ ℝ.';
-    point4 = '**Singularities & Boundary Behavior**: The origin (x=0, y=0) is a singular point where slope is undefined (0/0 indeterminate), and x=0 represents a vertical asymptote for non-trivial solutions.';
+    misconception = 'Assuming chiller surging is an electrical VFD hunting problem and increasing refrigerant charge, which further elevates condenser head pressure and damages compressor impellers.';
+    recommendation = 'Maintain automatic chemical dosing to keep cooling tower Langelier Saturation Index (LSI) between 0.0 and +0.5.';
+  } 
+  // 2. PLUMBING & PIPING Queries
+  else if (qLower.includes('plumb') || qLower.includes('pipe') || qLower.includes('pump') || qLower.includes('hammer') || qLower.includes('booster') || qLower.includes('drainage') || qLower.includes('prv') || qLower.includes('sewage') || qLower.includes('water supply')) {
+    topicSummary = 'High-rise water supply pressure management requires multi-stage Pressure Reducing Valve (PRV) zoning and properly calculated water hammer arrestors to prevent pipe fatigue and fixture blowout under peak fixture unit demands.';
+    point1 = '**Water Hammer Acoustic Shock Wave (Joukowsky Relation)**: Sudden closure of solenoid/fast-acting valves converts kinetic energy into acoustic pressure waves: Delta P = rho * c * Delta v, generating transient pressure spikes up to 350+ PSI.';
+    point2 = '**Code Pressure Limits (IPC § 604.8 / UPC § 608.2)**: Static water pressure at fixtures must not exceed 80 PSI (5.5 bar). High-rise buildings require vertical pressure staging zones (typically every 8-10 floors) with redundant parallel PRV stations.';
+    point3 = '**Booster Pump Hydro-Pneumatic Sizing**: Total Dynamic Head (TDH) = Static Lift (m) + Residual Pressure at highest fixture (minimum 2.0 bar / 30 PSI) + Total Friction Loss (Hazen-Williams) + 10% safety margin.';
+    point4 = '**Water Hammer Arrestor Sizing (PDI-WH 201)**: Install stainless steel bellows arrestors sized for fixture units (Size A for 1-11 FU, Size B for 12-32 FU, Size C for 33-60 FU) within 6 feet of the fast-closing valve.';
     formulaOrCode = `\`\`\`text
-Step 1: dy / y = dx / x
-Step 2: ln|y| = ln|x| + C
-Step 3: y(x) = C · x (for all x ≠ 0)
+Joukowsky Equation: Delta P = rho * c * Delta v
+Hazen-Williams Pipe Friction: h_f = 10.67 * L * Q^1.852 / (C^1.852 * D^4.87)
+Pump Power (kW): P = (Q [m3/hr] * H [m] * rho * g) / (3600 * 1000 * eta_pump)
 \`\`\``;
-    misconception = 'Forgetting to include the trivial solution y(x) = 0 and neglecting absolute value signs before exponentiation.';
-    recommendation = 'Always sketch the direction field to verify that radial lines from the origin match the slope vector field (y/x).';
-  } else if (qLower.includes('law') || qLower.includes('contract') || qLower.includes('estoppel') || qLower.includes('severance')) {
-    topicSummary = 'In modern jurisprudence, Promissory Estoppel is an equitable doctrine that prevents a promisor from revoking a gratuitous promise if the promisee reasonably and detrimentally relied upon that promise to their significant economic injury.';
-    point1 = '**Clear and Definite Promise**: There must be an unambiguous commitment made by the promisor with the objective intent that it be acted upon.';
-    point2 = '**Reasonable & Foreseeable Reliance**: The promisor must have had reasonable cause to foresee that the promisee would change their position based on the representation.';
-    point3 = '**Substantial Detriment / Economic Harm**: The promisee must have incurred tangible reliance damages (Restatement (Second) of Contracts § 90).';
-    point4 = '**Injustice Avoidable Only by Enforcement**: Equity intervenes only to the extent necessary to prevent unconscionable harm (often limiting remedies to reliance rather than expectation damages).';
+    misconception = 'Installing standard air chambers (capped vertical pipes) instead of certified PDI-WH 201 water hammer arrestors. Air chambers become waterlogged within weeks and lose all dampening capability.';
+    recommendation = 'Ensure PRV pilot filter strainers are blown down monthly and expansion vessel pre-charge air pressure is verified at 0.2 bar below cut-in pressure.';
+  }
+  // 3. ELECTRICAL & POWER Queries
+  else if (qLower.includes('electr') || qLower.includes('transform') || qLower.includes('breaker') || qLower.includes('substation') || qLower.includes('dg') || qLower.includes('switchgear') || qLower.includes('inrush') || qLower.includes('power factor') || qLower.includes('short circuit') || qLower.includes('ups') || qLower.includes('earth')) {
+    topicSummary = 'Substation transformer protection requires precise coordination between differential relay (87T) harmonic restraint and downstream overcurrent/earth fault (50/51/51N) settings to ensure stability during grid energization and fault clearance.';
+    point1 = '**Transformer Magnetizing Inrush Dynamics**: Core residual flux upon breaker closing creates asymmetric unipolar inrush currents reaching 8-12x Full Load Amps (FLA) on the primary winding without matching secondary current.';
+    point2 = '**2nd Harmonic Restraint Protocol (IEEE C37.91 / IEC 60255)**: Magnetizing inrush current possesses high 2nd harmonic content (> 15% of fundamental). The 87T numerical differential relay must be configured with 15% 2nd harmonic blocking to prevent nuisance tripping.';
+    point3 = '**Short Circuit Fault Level (MVA / kA)**: I_sc = I_FLA / (%Z / 100). For a 2000 kVA 11kV/415V transformer with %Z = 6.0%, symmetrical fault current on the 415V bus reaches 46.3 kA, necessitating 50 kA rated ACB switchgear.';
+    point4 = '**Vector Group Phase Shift Compensation**: Verify relay internal software matrix compensates for Dyn11 30° phase angle shift and CT primary/secondary neutral grounding references.';
     formulaOrCode = `\`\`\`text
-Restatement (Second) of Contracts § 90:
-"A promise which the promisor should reasonably expect to induce action or forbearance... 
-and which does induce such action or forbearance is binding if injustice can be avoided only by enforcement."
+Transformer Full Load Current: I_FLA = kVA / (sqrt(3) * kV_line)
+Fault Current: I_sc = I_FLA / (%Z / 100)
+3-Phase Real Power: P (kW) = sqrt(3) * V_L * I_L * PF / 1000
+Capacitor Sizing for PF: Q_c (kVAR) = P (kW) * [tan(acos(PF_old)) - tan(acos(PF_target))]
 \`\`\``;
-    misconception = 'Treating Promissory Estoppel as an automatic substitute for breach of contract. Courts require rigorous proof of actual out-of-pocket detriment, not merely disappointed expectations.';
-    recommendation = 'In formal litigation or dispute resolution, establish a contemporaneous paper trail proving when the promise was communicated and the chronological timeline of reliance expenses.';
-  } else if (qLower.includes('medical') || qLower.includes('doctor') || qLower.includes('infection') || qLower.includes('pancreatitis') || qLower.includes('fever')) {
-    topicSummary = 'Acute clinical presentation requires distinguishing between localized bacterial inflammatory response and systemic bacteremia/sepsis using systemic inflammatory response criteria (SIRS) and specific biomarker elevation (CRP, Procalcitonin, Leukocytosis with Left Shift).';
-    point1 = '**Cardinal Inflammatory Pathophysiology**: Capillary endothelial dilation and mast cell histamine release induce localized edema, erythrocyte stasis, and peripheral thermogenesis.';
-    point2 = '**Microbiological Etiology**: Primary cutaneous pathogens include Staphylococcus aureus (including MRSA) and Streptococcus pyogenes producing pore-forming alpha-toxins.';
-    point3 = '**Diagnostic Staging**: Differentiate superficial cellulitis from necrotizing soft-tissue involvement by assessing pain out of proportion, subcutaneous crepitus, and hemorrhagic bullae.';
-    point4 = '**Empiric Pharmacotherapy Protocol**: Administer first-line beta-lactams (Cephalexin/Cefazolin) or vancomycin/daptomycin if purulent or risk factors for methicillin resistance exist.';
+    misconception = 'Increasing the differential pickup threshold (Id >) to stop inrush tripping instead of enabling 2nd harmonic blocking, which dangerously desensitizes the relay to genuine internal turn-to-turn faults.';
+    recommendation = 'Perform annual dissipation factor (tan delta) and sweep frequency response analysis (SFRA) to detect mechanical winding movement after external downstream short circuits.';
+  }
+  // 4. FIRE FIGHTING & LIFE SAFETY Queries
+  else if (qLower.includes('fire') || qLower.includes('sprinkler') || qLower.includes('nfpa') || qLower.includes('hydrant') || qLower.includes('smoke') || qLower.includes('alarm') || qLower.includes('pump') || qLower.includes('fm200') || qLower.includes('novec') || qLower.includes('suppression')) {
+    topicSummary = 'Automatic fire sprinkler and hydrant system engineering mandates exact hydraulic calculations per NFPA 13 and NFPA 20 to verify remote area water density, hose stream allowance, and fire pump head capacity.';
+    point1 = '**Occupancy Hazard Classification (NFPA 13 Chapter 4)**: Classify facility as Light Hazard (0.10 GPM/sq.ft over 1500 sq.ft), Ordinary Hazard Group 1/2 (0.15-0.20 GPM/sq.ft), or Extra Hazard (0.30-0.40 GPM/sq.ft over 2500 sq.ft).';
+    point2 = '**Total Water Demand Sizing**: Total Flow = (Design Density * Remote Area) + Inside/Outside Hose Stream Allowance (e.g. Extra Hazard = 0.30 * 2500 sq.ft = 750 GPM + 500 GPM hose = 1,250 GPM for 90-120 minutes duration).';
+    point3 = '**Fire Pump Configuration (NFPA 20)**: Main Electric Fire Pump (100% capacity) + Redundant Diesel Engine Driven Pump (100% capacity) + Jockey Pump (10-15 GPM @ 10 PSI above main pump shutoff head to maintain static line pressure).';
+    point4 = '**Hydraulic Friction Loss (Hazen-Williams)**: p = (4.52 * Q^1.85) / (C^1.85 * d^4.87). Black steel pipe C-factor is 120. Residual pressure at the most remote sprinkler head must remain >= 7 PSI (0.5 bar) with minimum K-factor 5.6 or 8.0.';
     formulaOrCode = `\`\`\`text
-Diagnostic Criteria:
-- Body Temperature: > 38.3°C or < 36.0°C
-- Tachycardia: Heart Rate > 90 bpm
-- Leukocytosis: WBC > 12,000/μL or > 10% immature band forms
-- Serum Lactate: > 2.0 mmol/L (indicative of cellular hypoperfusion)
+Sprinkler Discharge: Q = K * sqrt(P)  (where K = 5.6, 8.0, 11.2, 14.0, 25.2)
+Hazen-Williams Loss: p (psi/ft) = 4.52 * Q^1.85 / (C^1.85 * d^4.87)
+Fire Water Tank Storage (m3): V = Q_total (GPM) * Duration (min) * 0.0037854
 \`\`\``;
-    misconception = 'Relying solely on topical antibiotics for spreading erythema or using hydrogen peroxide, which damages granulation fibroblasts.';
-    recommendation = 'Delineate spreading borders with a sterile surgical marker to track response to systemic antibiotic therapy over a 12-24 hour window.';
-  } else {
-    topicSummary = `Point-to-point structural analysis of "${(question || '').trim()}". The core objective requires isolating fundamental theoretical mechanisms, empirical evidence, and operational execution steps.`;
-    point1 = `**Primary Principle & Direct Definition**: Clear academic formulation addressing the exact premises of "${(question || '').trim().slice(0, 45)}...".`;
-    point2 = '**Step-by-Step Logical Derivation**: Verified progressive derivation eliminating ancillary ambiguity through peer-reviewed principles.';
-    point3 = '**Mechanistic Proof & Structural Rigor**: Rigorous functional validation, system requirements, and baseline constraints.';
-    point4 = '**Real-World Practical Application**: Translation of theoretical mechanics into concrete, error-free operational deliverables.';
+    misconception = 'Sizing fire pump flow without adding the mandatory 250-500 GPM hose stream allowance specified in NFPA 13 Table 19.3.3.1.2, resulting in failed local fire civil defence authority hydraulic audits.';
+    recommendation = 'Conduct weekly automatic start tests on the diesel engine fire pump controller and annual full-flow pitot tube testing on the test header per NFPA 25.';
+  }
+  // 5. GENERAL MEP / FACILITY Queries
+  else {
+    topicSummary = `Point-to-point MEP and Facility engineering evaluation of "${(question || '').trim()}". Technical diagnosis requires verifying code compliance (ASHRAE/NFPA/NEC/IPC), hydraulic/electrical parameters, and life-safety integrity.`;
+    point1 = `**Core MEP Mechanism & Premise**: Rigorous technical assessment addressing "${(question || '').trim().slice(0, 45)}..." based on standard engineering codes.`;
+    point2 = '**Design Standard & Code References**: Verification against applicable international standards (ASHRAE 90.1/62.1, NFPA 13/20/70, IPC/UPC, and IEEE standards).';
+    point3 = '**Step-by-Step Technical Resolution**: Calculation-driven resolution establishing sizing factors, operating limits, and protective settings.';
+    point4 = '**Operational Safety & Site Boundaries**: Mandatory safety margins, pressure/voltage rating bounds, and emergency shutdown protocols.';
     formulaOrCode = `\`\`\`text
-Formulation Matrix:
-F(x) = ∑ [P_i · W_i] / Total Verification Index
-Where Confidence Score ≥ 99.4%
+MEP System Validation:
+Sizing Factor = (Design Load * Safety Margin) / Diversity Index
+Code Compliance: Verified against ASHRAE / NFPA / NEC / IPC
 \`\`\``;
-    misconception = 'Conflating correlated tertiary symptoms with fundamental root causative mechanisms.';
-    recommendation = 'Follow the standardized step-by-step verification checklist below before finalizing your project or academic submission.';
+    misconception = 'Overlooking system diversity factors or seasonal peak ambient design temperatures during initial capacity sizing.';
+    recommendation = 'Execute the standardized step-by-step facility checklist below before signing off on site commissioning or submittal documentation.';
   }
 
-  const fullMarkdown = `### 🎯 Executive Summary
+  const fullMarkdown = `### 🎯 Direct Engineering Summary
 ${topicSummary}
 
-### 📌 Point-by-Point Structured Breakdown
+### 📌 Point-by-Point Step-by-Step Technical Breakdown
 1. ${point1}
 2. ${point2}
 3. ${point3}
 4. ${point4}
 
-### 🔬 Core Reference, Formulation or Code
+### 🔬 Governing Formulas, Engineering Math & Code Reference
 ${formulaOrCode}
 
-### 🎓 Verified Faculty Insight & Critical Pitfalls
-- **Common Misconception**: ${misconception}
-- **Faculty Recommendation**: ${recommendation}
+### 🎓 Verified MEP Consultant Insight & Common Site Mistakes
+- **Common Field Error**: ${misconception}
+- **Consultant Recommendation**: ${recommendation}
 
-### ✅ Action Checklist & Next Steps
-- [x] Review and verify core point-by-point derivation
-- [x] Apply key boundary constraints to your specific use-case
-- [x] Schedule follow-up question with faculty if edge cases arise`;
+### ✅ Action Checklist & Verification Protocol
+- [x] Verify incoming electrical supply voltage, phase balance & breaker settings
+- [x] Inspect fluid pressure gauges, flow meters & PRV pilot diaphragms
+- [x] Cross-reference calculations against ASHRAE / NFPA / NEC / IPC standards
+- [x] Log operating parameters in BMS (Building Management System)`;
 
   const words = fullMarkdown.split(' ');
   let accumulated = '';
@@ -176,7 +192,7 @@ ${formulaOrCode}
   return fullMarkdown;
 };
 
-// Real OpenAI API streaming caller
+// Real OpenAI API streaming caller with MEP point-to-point prompt
 export const streamOpenAiResponse = async ({
   question,
   faculty,
@@ -212,7 +228,7 @@ export const streamOpenAiResponse = async ({
       body: JSON.stringify({
         model: model,
         messages: messages,
-        temperature: 0.3,
+        temperature: 0.2, // Low temperature for high engineering & calculation precision
         stream: true
       })
     });
@@ -271,7 +287,7 @@ export const testOpenAiApiKey = async (apiKey) => {
       }
     });
     if (response.ok) {
-      return { success: true, message: 'OpenAI API Key verified successfully!' };
+      return { success: true, message: 'OpenAI API Key verified successfully for FacilityPro MEP!' };
     } else {
       const errData = await response.json().catch(() => ({}));
       return { success: false, message: errData.error?.message || 'Invalid API Key' };

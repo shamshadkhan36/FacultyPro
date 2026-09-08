@@ -1,66 +1,66 @@
 ﻿export const popularQuestions = [
   {
-    id: 'med-1',
-    category: 'Medical',
-    badgeColor: 'bg-rose-50 text-rose-700 border-rose-200',
-    title: 'Pathophysiology of acute cut infections & antibiotic resistance',
-    excerpt: 'I have a cut on my finger that does not seem to be healing and is swollen. What are the clinical signs of an acute infection vs cellulitis?',
-    image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80',
-    facultyName: 'Dr. Marcus Lin, MD/Ph.D.',
-    assignedFacultyId: 'dr-marcus-lin',
+    id: 'hvac-1',
+    category: 'HVAC',
+    badgeColor: 'bg-sky-50 text-sky-700 border-sky-200',
+    title: 'Centrifugal Chiller Condenser High Approach Temperature & Surging',
+    excerpt: 'Our 500 TR centrifugal chiller has a condenser approach temperature exceeding 6.5°F (normal < 2.0°F) and begins surging under 85% load. What is the root cause and diagnostic step?',
+    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
+    facultyName: 'Eng. David Sterling, PE, LEED AP',
+    assignedFacultyId: 'eng-david-sterling',
     answerPoints: [
-      'Primary Signs of Infection: Localized erythema spreading > 1cm from wound edge, elevated skin warmth, throbbing pain out of proportion, and fluctuating edema.',
-      'Systemic Red Flags: Presence of lymphangitic streaking, fevers (>38°C), chills, or purulent drainage indicate progressive bacteremia.',
-      'Pathophysiology: Staph aureus and Group A Streptococcus break epidermal stratum corneum, releasing exotoxins that trigger neutrophil extravasation.',
-      'Action Plan: (1) Cleanse with normal saline, (2) Elevate extremity, (3) Obtain medical evaluation for oral empiric cephalexin.'
+      'Diagnostic Indicator: Condenser Approach Temp = Condenser Refrigerant Saturation Temp - Condenser Water Leaving Temp. A 6.5°F approach indicates significant tube fouling/scaling or non-condensable gas trapping.',
+      'Root Cause of Surging: High condenser pressure forces the compressor operating point above the surge line on the aerodynamic pressure-lift curve, causing refrigerant backflow and aerodynamic stall.',
+      'Governing Heat Transfer Formula: Q = U * A * LMTD. Calcium carbonate scale reduces overall heat transfer coefficient (U) by 40-60%.',
+      'Point-to-Point Remediation: (1) Run automatic purge unit to evacuate air/non-condensables, (2) Inspect cooling tower water TDS and biocide dosing, (3) Perform mechanical nylon-brush tube punching during planned shutdown.'
     ]
   },
   {
-    id: 'vet-1',
-    category: 'Veterinary & Bio',
-    badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    title: 'Theobromine Toxicity in Canines: Lethal Dose & Timeline',
-    excerpt: 'My dog is 75 lb and ingested dark baker chocolate. How much theobromine is dangerous for a large dog and what is the exact treatment window?',
-    image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=600&q=80',
-    facultyName: 'Dr. Arthur Vance & Vet Faculty Board',
-    assignedFacultyId: 'dr-arthur-vance',
-    answerPoints: [
-      'Toxic Thresholds: Mild signs occur at 20 mg/kg; cardiotoxic arrhythmias at 40-50 mg/kg; fatal neurotoxicity at >=60 mg/kg.',
-      'Bakers Calculation: 1 oz Baker chocolate contains ~400mg theobromine. For 75 lb (34 kg), 2 oz is moderate toxicity, 4+ oz is critical.',
-      'Metabolic Half-Life: Long half-life (~17.5 hours) due to slow hepatic CYP450 demethylation.',
-      'Immediate Action: Decontamination via activated charcoal within 2-4 hours, IV fluid diuresis.'
-    ]
-  },
-  {
-    id: 'auto-1',
-    category: 'Automotive & Eng',
+    id: 'plumbing-1',
+    category: 'Plumbing',
     badgeColor: 'bg-blue-50 text-blue-700 border-blue-200',
-    title: 'Planetary Gearbox Grinding & Torque Converter Diagnosis',
-    excerpt: 'My car transmission is making a distinct grinding sound during 2nd to 3rd gear shift. What are the root mechanical causes?',
-    image: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=600&q=80',
-    facultyName: 'Dr. David Sterling, P.E.',
-    assignedFacultyId: 'dr-david-sterling',
+    title: 'High-Rise Riser Water Hammer & Pressure Reducing Valve (PRV) Sizing',
+    excerpt: 'In a 28-story residential tower, violent water hammer and pipe rattling occur whenever solenoid flush valves shut. How do we size water hammer arrestors and staging PRV stations?',
+    image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80',
+    facultyName: 'Eng. Robert Vance, CPD, PE',
+    assignedFacultyId: 'eng-robert-vance',
     answerPoints: [
-      'Synchronizer Ring Wear: Brass synchro teeth on 2-3 hub rounded off, failing to equalize rotational speed.',
-      'Torque Converter Stator Clutch Failure: Grinding under high acceleration indicates stator clutch slippage.',
-      'Planetary Carrier Bearing Galling: Breakdown on pinion shafts generates metallic debris.',
-      'Verification: Inspect pan magnet and run OBD2 line pressure logging.'
+      'Joukowsky Shock Pressure Equation: Delta P = rho * c * Delta v. Sudden valve closure converts fluid kinetic energy into acoustic pressure wave spikes exceeding 300+ PSI.',
+      'PRV Staging Requirement (IPC § 604.8): Static pressure on fixtures must not exceed 80 PSI. Divide the 28-story building into 3 vertical pressure zones (Low: L1-L10, Mid: L11-L20, High: L21-L28) with redundant dual-PRV bypass stations.',
+      'Water Hammer Arrestor Sizing (PDI-WH 201): Install PDI certified Size C/D stainless steel bellows arrestors within 6 feet of the solenoid valve headers.',
+      'Maintenance Action: Check PRV pilot diaphragm condition and inspect expansion vessel nitrogen pre-charge pressure (must be 0.2 bar below cut-in pressure).'
     ]
   },
   {
-    id: 'law-1',
-    category: 'Legal Studies',
+    id: 'elec-1',
+    category: 'Electrical',
     badgeColor: 'bg-amber-50 text-amber-700 border-amber-200',
-    title: 'Severance Agreement Waivers, ADEA 21-Day Period & Non-Competes',
-    excerpt: 'I was recently laid off. What is legally required in a severance package under federal law, and can I negotiate the non-compete clause?',
-    image: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=600&q=80',
-    facultyName: 'Prof. Elena Rostova, J.D.',
-    assignedFacultyId: 'prof-elena-rostova',
+    title: 'Transformer Differential Protection (87T) Tripping on Inrush Current',
+    excerpt: 'A 2000 kVA 11kV/415V dry-type transformer trips on 87T differential protection during no-load energization from the grid. How do we configure harmonic restraint?',
+    image: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=600&q=80',
+    facultyName: 'Eng. Marcus Lin, PE, IEEE',
+    assignedFacultyId: 'eng-marcus-lin',
     answerPoints: [
-      'Statutory Rights (OWBPA/ADEA): Mandates 21-day review period plus 7-day revocation window for age 40+.',
-      'Consideration Requirement: Valid release requires consideration beyond what is already owed.',
-      'Non-Compete Enforceability: Must be narrowly tailored in duration (<1 year) and protectable interest.',
-      'Negotiation Strategy: Focus on COBRA subsidies and mutual non-disparagement.'
+      'Magnetizing Inrush Phenomenon: High residual core flux causes core saturation upon energization, generating unipolar inrush currents up to 8-12x Full Load Amps (FLA) on the primary side without secondary current.',
+      '2nd Harmonic Restraint Protocol (IEEE C37.91): Magnetizing inrush current contains high 2nd harmonic content (typically > 15-20% of fundamental). Differential relay must be set to 15% 2nd harmonic blocking.',
+      'CT Ratio & Vector Group Phase Shift: Verify numerical relay CT compensation matches transformer vector group Dyn11 (30° phase shift compensation).',
+      'Verification Steps: (1) Review relay waveform event oscillography to confirm 2nd harmonic ratio, (2) Confirm differential slope setting (Slope 1 = 20%, Slope 2 = 50-80%).'
+    ]
+  },
+  {
+    id: 'fire-1',
+    category: 'Fire Fighting',
+    badgeColor: 'bg-rose-50 text-rose-700 border-rose-200',
+    title: 'NFPA 13 Wet Sprinkler Hydraulic Sizing & Fire Pump Head Calculation',
+    excerpt: 'For an industrial warehouse classified under Extra Hazard Group 1, what is the design density, remote area calculation, and required fire pump flow & head?',
+    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f8?auto=format&fit=crop&w=600&q=80',
+    facultyName: 'Eng. Sarah Chen, FPE, NFPA',
+    assignedFacultyId: 'eng-sarah-chen',
+    answerPoints: [
+      'NFPA 13 Classification & Density: Extra Hazard Group 1 requires a minimum design density of 0.30 GPM/sq.ft over a hydraulically most demanding remote area of 2,500 sq.ft.',
+      'Primary Water Demand Calculation: Q_sprinkler = Density * Area = 0.30 * 2500 = 750 GPM + 500 GPM hose stream allowance (NFPA 13 Table 19.3.3.1.2) = Total 1,250 GPM.',
+      'Fire Pump Sizing (NFPA 20): Select a UL/FM certified 1,250 GPM @ 140 PSI main electric fire pump + 100% redundant diesel pump + 10 GPM @ 150 PSI jockey pump.',
+      'Hazen-Williams Friction Loss: p = (4.52 * Q^1.85) / (C^1.85 * d^4.87). Verify C=120 for black steel pipe to avoid undersizing remote riser friction heads.'
     ]
   }
 ];

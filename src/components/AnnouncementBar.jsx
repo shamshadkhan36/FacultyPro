@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { Sparkles, ArrowRight, Wrench } from 'lucide-react';
 
 export const AnnouncementBar = ({ onApplyClick }) => {
   return (
@@ -7,16 +7,16 @@ export const AnnouncementBar = ({ onApplyClick }) => {
       <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
         <div className="flex items-center gap-2 font-medium">
           <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-white">
-            <Sparkles className="w-3 h-3" />
+            <Wrench className="w-3 h-3" />
           </span>
-          <span>Want to become a Verified Faculty Expert on the FacultyPro platform?</span>
+          <span>Are you a Licensed PE, ASHRAE, NFPA, or IEEE MEP Consultant? Join FacilityPro!</span>
         </div>
         
         <div className="flex items-center gap-2">
           <div className="flex -space-x-1.5 overflow-hidden">
-            <img className="inline-block h-5 w-5 rounded-full ring-1 ring-white/50" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Faculty" />
-            <img className="inline-block h-5 w-5 rounded-full ring-1 ring-white/50" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" alt="Faculty" />
-            <img className="inline-block h-5 w-5 rounded-full ring-1 ring-white/50" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80" alt="Faculty" />
+            <img className="inline-block h-5 w-5 rounded-full ring-1 ring-white/50" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" alt="MEP Engineer" />
+            <img className="inline-block h-5 w-5 rounded-full ring-1 ring-white/50" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80" alt="MEP Engineer" />
+            <img className="inline-block h-5 w-5 rounded-full ring-1 ring-white/50" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80" alt="MEP Engineer" />
           </div>
           
           <button 

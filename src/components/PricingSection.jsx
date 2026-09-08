@@ -1,53 +1,53 @@
 ﻿import React from 'react';
-import { Check, Sparkles, ShieldCheck } from 'lucide-react';
+import { Check, Sparkles, ShieldCheck, Wrench } from 'lucide-react';
 
 export const PricingSection = ({ onSelectPlan }) => {
   const plans = [
     {
-      name: 'Single Question Trial',
-      price: '$5',
+      name: 'Single Emergency Case',
+      price: '$15',
       period: 'one-time',
-      description: 'Ideal for an urgent homework problem, bug fix, or legal question.',
+      description: 'Ideal for an urgent site breakdown, pump trip, or authority code clarification.',
       features: [
-        '1 Complete Point-to-Point Answer',
-        'Assigned Verified Professor',
-        'Full Step-by-Step Breakdown',
-        '24h Follow-up Chat with Faculty',
-        'Export to Markdown & PDF'
+        '1 Complete Point-to-Point MEP Solution',
+        'Assigned Licensed Professional Engineer',
+        'Exact Sizing Formulas & Code Clauses',
+        '24h Follow-up Chat with MEP Specialist',
+        'Export to Calculation Notes & PDF'
       ],
       popular: false,
-      buttonText: 'Ask Single Question'
+      buttonText: 'Solve 1 Emergency Issue'
     },
     {
-      name: 'Monthly Scholar Pro',
-      price: '$29',
+      name: 'Facility Pro Monthly',
+      price: '$49',
       period: 'per month',
-      description: 'Unlimited point-to-point Q&A for undergraduate, graduate & PhD researchers.',
+      description: 'Unlimited point-to-point Q&A for Facility Managers, MEP Contractors & Plant Engineers.',
       features: [
-        'Unlimited Point-to-Point Questions',
-        'Direct OpenAI GPT-4o Integration',
-        'Priority Faculty Response (< 30s)',
-        'Direct Messaging with MIT/Stanford Faculty',
-        'LaTeX Math & Full Code Sandbox',
+        'Unlimited HVAC, Plumbing, Electrical & Fire Q&A',
+        'Direct OpenAI GPT-4o MEP Reasoning',
+        'Priority Response (< 30s) from Licensed PE',
+        'ASHRAE, NFPA, NEC & IPC Standards Engine',
+        'Full Engineering Equations & Math Steps',
         'Cancel Anytime With 1-Click'
       ],
       popular: true,
       buttonText: 'Start 7-Day Free Trial'
     },
     {
-      name: 'Academic Research Lab',
-      price: '$89',
+      name: 'Enterprise MEP & Plant Lab',
+      price: '$149',
       period: 'per month',
-      description: 'For university research groups, law firms, and engineering teams.',
+      description: 'For MEP Consultancy firms, Hospital facilities, and Data Center operations teams.',
       features: [
-        'Everything in Scholar Pro',
-        'Up to 5 Team Member Seats',
+        'Everything in Facility Pro',
+        'Up to 10 Site Engineer Seats',
         'Custom OpenAI API Key Bring-Your-Own',
-        'Peer-Review Publication Verification',
-        'Dedicated Faculty Account Manager'
+        'Single Line Diagram (SLD) & Hydraulic Review',
+        'Dedicated Senior MEP Account Director'
       ],
       popular: false,
-      buttonText: 'Get Lab Access'
+      buttonText: 'Get Enterprise Facility Access'
     }
   ];
 
@@ -57,13 +57,13 @@ export const PricingSection = ({ onSelectPlan }) => {
         
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-bold uppercase tracking-widest text-[#0077c8] bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
-            Simple Transparent Pricing
+            Transparent Facility Pricing
           </span>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mt-3">
-            Affordable Academic & Technical Clarity
+            Affordable On-Demand MEP Engineering
           </h2>
           <p className="text-slate-600 text-sm sm:text-base mt-3">
-            Save 80% compared to private tutoring fees ($60-150/hr). Direct, fluff-free point-to-point solutions.
+            Save 90% compared to traditional third-party MEP consultant callout fees ($200-500/hr). Instant point-to-point solutions.
           </p>
         </div>
 
@@ -80,7 +80,7 @@ export const PricingSection = ({ onSelectPlan }) => {
               {plan.popular && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#f05423] text-white text-xs font-black uppercase px-4 py-1 rounded-full shadow-md tracking-wider flex items-center gap-1">
                   <Sparkles className="w-3 h-3 fill-white" />
-                  <span>Most Popular</span>
+                  <span>Most Popular for Plants</span>
                 </div>
               )}
 
@@ -120,7 +120,7 @@ export const PricingSection = ({ onSelectPlan }) => {
                 </button>
                 <div className="text-center mt-2">
                   <span className="text-[10px] text-slate-400 font-medium flex items-center justify-center gap-1">
-                    <ShieldCheck className="w-3 h-3 text-emerald-500" /> 30-Day Money-Back Guarantee
+                    <ShieldCheck className="w-3 h-3 text-emerald-500" /> 100% Code-Compliance Guarantee
                   </span>
                 </div>
               </div>

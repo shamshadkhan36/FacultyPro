@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { AnnouncementBar } from './components/AnnouncementBar';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
@@ -39,22 +39,22 @@ export function App() {
     refreshApiKeyStatus();
   }, []);
 
+  // Smart MEP specialist matching based on query
   const handleStartConsultation = (questionText, faculty = null) => {
     setActiveQuestion(questionText);
     if (faculty) {
       setActiveFaculty(faculty);
     } else {
-      const qLower = questionText.toLowerCase();
-      if (qLower.includes('law') || qLower.includes('contract') || qLower.includes('severance') || qLower.includes('legal')) {
-        setActiveFaculty(faculties.find(f => f.id === 'prof-elena-rostova') || faculties[0]);
-      } else if (qLower.includes('medical') || qLower.includes('doctor') || qLower.includes('infection') || qLower.includes('antibiotic')) {
-        setActiveFaculty(faculties.find(f => f.id === 'dr-marcus-lin') || faculties[0]);
-      } else if (qLower.includes('code') || qLower.includes('algorithm') || qLower.includes('cs') || qLower.includes('software') || qLower.includes('deadlock') || qLower.includes('raft')) {
-        setActiveFaculty(faculties.find(f => f.id === 'prof-sarah-chen') || faculties[0]);
-      } else if (qLower.includes('auto') || qLower.includes('car') || qLower.includes('gear') || qLower.includes('engine') || qLower.includes('thermodynamic')) {
-        setActiveFaculty(faculties.find(f => f.id === 'dr-david-sterling') || faculties[0]);
+      const qLower = (questionText || '').toLowerCase();
+      if (qLower.includes('plumb') || qLower.includes('pipe') || qLower.includes('pump') || qLower.includes('hammer') || qLower.includes('booster') || qLower.includes('drain') || qLower.includes('prv') || qLower.includes('sewage') || qLower.includes('water')) {
+        setActiveFaculty(faculties.find(f => f.id === 'eng-robert-vance') || faculties[1]);
+      } else if (qLower.includes('electr') || qLower.includes('transform') || qLower.includes('substation') || qLower.includes('breaker') || qLower.includes('inrush') || qLower.includes('dg') || qLower.includes('power') || qLower.includes('short circuit') || qLower.includes('ups') || qLower.includes('earth')) {
+        setActiveFaculty(faculties.find(f => f.id === 'eng-marcus-lin') || faculties[2]);
+      } else if (qLower.includes('fire') || qLower.includes('sprinkler') || qLower.includes('nfpa') || qLower.includes('hydrant') || qLower.includes('smoke') || qLower.includes('alarm') || qLower.includes('fm200') || qLower.includes('suppression')) {
+        setActiveFaculty(faculties.find(f => f.id === 'eng-sarah-chen') || faculties[3]);
       } else {
-        setActiveFaculty(faculties.find(f => f.id === 'dr-arthur-vance') || faculties[0]);
+        // Default to HVAC & Chilled Water specialist
+        setActiveFaculty(faculties.find(f => f.id === 'eng-david-sterling') || faculties[0]);
       }
     }
     setConsultationOpen(true);
@@ -66,7 +66,22 @@ export function App() {
   };
 
   const handleSelectFacultyCard = (fac) => {
-    handleStartConsultation(`I would like a point-to-point consultation regarding ${fac.specialties.join(', ')}.`, fac);
+    handleStartConsultation(`I would like a point-to-point MEP consultation regarding ${fac.specialties.join(', ')}.`, fac);
+  };
+
+  const handleCategorySelect = (catId) => {
+    setSelectedCategory(catId);
+    if (catId === 'hvac') {
+      setActiveFaculty(faculties[0]);
+    } else if (catId === 'plumbing') {
+      setActiveFaculty(faculties[1]);
+    } else if (catId === 'electrical') {
+      setActiveFaculty(faculties[2]);
+    } else if (catId === 'firefighting') {
+      setActiveFaculty(faculties[3]);
+    }
+    const elem = document.getElementById('popular');
+    if (elem) elem.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -81,63 +96,59 @@ export function App() {
         onOpenAuth={() => setAuthModalOpen(true)}
         onOpenApply={() => setApplyModalOpen(true)}
         hasApiKey={hasApiKey}
-        onSelectCategory={(catId) => setSelectedCategory(catId)}
+        onSelectCategory={handleCategorySelect}
       />
 
-      {/* 3. Hero Section with Question Input & Prompt Badges */}
+      {/* 3. Hero Section with MEP Question Input & Prompt Badges */}
       <HeroSection
         onStartChat={(q) => handleStartConsultation(q)}
         onSelectPrompt={(p) => handleStartConsultation(p)}
       />
 
-      {/* 4. Category Pills Ribbon matching Screenshot 2 */}
+      {/* 4. Category Pills Ribbon (HVAC, Plumbing, Electrical, Fire Fighting) */}
       <CategoryPills
         selectedCategory={selectedCategory}
-        onSelectCategory={(catId) => {
-          setSelectedCategory(catId);
-          const elem = document.getElementById('popular');
-          if (elem) elem.scrollIntoView({ behavior: 'smooth' });
-        }}
+        onSelectCategory={handleCategorySelect}
       />
 
-      {/* 5. Popular Questions Grid matching Screenshot 2 */}
+      {/* 5. Popular Questions Grid (4 Core MEP Disciplines) */}
       <PopularQuestions
         onSelectQuestion={handleSelectPopularQuestion}
       />
 
-      {/* 6. How It Works 3-Step Guide matching Screenshot 2 */}
+      {/* 6. How It Works 3-Step Guide */}
       <HowItWorks
-        onTryNow={() => handleStartConsultation('Explain Bell Inequality and why local hidden variable theories fail.')}
+        onTryNow={() => handleStartConsultation('Calculate NFPA 13 sprinkler water demand for Extra Hazard Group 1 warehouse.')}
       />
 
-      {/* 7. Meet The Experts Carousel matching Screenshot 3 */}
+      {/* 7. Meet The MEP Experts Carousel */}
       <MeetTheExperts
         onSelectFaculty={handleSelectFacultyCard}
       />
 
-      {/* 8. Why You'll Love FacultyPro matching Screenshot 4 */}
+      {/* 8. Why Facility Managers Love FacilityPro */}
       <WhyYouLoveUs />
 
-      {/* 9. Student & Scholar Pricing Section */}
+      {/* 9. Facility & MEP Pricing Section */}
       <PricingSection
-        onSelectPlan={(plan) => handleStartConsultation(`I would like to activate the ${plan.name} with point-to-point faculty guidance.`)}
+        onSelectPlan={(plan) => handleStartConsultation(`I would like to activate the ${plan.name} for our facility plant.`)}
       />
 
-      {/* 10. Trust Badges & Accreditation matching Screenshot 5 */}
+      {/* 10. Trust Badges & Accreditations */}
       <TrustBadges />
 
-      {/* 11. Footer matching Screenshot 5 */}
+      {/* 11. Comprehensive Footer */}
       <Footer
         onOpenApply={() => setApplyModalOpen(true)}
         onOpenAuth={() => setAuthModalOpen(true)}
       />
 
-      {/* 12. Persistent Floating Live Chat Helper matching Screenshot 1-5 */}
+      {/* 12. Persistent Floating Live MEP Chat Helper */}
       <FloatingChatWidget
         onOpenConsultation={(q) => handleStartConsultation(q)}
       />
 
-      {/* Flagship Point-to-Point Consultation Workspace */}
+      {/* Flagship Point-to-Point MEP Consultation Workspace */}
       <ConsultationModal
         isOpen={consultationOpen}
         onClose={() => setConsultationOpen(false)}
@@ -153,7 +164,7 @@ export function App() {
         onSettingsUpdated={refreshApiKeyStatus}
       />
 
-      {/* Become an Expert Application Modal */}
+      {/* Become an MEP Expert Application Modal */}
       <BecomeExpertModal
         isOpen={applyModalOpen}
         onClose={() => setApplyModalOpen(false)}

@@ -10,49 +10,47 @@ export const WhyYouLoveUs = () => {
   const benefits = [
     {
       icon: BadgeCheck,
-      title: '15,000+ verified Faculty',
-      description: 'Multi-Step Academic Quality Process, including university faculty registry, doctoral diploma verification, and peer reviews.'
+      title: '15,000+ verified MEP Engineers',
+      description: 'Multi-step verification including state PE board validation, ASHRAE credentials, NFPA certifications, and past project audits.'
     },
     {
       icon: PiggyBank,
-      title: 'Every question saves money',
-      description: 'Join over 2 million students and researchers who save hundreds on private tutoring or expensive consultation fees.'
+      title: 'Prevent Costly Facility Downtime',
+      description: 'Avoid thousands of dollars in emergency breakdown costs, consultant site visit fees, and regulatory civil defence penalties.'
     },
     {
       icon: HeartHandshake,
-      title: "Service that's tailored to you",
-      description: 'Discuss your specific syllabus, problem set, or research paper with a Professor who specializes in your exact discipline, 24/7.'
+      title: "Solutions tailored to your plant",
+      description: 'Discuss your specific chiller model, pump curve, substation single line diagram (SLD), or sprinkler hydraulic calculation directly, 24/7.'
     },
     {
       icon: Hourglass,
-      title: 'Save valuable time at home',
-      description: 'Connect from your laptop or smartphone in under 45 seconds. No booking weeks ahead or waiting in academic office hours.'
+      title: 'Save critical on-site time',
+      description: 'Connect directly from equipment plant rooms, electrical substations, or site offices in under 30 seconds.'
     }
   ];
 
   const collageImages = [
-    { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=400&q=80', alt: 'Study group' },
-    { src: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=400&q=80', alt: 'Professor teaching' },
-    { src: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=400&q=80', alt: 'Students discussing' },
-    { src: 'https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit=crop&w=400&q=80', alt: 'Online research' },
-    { src: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=400&q=80', alt: 'Tech lab' },
+    { src: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80', alt: 'Chiller Plant Room' },
+    { src: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=400&q=80', alt: 'Plumbing Booster Pumps' },
+    { src: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=400&q=80', alt: 'Electrical Substation' },
+    { src: 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f8?auto=format&fit=crop&w=400&q=80', alt: 'Fire Pump Room' },
+    { src: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=400&q=80', alt: 'BMS Facility Control' },
   ];
 
   return (
     <section id="why-us" className="py-16 sm:py-24 bg-white border-b border-slate-200/70 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Title matching Screenshot 4 */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl sm:text-5xl font-extrabold text-[#0b2545] tracking-tight">
-            Why you’ll love Faculty<span className="text-[#f05423]">Pro</span>
+            Why facility managers trust Facility<span className="text-[#f05423]">Pro</span>
           </h2>
           <p className="text-slate-600 text-sm sm:text-base mt-3">
-            The precision of OpenAI reasoning paired with the authority of verified university professors.
+            The mathematical precision of OpenAI reasoning paired with the real-world authority of licensed MEP consulting engineers.
           </p>
         </div>
 
-        {/* 4 Benefits Columns matching Screenshot 4 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {benefits.map((b, idx) => {
             const Icon = b.icon;
@@ -72,7 +70,6 @@ export const WhyYouLoveUs = () => {
           })}
         </div>
 
-        {/* Bottom Photo Collage matching Screenshot 4 */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 pt-6">
           {collageImages.map((img, idx) => (
             <div key={idx} className="relative rounded-2xl overflow-hidden h-36 sm:h-44 shadow-xs group">

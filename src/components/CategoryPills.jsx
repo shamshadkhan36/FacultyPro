@@ -1,28 +1,20 @@
 ﻿import React from 'react';
 import { categories } from '../data/categories';
 import { 
-  Laptop, 
-  Atom, 
-  Stethoscope, 
-  Scale, 
-  Cpu, 
-  TrendingUp, 
-  FlaskConical, 
-  BookOpen, 
+  Wind, 
+  Droplets, 
+  Zap, 
+  Flame, 
   Sparkles,
   MoreHorizontal
 } from 'lucide-react';
 
 const categoryIconMap = {
   all: Sparkles,
-  cs: Laptop,
-  physics: Atom,
-  medical: Stethoscope,
-  law: Scale,
-  engineering: Cpu,
-  business: TrendingUp,
-  chemistry: FlaskConical,
-  humanities: BookOpen,
+  hvac: Wind,
+  plumbing: Droplets,
+  electrical: Zap,
+  firefighting: Flame,
 };
 
 export const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
@@ -38,7 +30,7 @@ export const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
               <button
                 key={cat.id}
                 onClick={() => onSelectCategory(cat.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer border shrink-0 ${
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-150 cursor-pointer border shrink-0 ${
                   isSelected
                     ? 'bg-[#0077c8] text-white border-[#0077c8] shadow-md shadow-blue-500/20 scale-105'
                     : 'bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 border-slate-200/90'
@@ -46,6 +38,9 @@ export const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
               >
                 <Icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-slate-500'}`} />
                 <span>{cat.name}</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-semibold ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'}`}>
+                  {cat.count}
+                </span>
               </button>
             );
           })}
@@ -55,7 +50,7 @@ export const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200 shrink-0 cursor-pointer"
           >
             <MoreHorizontal className="w-4 h-4 text-slate-500" />
-            <span>More</span>
+            <span>All Facilities</span>
           </button>
         </div>
       </div>

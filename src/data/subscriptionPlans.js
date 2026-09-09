@@ -1,80 +1,70 @@
-﻿export const subscriptionPlans = [
+export const subscriptionPlans = [
   {
-    id: 'free',
-    name: 'Free Starter',
-    priceMonthly: 0,
-    priceAnnual: 0,
-    badge: 'Free Forever',
-    description: 'Essential MEP point-to-point Q&A and basic engineering references for technicians and students.',
+    id: 'starter-199',
+    name: 'Single Emergency Case',
+    price: '₹199',
+    priceMonthly: 199,
+    priceAnnual: 199,
+    period: 'one-time',
+    badge: 'Quick Solver',
+    description: 'Essential MEP point-to-point Q&A and urgent diagnostic troubleshooting for plant engineers.',
     features: [
-      '5 Daily AI Point-to-Point MEP Solutions',
-      'Basic Engineering Knowledge Articles',
-      'Standard CFM & Electrical Calculators',
-      'Read-Only Preview of SOP Library',
-      'Community Discussion Access'
+      '1 Complete Point-to-Point MEP Solution',
+      'Assigned Licensed Professional Engineer',
+      'Exact Sizing Formulas & Code Clauses',
+      '24h Follow-up Chat with Specialist',
+      'Export to Calculation Notes & PDF'
     ],
     popular: false,
-    ctaText: 'Current Plan',
+    isComingSoon: false,
+    ctaText: 'Solve for ₹199',
     disabled: false
   },
   {
-    id: 'pro',
-    name: 'Professional Engineer',
-    priceMonthly: 29,
-    priceAnnual: 24,
-    badge: 'Most Popular',
-    description: 'For Facility Managers, MEP Project Engineers, and Licensed Consultants needing daily calculations and code verification.',
+    id: 'pro-399',
+    name: 'Facility Pro Monthly',
+    price: '₹399',
+    priceMonthly: 399,
+    priceAnnual: 349,
+    period: 'per month',
+    badge: 'Most Popular for Plants',
+    description: 'Unlimited point-to-point Q&A for Facility Managers, MEP Contractors & Plant Engineers.',
     features: [
       'Unlimited OpenAI GPT-4o Point-to-Point Q&A',
       'All 6 Interactive Engineering Calculators',
       'Full Access to 50+ MEP Standard Operating Procedures (SOPs)',
       'Interactive Maintenance & Inspection Checklists',
       'Export Calculations to Markdown & PDF',
-      'Text-to-Speech Audio Explanations',
-      'Direct Question Routing to Licensed PEs'
+      'Direct Question Routing to Licensed PEs',
+      'Cancel Anytime with 1-Click'
     ],
     popular: true,
-    ctaText: 'Upgrade to Professional',
+    isComingSoon: false,
+    ctaText: 'Upgrade for ₹399/mo',
     disabled: false
   },
   {
-    id: 'business',
-    name: 'Facility Operations Team',
-    priceMonthly: 89,
-    priceAnnual: 74,
-    badge: 'Best for Plants',
-    description: 'For commercial buildings, multi-story hotels, hospitals, and MEP contracting teams.',
-    features: [
-      'Everything in Professional',
-      'Up to 5 Team Member Accounts',
-      'Custom Plant Equipment Sizing & Log History',
-      'Signed Inspection PDF Report Generator',
-      'Bring Your Own OpenAI API Key (BYOK)',
-      'Priority 24/7 Site Support (< 30s response)',
-      'Custom Maintenance Checklist Creator'
-    ],
-    popular: false,
-    ctaText: 'Start 14-Day Team Trial',
-    disabled: false
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise Facility Lab',
-    priceMonthly: 249,
-    priceAnnual: 199,
+    id: 'enterprise-custom',
+    name: 'Enterprise MEP & Plant Lab',
+    price: 'Coming Soon',
+    priceMonthly: 0,
+    priceAnnual: 0,
+    period: 'Custom Plant',
     badge: 'Enterprise',
-    description: 'For corporate real estate portfolios, data centers, and multi-property hotel chains.',
+    description: 'For MEP Consultancy firms, Hospital facilities, and Data Center operations teams.',
     features: [
-      'Everything in Business Team',
-      'Unlimited Site Engineer Seats',
+      'Everything in Facility Pro',
+      'Up to 10 Site Engineer Seats',
       'Customized Plant SOPs & LOTO Safety Standards',
-      'BMS & SCADA Protocol Integration Consulting',
+      'Single Line Diagram (SLD) & Hydraulic Review',
       'Dedicated Senior MEP Engineering Account Manager',
-      'Single Sign-On (SSO) & Audit Compliance Log',
       'Custom SLA & 99.99% Guaranteed Uptime'
     ],
     popular: false,
-    ctaText: 'Contact Enterprise Sales',
-    disabled: false
+    isComingSoon: true,
+    ctaText: 'Coming Soon',
+    disabled: true
   }
 ];
+
+export default subscriptionPlans;

@@ -30,7 +30,7 @@ export const UserDashboard = ({ onStartAiConsultation, onOpenPricing, onOpenCalc
     role: 'Chief MEP & Facility Manager',
     company: 'Apex Prime Commercial Towers',
     email: 'shamshad.khan@apexprime.com',
-    planId: 'pro',
+    planId: 'pro-399',
     joinedDate: 'January 2026',
     queriesRemaining: 84,
     totalQueriesLimit: 100,

@@ -1,4 +1,4 @@
-﻿export const popularQuestions = [
+export const popularQuestions = [
   {
     id: 'hvac-1',
     category: 'HVAC',
@@ -6,6 +6,7 @@
     title: 'Centrifugal Chiller Condenser High Approach Temperature & Surging',
     excerpt: 'Our 500 TR centrifugal chiller has a condenser approach temperature exceeding 6.5°F (normal < 2.0°F) and begins surging under 85% load. What is the root cause and diagnostic step?',
     image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
+    fallbackIcon: 'Wind',
     facultyName: 'Eng. David Sterling, PE, LEED AP',
     assignedFacultyId: 'eng-david-sterling',
     answerPoints: [
@@ -22,6 +23,7 @@
     title: 'High-Rise Riser Water Hammer & Pressure Reducing Valve (PRV) Sizing',
     excerpt: 'In a 28-story residential tower, violent water hammer and pipe rattling occur whenever solenoid flush valves shut. How do we size water hammer arrestors and staging PRV stations?',
     image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80',
+    fallbackIcon: 'Droplets',
     facultyName: 'Eng. Robert Vance, CPD, PE',
     assignedFacultyId: 'eng-robert-vance',
     answerPoints: [
@@ -38,6 +40,7 @@
     title: 'Transformer Differential Protection (87T) Tripping on Inrush Current',
     excerpt: 'A 2000 kVA 11kV/415V dry-type transformer trips on 87T differential protection during no-load energization from the grid. How do we configure harmonic restraint?',
     image: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=600&q=80',
+    fallbackIcon: 'Zap',
     facultyName: 'Eng. Marcus Lin, PE, IEEE',
     assignedFacultyId: 'eng-marcus-lin',
     answerPoints: [
@@ -53,7 +56,8 @@
     badgeColor: 'bg-rose-50 text-rose-700 border-rose-200',
     title: 'NFPA 13 Wet Sprinkler Hydraulic Sizing & Fire Pump Head Calculation',
     excerpt: 'For an industrial warehouse classified under Extra Hazard Group 1, what is the design density, remote area calculation, and required fire pump flow & head?',
-    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f8?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=600&q=80',
+    fallbackIcon: 'Flame',
     facultyName: 'Eng. Sarah Chen, FPE, NFPA',
     assignedFacultyId: 'eng-sarah-chen',
     answerPoints: [
@@ -64,3 +68,5 @@
     ]
   }
 ];
+
+export default popularQuestions;

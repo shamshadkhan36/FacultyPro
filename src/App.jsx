@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnnouncementBar } from './components/AnnouncementBar';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
@@ -15,10 +15,21 @@ import { ConsultationModal } from './components/ConsultationModal';
 import { SettingsModal } from './components/SettingsModal';
 import { BecomeExpertModal } from './components/BecomeExpertModal';
 import { AuthModal } from './components/AuthModal';
+
+// 8 Extended Main Features
+import { EngineeringCalculators } from './components/EngineeringCalculators';
+import { KnowledgeHub } from './components/KnowledgeHub';
+import { SopLibrary } from './components/SopLibrary';
+import { MaintenanceChecklists } from './components/MaintenanceChecklists';
+import { UserDashboard } from './components/UserDashboard';
+import { AdminPanel } from './components/AdminPanel';
+
 import { faculties } from './data/faculties';
 import { getStoredApiKey } from './services/openai';
 
 export function App() {
+  const [activeView, setActiveView] = useState('home'); // 'home' | 'calculators' | 'knowledge' | 'sops' | 'checklists' | 'dashboard' | 'admin' | 'pricing'
+  
   const [consultationOpen, setConsultationOpen] = useState(false);
   const [activeQuestion, setActiveQuestion] = useState('');
   const [activeFaculty, setActiveFaculty] = useState(faculties[0]);
@@ -40,15 +51,16 @@ export function App() {
   }, []);
 
   // Smart MEP specialist matching based on query
-  const handleStartConsultation = (questionText, faculty = null) => {
-    setActiveQuestion(questionText);
+  const handleStartConsultation = (questionText = '', faculty = null) => {
+    const text = questionText || 'Calculate NFPA 13 sprinkler water demand for Extra Hazard Group 1 warehouse.';
+    setActiveQuestion(text);
     if (faculty) {
       setActiveFaculty(faculty);
     } else {
-      const qLower = (questionText || '').toLowerCase();
+      const qLower = (text || '').toLowerCase();
       if (qLower.includes('plumb') || qLower.includes('pipe') || qLower.includes('pump') || qLower.includes('hammer') || qLower.includes('booster') || qLower.includes('drain') || qLower.includes('prv') || qLower.includes('sewage') || qLower.includes('water')) {
         setActiveFaculty(faculties.find(f => f.id === 'eng-robert-vance') || faculties[1]);
-      } else if (qLower.includes('electr') || qLower.includes('transform') || qLower.includes('substation') || qLower.includes('breaker') || qLower.includes('inrush') || qLower.includes('dg') || qLower.includes('power') || qLower.includes('short circuit') || qLower.includes('ups') || qLower.includes('earth')) {
+      } else if (qLower.includes('electr') || qLower.includes('transform') || qLower.includes('substation') || qLower.includes('breaker') || qLower.includes('inrush') || qLower.includes('dg') || qLower.includes('power') || qLower.includes('short circuit') || qLower.includes('ups') || qLower.includes('earth') || qLower.includes('cable')) {
         setActiveFaculty(faculties.find(f => f.id === 'eng-marcus-lin') || faculties[2]);
       } else if (qLower.includes('fire') || qLower.includes('sprinkler') || qLower.includes('nfpa') || qLower.includes('hydrant') || qLower.includes('smoke') || qLower.includes('alarm') || qLower.includes('fm200') || qLower.includes('suppression')) {
         setActiveFaculty(faculties.find(f => f.id === 'eng-sarah-chen') || faculties[3]);
@@ -80,8 +92,15 @@ export function App() {
     } else if (catId === 'firefighting') {
       setActiveFaculty(faculties[3]);
     }
-    const elem = document.getElementById('popular');
-    if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+    if (activeView === 'home') {
+      const elem = document.getElementById('popular');
+      if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleNavigate = (view) => {
+    setActiveView(view);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -90,60 +109,116 @@ export function App() {
       {/* 1. Top Announcement Bar */}
       <AnnouncementBar onApplyClick={() => setApplyModalOpen(true)} />
 
-      {/* 2. Main Navigation Bar */}
+      {/* 2. Main Navigation Bar with Tab Routing */}
       <Navbar
+        activeView={activeView}
+        onNavigate={handleNavigate}
         onOpenSettings={() => setSettingsOpen(true)}
         onOpenAuth={() => setAuthModalOpen(true)}
         onOpenApply={() => setApplyModalOpen(true)}
+        onStartAiChat={() => handleStartConsultation()}
         hasApiKey={hasApiKey}
         onSelectCategory={handleCategorySelect}
       />
 
-      {/* 3. Hero Section with MEP Question Input & Prompt Badges */}
-      <HeroSection
-        onStartChat={(q) => handleStartConsultation(q)}
-        onSelectPrompt={(p) => handleStartConsultation(p)}
-      />
+      {/* View Switcher Routing */}
+      <main className="flex-1">
+        {activeView === 'home' && (
+          <>
+            {/* Hero Section */}
+            <HeroSection
+              onStartChat={(q) => handleStartConsultation(q)}
+              onSelectPrompt={(p) => handleStartConsultation(p)}
+            />
 
-      {/* 4. Category Pills Ribbon (HVAC, Plumbing, Electrical, Fire Fighting) */}
-      <CategoryPills
-        selectedCategory={selectedCategory}
-        onSelectCategory={handleCategorySelect}
-      />
+            {/* Category Pills Ribbon */}
+            <CategoryPills
+              selectedCategory={selectedCategory}
+              onSelectCategory={handleCategorySelect}
+            />
 
-      {/* 5. Popular Questions Grid (4 Core MEP Disciplines) */}
-      <PopularQuestions
-        onSelectQuestion={handleSelectPopularQuestion}
-      />
+            {/* Popular Questions Grid */}
+            <PopularQuestions
+              onSelectQuestion={handleSelectPopularQuestion}
+            />
 
-      {/* 6. How It Works 3-Step Guide */}
-      <HowItWorks
-        onTryNow={() => handleStartConsultation('Calculate NFPA 13 sprinkler water demand for Extra Hazard Group 1 warehouse.')}
-      />
+            {/* How It Works */}
+            <HowItWorks
+              onTryNow={() => handleStartConsultation('Calculate NFPA 13 sprinkler water demand for Extra Hazard Group 1 warehouse.')}
+            />
 
-      {/* 7. Meet The MEP Experts Carousel */}
-      <MeetTheExperts
-        onSelectFaculty={handleSelectFacultyCard}
-      />
+            {/* Meet The MEP Experts Carousel */}
+            <MeetTheExperts
+              onSelectFaculty={handleSelectFacultyCard}
+            />
 
-      {/* 8. Why Facility Managers Love FacilityPro */}
-      <WhyYouLoveUs />
+            {/* Why Facility Managers Love FacilityPro */}
+            <WhyYouLoveUs />
 
-      {/* 9. Facility & MEP Pricing Section */}
-      <PricingSection
-        onSelectPlan={(plan) => handleStartConsultation(`I would like to activate the ${plan.name} for our facility plant.`)}
-      />
+            {/* Pricing Section */}
+            <PricingSection
+              onSelectPlan={(plan) => handleStartConsultation(`I would like to activate the ${plan.name} for our facility plant.`)}
+            />
 
-      {/* 10. Trust Badges & Accreditations */}
-      <TrustBadges />
+            {/* Trust Badges */}
+            <TrustBadges />
+          </>
+        )}
 
-      {/* 11. Comprehensive Footer */}
+        {/* Feature 5: Engineering Calculators */}
+        {activeView === 'calculators' && (
+          <EngineeringCalculators
+            onStartAiConsultation={(q) => handleStartConsultation(q)}
+          />
+        )}
+
+        {/* Feature 2: Engineering Knowledge Hub */}
+        {activeView === 'knowledge' && (
+          <KnowledgeHub
+            onStartAiConsultation={(q) => handleStartConsultation(q)}
+          />
+        )}
+
+        {/* Feature 3: SOP Library */}
+        {activeView === 'sops' && (
+          <SopLibrary
+            onStartAiConsultation={(q) => handleStartConsultation(q)}
+          />
+        )}
+
+        {/* Feature 4: Maintenance Checklists */}
+        {activeView === 'checklists' && (
+          <MaintenanceChecklists
+            onStartAiConsultation={(q) => handleStartConsultation(q)}
+          />
+        )}
+
+        {/* Feature 6 & 7: User Dashboard & Subscription Status */}
+        {activeView === 'dashboard' && (
+          <UserDashboard
+            onStartAiConsultation={(q) => handleStartConsultation(q)}
+            onOpenPricing={() => handleNavigate('home')}
+            onOpenCalculator={() => handleNavigate('calculators')}
+            onOpenSop={() => handleNavigate('sops')}
+          />
+        )}
+
+        {/* Feature 8: Admin Panel */}
+        {activeView === 'admin' && (
+          <AdminPanel
+            onStartAiConsultation={(q) => handleStartConsultation(q)}
+          />
+        )}
+      </main>
+
+      {/* Comprehensive Footer */}
       <Footer
         onOpenApply={() => setApplyModalOpen(true)}
         onOpenAuth={() => setAuthModalOpen(true)}
+        onNavigate={handleNavigate}
       />
 
-      {/* 12. Persistent Floating Live MEP Chat Helper */}
+      {/* Persistent Floating Live MEP Chat Helper */}
       <FloatingChatWidget
         onOpenConsultation={(q) => handleStartConsultation(q)}
       />

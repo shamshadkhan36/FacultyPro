@@ -151,14 +151,10 @@ export const MeetTheExperts = ({ onSelectFaculty }) => {
 
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100 space-y-3">
-                    <div className="text-xs font-extrabold text-[#009b68] flex items-center gap-1.5">
-                      <span>{fac.satisfiedLabel}</span>
-                    </div>
-
+                  <div className="pt-3 border-t border-slate-100">
                     <button
                       onClick={() => onSelectFaculty(fac)}
-                      className="w-full py-2 px-3 rounded-xl bg-blue-50 hover:bg-[#0077c8] text-[#0077c8] hover:text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="w-full py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-[#0077c8] text-[#0077c8] hover:text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <span>Consult {fac.name.split(' ')[1] || 'AI'} (AI)</span>
                       <ArrowRight className="w-3 h-3" />

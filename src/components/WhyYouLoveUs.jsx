@@ -31,11 +31,11 @@ export const WhyYouLoveUs = () => {
   ];
 
   const collageImages = [
-    { src: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80', alt: 'Chiller Plant Room' },
-    { src: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=400&q=80', alt: 'Plumbing Booster Pumps' },
-    { src: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=400&q=80', alt: 'Electrical Substation' },
-    { src: 'https://images.unsplash.com/photo-1509783236416-c9ad59bae472?auto=format&fit=crop&w=400&q=80', alt: 'Fire Pump Room' },
-    { src: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=400&q=80', alt: 'BMS Facility Control' },
+    { src: '/images/hvac_chiller_plant.jpg', alt: 'Chiller Plant Room' },
+    { src: '/images/plumbing_booster_pumps.jpg', alt: 'Plumbing Booster Pumps' },
+    { src: '/images/electrical_substation_room.jpg', alt: 'Electrical Substation' },
+    { src: '/images/fire_sprinkler_pumps.jpg', alt: 'Fire Pump Room' },
+    { src: '/images/bms_control_room.jpg', alt: 'BMS Facility Control' },
   ];
 
   return (

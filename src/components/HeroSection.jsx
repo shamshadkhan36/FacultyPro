@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Sparkles, 
@@ -36,9 +36,9 @@ export const HeroSection = ({ onStartChat, onSelectPrompt }) => {
       {/* Background Image of Industrial Plant Room / MEP Facility with Dark Overlay */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=2000&q=85" 
+          src="/images/bms_control_room.jpg" 
           alt="MEP Facility Plant Room" 
-          className="w-full h-full object-cover object-center opacity-35 filter contrast-125 brightness-90 transform scale-105 transition-transform duration-1000"
+          className="w-full h-full object-cover object-center opacity-30 filter contrast-125 brightness-90 transform scale-105 transition-transform duration-1000"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-slate-900/60"></div>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-black/60"></div>

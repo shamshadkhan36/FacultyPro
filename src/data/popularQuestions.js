@@ -56,7 +56,7 @@ export const popularQuestions = [
     badgeColor: 'bg-rose-50 text-rose-700 border-rose-200',
     title: 'NFPA 13 Wet Sprinkler Hydraulic Sizing & Fire Pump Head Calculation',
     excerpt: 'For an industrial warehouse classified under Extra Hazard Group 1, what is the design density, remote area calculation, and required fire pump flow & head?',
-    image: 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1509783236416-c9ad59bae472?auto=format&fit=crop&w=600&q=80',
     fallbackIcon: 'Flame',
     facultyName: 'Eng. Sarah Chen, FPE, NFPA',
     assignedFacultyId: 'eng-sarah-chen',

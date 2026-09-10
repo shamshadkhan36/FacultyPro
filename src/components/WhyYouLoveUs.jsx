@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { 
   BadgeCheck, 
   PiggyBank, 
@@ -34,8 +34,8 @@ export const WhyYouLoveUs = () => {
     { src: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80', alt: 'Chiller Plant Room' },
     { src: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=400&q=80', alt: 'Plumbing Booster Pumps' },
     { src: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=400&q=80', alt: 'Electrical Substation' },
-    { src: 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f8?auto=format&fit=crop&w=400&q=80', alt: 'Fire Pump Room' },
-    { src: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=400&q=80', alt: 'BMS Facility Control' },
+    { src: 'https://images.unsplash.com/photo-1509783236416-c9ad59bae472?auto=format&fit=crop&w=400&q=80', alt: 'Fire Pump Room' },
+    { src: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=400&q=80', alt: 'BMS Facility Control' },
   ];
 
   return (
@@ -72,10 +72,12 @@ export const WhyYouLoveUs = () => {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 pt-6">
           {collageImages.map((img, idx) => (
-            <div key={idx} className="relative rounded-2xl overflow-hidden h-36 sm:h-44 shadow-xs group">
+            <div key={idx} className="relative rounded-2xl overflow-hidden h-36 sm:h-44 shadow-xs group bg-slate-100">
               <img
                 src={img.src}
                 alt={img.alt}
+                loading="lazy"
+                referrerPolicy="no-referrer"
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent opacity-60"></div>

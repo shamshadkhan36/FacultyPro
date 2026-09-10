@@ -1,4 +1,4 @@
-﻿export const faculties = [
+export const faculties = [
   {
     id: 'eng-david-sterling',
     name: 'Eng. David Sterling, PE, LEED AP',
@@ -61,7 +61,7 @@
     reviewsCount: 39850,
     satisfiedLabel: '39,850 resolved Fire & Life Safety cases',
     avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
-    bannerPhoto: 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f8?auto=format&fit=crop&w=800&q=80',
+    bannerPhoto: 'https://images.unsplash.com/photo-1509783236416-c9ad59bae472?auto=format&fit=crop&w=800&q=80',
     specialties: ['NFPA 13 Sprinkler Hydraulic Sizing', 'NFPA 20 Fire Pumps & Jockey Systems', 'FM200 / Novec 1230 Clean Agents', 'Smoke Evacuation & NFPA 72 Alarms'],
     status: 'Online',
     responseTime: '< 35 seconds',

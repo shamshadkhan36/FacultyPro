@@ -74,7 +74,9 @@ export const PopularQuestions = ({ onSelectQuestion }) => {
                   {!hasError ? (
                     <img
                       src={q.image}
-                      alt={q.title}
+                      alt={`${q.category} Engineering`}
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
                       onError={() => handleImageError(q.id)}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

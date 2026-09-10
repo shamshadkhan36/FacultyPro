@@ -43,7 +43,7 @@ export const UserDashboard = ({ onStartAiConsultation, onOpenPricing, onOpenCalc
     {
       id: 'hist-1',
       date: 'Today at 02:45 PM',
-      faculty: 'Eng. David Sterling, PE',
+      faculty: 'Er. Rajesh Sharma (AI HVAC)',
       specialty: 'HVAC & Chilled Water',
       question: 'Calculate NFPA 13 sprinkler water demand for Extra Hazard Group 1 warehouse.',
       status: 'Resolved',
@@ -52,7 +52,7 @@ export const UserDashboard = ({ onStartAiConsultation, onOpenPricing, onOpenCalc
     {
       id: 'hist-2',
       date: 'Yesterday at 11:20 AM',
-      faculty: 'Eng. Marcus Lin, PE, IEEE',
+      faculty: 'Dr. Vikram Malhotra (AI Electrical)',
       specialty: 'Electrical & Power Systems',
       question: '11kV transformer differential relay 87T trip on cold energization.',
       status: 'Resolved',
@@ -61,7 +61,7 @@ export const UserDashboard = ({ onStartAiConsultation, onOpenPricing, onOpenCalc
     {
       id: 'hist-3',
       date: '3 days ago',
-      faculty: 'Eng. Robert Vance, CEng, MCIBSE',
+      faculty: 'Er. Amit Patel (AI Plumbing)',
       specialty: 'Plumbing & Drainage',
       question: 'Water hammer surge on high-rise booster pump shutdown.',
       status: 'Resolved',

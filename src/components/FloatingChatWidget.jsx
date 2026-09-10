@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { X, Sparkles, Wrench } from 'lucide-react';
 
 export const FloatingChatWidget = ({ onOpenConsultation }) => {
@@ -44,7 +44,7 @@ export const FloatingChatWidget = ({ onOpenConsultation }) => {
           </div>
 
           <div className="p-3 rounded-xl bg-blue-50 text-xs text-slate-700 leading-relaxed">
-            <strong>Eng. David Sterling, PE (HVAC):</strong> "Hello! What HVAC, Plumbing, Electrical, or Fire Fighting issue can we troubleshoot with exact calculations today?"
+            <strong>Er. Rajesh Sharma (AI HVAC):</strong> "Hello! What HVAC, Plumbing, Electrical, or Fire Fighting issue can our AI Engineers troubleshoot for you today?"
           </div>
 
           <form onSubmit={handleQuickSubmit} className="space-y-2">
@@ -58,13 +58,16 @@ export const FloatingChatWidget = ({ onOpenConsultation }) => {
               />
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[10px] text-slate-400">Point-to-Point MEP Solution</span>
+              <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                AI Models Online (&lt; 5s reply)
+              </span>
               <button
                 type="submit"
-                className="px-3.5 py-1.5 rounded-lg bg-[#f05423] hover:bg-[#ff6f3c] text-white text-xs font-bold flex items-center gap-1 cursor-pointer shadow-xs"
+                className="px-3 py-1.5 bg-[#f05423] hover:bg-[#d84315] text-white text-xs font-bold rounded-lg flex items-center gap-1 shadow-xs transition-colors cursor-pointer"
               >
-                <Sparkles className="w-3 h-3" />
-                <span>Start Now</span>
+                <span>Ask AI</span>
+                <Send className="w-3 h-3" />
               </button>
             </div>
           </form>
@@ -72,25 +75,17 @@ export const FloatingChatWidget = ({ onOpenConsultation }) => {
         </div>
       )}
 
-      {/* Floating Trigger Group */}
-      <div className="flex items-center gap-2.5">
+      {/* Floating Launcher Button */}
+      <div className="flex items-center gap-3">
         
-        {/* Blue speech bubble */}
-        {bubbleVisible && !isOpen && (
+        {/* Floating Bubble Hint */}
+        {!isOpen && (
           <div 
             onClick={() => setIsOpen(true)}
-            className="relative cursor-pointer bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-2xl rounded-br-none shadow-xl border border-blue-400/30 flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300 transition-all hover:scale-105 select-none"
+            className="hidden sm:flex items-center gap-2 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-xl border border-slate-200 text-xs font-bold text-slate-800 cursor-pointer hover:border-[#0077c8] hover:shadow-2xl transition-all duration-200 transform hover:-translate-y-0.5 animate-bounce"
           >
-            <span>What MEP system can we help with today?</span>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setBubbleVisible(false);
-              }}
-              className="text-blue-200 hover:text-white ml-1 -mr-1 p-0.5 rounded-full hover:bg-white/10"
-            >
-              <X className="w-3 h-3" />
-            </button>
+            <Sparkles className="w-4 h-4 text-[#f05423]" />
+            <span>Ask our AI MEP Consultants</span>
           </div>
         )}
 
@@ -101,8 +96,8 @@ export const FloatingChatWidget = ({ onOpenConsultation }) => {
         >
           <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-white shadow-2xl ring-4 ring-blue-500/30 group-hover:ring-[#f05423] transition-all duration-200 group-hover:scale-105">
             <img
-              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80"
-              alt="MEP Consultant"
+              src="/images/avatar_rajesh_sharma.jpg"
+              alt="AI MEP Consultant"
               className="w-full h-full object-cover"
             />
           </div>

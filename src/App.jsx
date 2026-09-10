@@ -59,14 +59,14 @@ export function App() {
     } else {
       const qLower = (text || '').toLowerCase();
       if (qLower.includes('plumb') || qLower.includes('pipe') || qLower.includes('pump') || qLower.includes('hammer') || qLower.includes('booster') || qLower.includes('drain') || qLower.includes('prv') || qLower.includes('sewage') || qLower.includes('water')) {
-        setActiveFaculty(faculties.find(f => f.id === 'eng-robert-vance') || faculties[1]);
+        setActiveFaculty(faculties.find(f => f.id === 'eng-amit-patel') || faculties[1]);
       } else if (qLower.includes('electr') || qLower.includes('transform') || qLower.includes('substation') || qLower.includes('breaker') || qLower.includes('inrush') || qLower.includes('dg') || qLower.includes('power') || qLower.includes('short circuit') || qLower.includes('ups') || qLower.includes('earth') || qLower.includes('cable')) {
-        setActiveFaculty(faculties.find(f => f.id === 'eng-marcus-lin') || faculties[2]);
+        setActiveFaculty(faculties.find(f => f.id === 'eng-vikram-malhotra') || faculties[2]);
       } else if (qLower.includes('fire') || qLower.includes('sprinkler') || qLower.includes('nfpa') || qLower.includes('hydrant') || qLower.includes('smoke') || qLower.includes('alarm') || qLower.includes('fm200') || qLower.includes('suppression')) {
-        setActiveFaculty(faculties.find(f => f.id === 'eng-sarah-chen') || faculties[3]);
+        setActiveFaculty(faculties.find(f => f.id === 'eng-ananya-verma') || faculties[3]);
       } else {
         // Default to HVAC & Chilled Water specialist
-        setActiveFaculty(faculties.find(f => f.id === 'eng-david-sterling') || faculties[0]);
+        setActiveFaculty(faculties.find(f => f.id === 'eng-rajesh-sharma') || faculties[0]);
       }
     }
     setConsultationOpen(true);

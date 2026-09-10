@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { faculties } from '../data/faculties';
 import { 
   CheckCircle2, 
@@ -15,12 +15,12 @@ export const MeetTheExperts = ({ onSelectFaculty }) => {
   const itemsPerPage = 3;
 
   const institutions = [
-    'ASHRAE Fellows & Chilled Water Experts',
-    'ASPE Certified Plumbing Designers (CPD)',
-    'IEEE High-Voltage Electrical Consultants',
-    'NFPA Certified Fire Protection Specialists (CFPS)',
-    'Licensed Professional Engineers (PE, FPE)',
-    'LEED AP Building Performance Auditors'
+    'ISHRAE & ASHRAE AI Chilled Water Models',
+    'Indian Plumbing Association (IPA) & ASPE AI',
+    'IEEE & CPRI High-Voltage Electrical Models',
+    'NFPA & FSAI Certified Fire Safety AI',
+    'Licensed Professional Engineers (PE, FPE) Backed',
+    'IS / NBC & LEED AP Building Code Engines'
   ];
 
   const handleNext = () => {
@@ -43,9 +43,14 @@ export const MeetTheExperts = ({ onSelectFaculty }) => {
           <div className="lg:col-span-4 space-y-6">
             
             <div className="flex items-center justify-between">
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0b2545] tracking-tight">
-                Meet the MEP Experts
-              </h2>
+              <div>
+                <span className="text-xs font-black uppercase tracking-widest text-[#f05423] bg-orange-50 px-3 py-1 rounded-full border border-orange-100 inline-block mb-2">
+                  AI Engineering Intelligence
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0b2545] tracking-tight">
+                  Meet the AI MEP Experts
+                </h2>
+              </div>
               
               <div className="flex items-center gap-2">
                 <button
@@ -70,7 +75,7 @@ export const MeetTheExperts = ({ onSelectFaculty }) => {
             </div>
 
             <p className="text-sm text-slate-600 leading-relaxed">
-              Consultants join FacilityPro from premier MEP design firms, industrial plants, and verified professional engineering associations, including:
+              Our domain-specialized AI Engineering Consultants are modeled after premier Indian & international MEP consultants, trained on verified standards including:
             </p>
 
             {/* Checklist */}
@@ -87,10 +92,10 @@ export const MeetTheExperts = ({ onSelectFaculty }) => {
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 text-xs text-slate-600 space-y-1">
                 <div className="font-bold text-slate-800 flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-[#0077c8]" />
-                  <span>Licensed PE & Code Verification Guarantee</span>
+                  <span>24/7 Instant AI Calculation Guarantee</span>
                 </div>
                 <p className="text-[11px] text-slate-500">
-                  Every consultant holds active state PE engineering licensure, ASHRAE/NFPA credentials, and peer reviewed project experience.
+                  Every AI consultant delivers verified equations, Indian NBC / IS standards, and international ASHRAE/NFPA code calculations in under 5 seconds.
                 </p>
               </div>
             </div>
@@ -114,12 +119,17 @@ export const MeetTheExperts = ({ onSelectFaculty }) => {
                           alt={fac.name}
                           className="w-14 h-14 rounded-full object-cover ring-2 ring-slate-100 group-hover:ring-[#0077c8] transition-all"
                         />
-                        <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+                        <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full" title="AI Online"></span>
                       </div>
                       <div>
-                        <h4 className="font-bold text-base text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
-                          {fac.name}
-                        </h4>
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="font-bold text-sm sm:text-base text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                            {fac.name}
+                          </h4>
+                        </div>
+                        <span className="inline-block mt-0.5 px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold">
+                          {fac.aiBadge || 'AI Specialist'}
+                        </span>
                         <div className="flex items-center gap-0.5 text-amber-500 text-xs mt-1">
                           <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                           <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -150,7 +160,7 @@ export const MeetTheExperts = ({ onSelectFaculty }) => {
                       onClick={() => onSelectFaculty(fac)}
                       className="w-full py-2 px-3 rounded-xl bg-blue-50 hover:bg-[#0077c8] text-[#0077c8] hover:text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      <span>Consult {fac.name.split(' ')[1] || 'Engineer'}</span>
+                      <span>Consult {fac.name.split(' ')[1] || 'AI'} (AI)</span>
                       <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>

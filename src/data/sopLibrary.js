@@ -1,4 +1,4 @@
-﻿export const sopLibrary = [
+export const sopLibrary = [
   {
     id: 'sop-hvac-01',
     code: 'SOP-HVAC-01',
@@ -7,7 +7,7 @@
     discipline: 'hvac',
     version: 'v2.4',
     effectiveDate: 'Jan 2026',
-    author: 'Eng. David Sterling, PE',
+    author: 'Er. Rajesh Sharma (AI HVAC Expert)',
     purpose: 'Standard operating procedure for the safe sequential start-up, operational monitoring, and shutdown of water-cooled centrifugal chiller plants.',
     ppe: ['Safety Shoes', 'Safety Glasses / Face Shield', 'Hearing Protection (Ear Muffs)', 'Nitride Gloves'],
     hazards: ['High pressure refrigerant R-134a / R-1234ze', 'Rotating compressor impellers & fan blades', '415V/3.3kV High voltage starter panels', 'Water hammer risk'],
@@ -23,20 +23,20 @@
       { stepNumber: 3, title: 'Initiate Chiller Microprocessor Start Command', description: 'Switch chiller control panel from LOCAL OFF to AUTO / REMOTE START. The unit will initiate lubrication pre-lube cycle for 60 seconds (Oil pressure >= 25 PSI above suction).' },
       { stepNumber: 4, title: 'Monitor Compressor Acceleration & Soft-Start', description: 'Observe motor starter ramp up (Star-Delta or VFD). Verify running current stabilizes below Full Load Amps (FLA). Confirm guide vanes modulate slowly from minimum position.' },
       { stepNumber: 5, title: 'Verify Steady-State Operating Parameters', description: 'After 15 minutes of operation, log parameters: Chilled Water Leaving (44°F / 6.7°C), Condenser Entering (85°F / 29.4°C), Approach Temperature (< 2.0°F), Oil Temp (130-145°F), Motor Amps.' },
-      { stepNumber: 6, title: 'Normal Controlled Shutdown Sequence', description: 'When stopping: Issue stop command on panel. Compressor will unload guide vanes to 0% and shut off. Primary chilled water pump will run for 3-minute post-lube / cool-down cycle before de-energizing. Finally stop CWP and cooling tower fan.' }
+      { stepNumber: 6, title: 'Chiller Normal Shutdown Sequence', description: 'Select NORMAL STOP on panel. Microprocessor unloads guide vanes to 0%, opens recycle bypass, trips main compressor motor, runs post-lube oil pump for 180 seconds, and shuts down chilled/condenser water pumps after 5 minutes.' }
     ]
   },
   {
     id: 'sop-elec-01',
     code: 'SOP-ELEC-01',
-    title: '11kV / 415V Substation Transformer Energization & LOTO Protocol',
+    title: '11kV / 415V Substation Transformer Cold Energization Procedure',
     category: 'Electrical & Power',
     discipline: 'electrical',
     version: 'v3.1',
-    effectiveDate: 'Feb 2026',
-    author: 'Eng. Marcus Lin, PE, IEEE',
-    purpose: 'Safe lockout/tagout (LOTO) isolation, dielectric verification, and step-by-step energization of 11kV/415V distribution transformers.',
-    ppe: ['Arc Flash Suit Category 4 (40 cal/cm²)', '11kV Insulated Rubber Gloves with Leather Protectors', 'Safety Helmet with Arc Face Shield', 'Safety Boots with Dielectric Rating'],
+    effectiveDate: 'Jan 2026',
+    author: 'Dr. Vikram Malhotra (AI Electrical Expert)',
+    purpose: 'Step-by-step safety standard for switching, cold energization, and phase synchronization of 11kV oil-immersed & dry-type power transformers.',
+    ppe: ['Arc Flash Suit Category 4 (40 cal/cm²)', '11kV Insulated Rubber Gloves (Class 2)', 'Full Face Shield', 'Safety Helmet with Flash Protection'],
     hazards: ['11,000V Lethal Electric Shock & Arc Flash Hazard', 'Transformer inrush explosion risk', 'Residual capacitive charge in HT cables'],
     prerequisites: [
       'Ensure Work Permit & LOTO Certificate is signed by Chief Electrical Engineer',
@@ -61,7 +61,7 @@
     discipline: 'dg',
     version: 'v2.0',
     effectiveDate: 'Jan 2026',
-    author: 'Eng. Marcus Lin, PE',
+    author: 'Dr. Vikram Malhotra (AI Electrical Expert)',
     purpose: 'Standard weekly inspection and on-load testing of emergency diesel generators to guarantee compliance with NFPA 110 Level 1 emergency power standards.',
     ppe: ['Hearing Protection (Ear Plugs / Muffs)', 'Safety Glasses', 'High-Grip Oil-Resistant Gloves', 'Safety Shoes'],
     hazards: ['Hot exhaust manifold (> 500°C)', 'High pressure diesel fuel injection leaks (2000+ bar)', 'Automatic remote starting without warning'],
@@ -88,7 +88,7 @@
     discipline: 'fire',
     version: 'v3.0',
     effectiveDate: 'Jan 2026',
-    author: 'Eng. Sarah Chen, FPE, NFPA',
+    author: 'Er. Ananya Verma (AI Fire Safety Expert)',
     purpose: 'Executing NFPA 25 weekly inspection, testing, and maintenance (ITM) protocol for main electric, diesel backup, and jockey fire pumps.',
     ppe: ['Safety Shoes', 'Safety Glasses', 'Protective Gloves', 'Reflective High-Vis Vest'],
     hazards: ['High pressure water spray (> 150 PSI)', 'Automatic starting of heavy 150kW electric motors and diesel engines'],
@@ -114,7 +114,7 @@
     discipline: 'plumbing',
     version: 'v2.1',
     effectiveDate: 'Jan 2026',
-    author: 'Eng. Robert Vance, CPD, PE',
+    author: 'Er. Amit Patel (AI Plumbing Expert)',
     purpose: 'Standard procedure for isolating, draining, and recharging the nitrogen/air pre-charge in hydro-pneumatic pressure vessels.',
     ppe: ['Safety Glasses', 'Leather Work Gloves', 'Safety Shoes'],
     hazards: ['Pressurized pneumatic gas vessel', 'Flooding hazard during drainage'],
@@ -140,7 +140,7 @@
     discipline: 'hotel',
     version: 'v2.0',
     effectiveDate: 'Jan 2026',
-    author: 'Eng. Sarah Chen, FPE, NFPA',
+    author: 'Er. Ananya Verma (AI Fire Safety Expert)',
     purpose: 'Monthly inspection of hotel/commercial kitchen grease filters, exhaust ducts, and automatic Ansul R-102 wet chemical fire suppression systems per NFPA 96 & NFPA 17A.',
     ppe: ['Safety Glasses', 'Cut-Resistant Gloves', 'Safety Shoes', 'Non-Slip Kitchen Overshoes'],
     hazards: ['Grease accumulation fire hazard', 'Accidental discharge of wet chemical agent onto cooking appliances'],

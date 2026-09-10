@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { 
   ArrowRight,
   Zap,
@@ -109,20 +109,20 @@ export const HowItWorks = ({ onTryNow }) => {
               <div className="flex items-center gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs">
                 <div className="relative">
                   <img
-                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80"
-                    alt="HVAC Consultant"
+                    src="/images/avatar_rajesh_sharma.jpg"
+                    alt="AI HVAC Consultant"
                     className="w-12 h-12 rounded-full object-cover ring-2 ring-[#0077c8]/20"
                   />
-                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
+                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" title="AI Active"></span>
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <h4 className="font-bold text-sm text-slate-900">Eng. David Sterling, PE</h4>
-                    <span className="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-bold border border-emerald-200">ASHRAE Fellow</span>
+                    <h4 className="font-bold text-sm text-slate-900">Er. Rajesh Sharma</h4>
+                    <span className="text-[10px] bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded font-bold border border-purple-200">AI Specialist</span>
                   </div>
                   <div className="flex items-center gap-1 text-amber-500 text-xs font-semibold">
                     <span>★★★★★</span>
-                    <span className="text-slate-500 font-normal text-[11px]">(58,420 reviews)</span>
+                    <span className="text-slate-500 font-normal text-[11px]">(58,420 resolved cases)</span>
                   </div>
                 </div>
               </div>

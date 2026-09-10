@@ -7,8 +7,8 @@ export const popularQuestions = [
     excerpt: 'Our 500 TR centrifugal chiller has a condenser approach temperature exceeding 6.5°F (normal < 2.0°F) and begins surging under 85% load. What is the root cause and diagnostic step?',
     image: '/images/hvac_chiller_plant.jpg',
     fallbackIcon: 'Wind',
-    facultyName: 'Eng. David Sterling, PE, LEED AP',
-    assignedFacultyId: 'eng-david-sterling',
+    facultyName: 'Er. Rajesh Sharma (AI HVAC Expert)',
+    assignedFacultyId: 'eng-rajesh-sharma',
     answerPoints: [
       'Diagnostic Indicator: Condenser Approach Temp = Condenser Refrigerant Saturation Temp - Condenser Water Leaving Temp. A 6.5°F approach indicates significant tube fouling/scaling or non-condensable gas trapping.',
       'Root Cause of Surging: High condenser pressure forces the compressor operating point above the surge line on the aerodynamic pressure-lift curve, causing refrigerant backflow and aerodynamic stall.',
@@ -24,8 +24,8 @@ export const popularQuestions = [
     excerpt: 'In a 28-story residential tower, violent water hammer and pipe rattling occur whenever solenoid flush valves shut. How do we size water hammer arrestors and staging PRV stations?',
     image: '/images/plumbing_booster_pumps.jpg',
     fallbackIcon: 'Droplets',
-    facultyName: 'Eng. Robert Vance, CPD, PE',
-    assignedFacultyId: 'eng-robert-vance',
+    facultyName: 'Er. Amit Patel (AI Plumbing Expert)',
+    assignedFacultyId: 'eng-amit-patel',
     answerPoints: [
       'Joukowsky Shock Pressure Equation: Delta P = rho * c * Delta v. Sudden valve closure converts fluid kinetic energy into acoustic pressure wave spikes exceeding 300+ PSI.',
       'PRV Staging Requirement (IPC § 604.8): Static pressure on fixtures must not exceed 80 PSI. Divide the 28-story building into 3 vertical pressure zones (Low: L1-L10, Mid: L11-L20, High: L21-L28) with redundant dual-PRV bypass stations.',
@@ -41,8 +41,8 @@ export const popularQuestions = [
     excerpt: 'A 2000 kVA 11kV/415V dry-type transformer trips on 87T differential protection during no-load energization from the grid. How do we configure harmonic restraint?',
     image: '/images/electrical_substation_room.jpg',
     fallbackIcon: 'Zap',
-    facultyName: 'Eng. Marcus Lin, PE, IEEE',
-    assignedFacultyId: 'eng-marcus-lin',
+    facultyName: 'Dr. Vikram Malhotra (AI Electrical Expert)',
+    assignedFacultyId: 'eng-vikram-malhotra',
     answerPoints: [
       'Magnetizing Inrush Phenomenon: High residual core flux causes core saturation upon energization, generating unipolar inrush currents up to 8-12x Full Load Amps (FLA) on the primary side without secondary current.',
       '2nd Harmonic Restraint Protocol (IEEE C37.91): Magnetizing inrush current contains high 2nd harmonic content (typically > 15-20% of fundamental). Differential relay must be set to 15% 2nd harmonic blocking.',
@@ -58,8 +58,8 @@ export const popularQuestions = [
     excerpt: 'For an industrial warehouse classified under Extra Hazard Group 1, what is the design density, remote area calculation, and required fire pump flow & head?',
     image: '/images/fire_sprinkler_pumps.jpg',
     fallbackIcon: 'Flame',
-    facultyName: 'Eng. Sarah Chen, FPE, NFPA',
-    assignedFacultyId: 'eng-sarah-chen',
+    facultyName: 'Er. Ananya Verma (AI Fire Safety Expert)',
+    assignedFacultyId: 'eng-ananya-verma',
     answerPoints: [
       'NFPA 13 Classification & Density: Extra Hazard Group 1 requires a minimum design density of 0.30 GPM/sq.ft over a hydraulically most demanding remote area of 2,500 sq.ft.',
       'Primary Water Demand Calculation: Q_sprinkler = Density * Area = 0.30 * 2500 = 750 GPM + 500 GPM hose stream allowance (NFPA 13 Table 19.3.3.1.2) = Total 1,250 GPM.',

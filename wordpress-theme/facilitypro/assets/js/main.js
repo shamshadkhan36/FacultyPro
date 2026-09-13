@@ -94,16 +94,27 @@ function switchAuthTab(mode) {
     if (window.lucide) lucide.createIcons();
 }
 
-// User Dashboard Tab Switcher
+// User Dashboard Tab Switcher (Sidebar & Mobile Tabs)
 function switchDashboardTab(tabId) {
+    // 1. Update Desktop Sidebar Buttons
     document.querySelectorAll('.dash-tab-btn').forEach(btn => {
         if (btn.dataset.dashtab === tabId) {
-            btn.className = 'dash-tab-btn active px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all bg-slate-900 text-white shadow-sm cursor-pointer';
+            btn.className = 'dash-tab-btn active w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-md border border-slate-900 cursor-pointer group';
         } else {
-            btn.className = 'dash-tab-btn px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer';
+            btn.className = 'dash-tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 cursor-pointer group';
         }
     });
 
+    // 2. Update Mobile Tabs
+    document.querySelectorAll('.dash-mobile-tab').forEach(btn => {
+        if (btn.dataset.dashtab === tabId) {
+            btn.className = 'dash-mobile-tab active px-3.5 py-2 rounded-xl font-bold text-xs whitespace-nowrap transition-all bg-slate-900 text-white shadow-sm cursor-pointer flex items-center gap-1.5';
+        } else {
+            btn.className = 'dash-mobile-tab px-3.5 py-2 rounded-xl font-semibold text-xs whitespace-nowrap transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer flex items-center gap-1.5';
+        }
+    });
+
+    // 3. Show Target Panel
     document.querySelectorAll('.dash-panel').forEach(panel => {
         panel.classList.add('hidden');
     });
@@ -111,6 +122,15 @@ function switchDashboardTab(tabId) {
     const active = document.getElementById('dashtab-' + tabId);
     if (active) active.classList.remove('hidden');
     if (window.lucide) lucide.createIcons();
+
+    // 4. Update URL Hash
+    try {
+        if (history.pushState) {
+            history.pushState(null, null, '#' + tabId);
+        } else {
+            location.hash = '#' + tabId;
+        }
+    } catch(e){}
 }
 
 // AJAX Login Handler

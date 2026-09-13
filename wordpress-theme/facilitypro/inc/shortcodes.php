@@ -1671,93 +1671,126 @@ add_shortcode('facilitypro_hero', 'facilitypro_hero_shortcode');
 
 
 
-// 8. Category Grid Shortcode (Exact 6 User Disciplines with Big Icons) [facilitypro_category_pills] and [facilitypro_category_grid]
+// 8. Category Grid Shortcode (9 Disciplines, 4 in a row mobile & desktop) [facilitypro_category_pills] and [facilitypro_category_grid]
 function facilitypro_category_grid_shortcode($atts) {
     ob_start();
     ?>
-    <!-- MEP ENGINEERING DISCIPLINES 6-CARD GRID -->
-    <section id="disciplines" class="py-12 sm:py-16 bg-slate-50/70 border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- MEP ENGINEERING DISCIPLINES 4-IN-A-ROW GRID -->
+    <section id="disciplines" class="py-8 sm:py-14 bg-slate-50/70 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
             
-            <div class="text-center max-w-3xl mx-auto mb-10">
-                <span class="text-xs font-bold uppercase tracking-widest text-[#0077c8] bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
+            <div class="text-center max-w-3xl mx-auto mb-6 sm:mb-10">
+                <span class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#0077c8] bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
                     Plant Engineering Categories
                 </span>
-                <h2 class="text-2xl sm:text-4xl font-extrabold text-[#0b2545] tracking-tight mt-2.5">
+                <h2 class="text-xl sm:text-3xl lg:text-4xl font-extrabold text-[#0b2545] tracking-tight mt-2">
                     Select Your Service Category
                 </h2>
-                <p class="text-slate-600 text-xs sm:text-sm mt-2">
+                <p class="text-slate-600 text-[11px] sm:text-xs md:text-sm mt-1.5">
                     Click any discipline below to view verified formulas, AI root-cause derivations, and engineering calculations.
                 </p>
             </div>
 
-            <!-- 6-Card Grid with Large Isometric-Style Icons -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-5" id="category-cards-grid">
+            <!-- 4-in-a-row Grid on BOTH Mobile & Desktop -->
+            <div class="grid grid-cols-4 gap-2 sm:gap-4 lg:gap-5" id="category-cards-grid">
                 
                 <!-- 1. HVAC -->
-                <div onclick="facilityProFilterCategory('hvac')" data-category="hvac" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
-                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="wind" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
+                <div onclick="facilityProFilterCategory('hvac')" data-category="hvac" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                        <i data-lucide="wind" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         HVAC
                     </h3>
-                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">Chillers &amp; AHUs</span>
+                    <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Chillers &amp; AHUs</span>
                 </div>
 
                 <!-- 2. Electrical -->
-                <div onclick="facilityProFilterCategory('electrical')" data-category="electrical" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
-                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="zap" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
+                <div onclick="facilityProFilterCategory('electrical')" data-category="electrical" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                        <i data-lucide="zap" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Electrical
                     </h3>
-                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">Power &amp; Substations</span>
+                    <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Substations &amp; LT</span>
                 </div>
 
                 <!-- 3. Fire Fighting -->
-                <div onclick="facilityProFilterCategory('firefighting')" data-category="firefighting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
-                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="flame" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
+                <div onclick="facilityProFilterCategory('firefighting')" data-category="firefighting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                        <i data-lucide="flame" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Fire fighting
                     </h3>
-                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">NFPA 13 &amp; Pumps</span>
+                    <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">NFPA 13 &amp; Pumps</span>
                 </div>
 
                 <!-- 4. Plumbing -->
-                <div onclick="facilityProFilterCategory('plumbing')" data-category="plumbing" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
-                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="droplets" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
+                <div onclick="facilityProFilterCategory('plumbing')" data-category="plumbing" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                        <i data-lucide="droplets" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Plumbing
                     </h3>
-                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">Pumps &amp; Drainage</span>
+                    <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Pumps &amp; Risers</span>
                 </div>
 
                 <!-- 5. Painting & Polishing -->
-                <div onclick="facilityProFilterCategory('painting')" data-category="painting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
-                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="paint-roller" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
+                <div onclick="facilityProFilterCategory('painting')" data-category="painting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                        <i data-lucide="paint-roller" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Painting &amp; polishing
                     </h3>
-                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">Epoxy &amp; PU Coating</span>
+                    <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Epoxy &amp; PU Coating</span>
                 </div>
 
                 <!-- 6. Solar System -->
-                <div onclick="facilityProFilterCategory('solar')" data-category="solar" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
-                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="sun" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
+                <div onclick="facilityProFilterCategory('solar')" data-category="solar" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                        <i data-lucide="sun" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Solar system
                     </h3>
-                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">Rooftop PV &amp; On-Grid</span>
+                    <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Rooftop PV &amp; On-Grid</span>
+                </div>
+
+                <!-- 7. BMS & Automation -->
+                <div onclick="facilityProFilterCategory('bms')" data-category="bms" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                        <i data-lucide="sliders" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
+                    </div>
+                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                        BMS &amp; Automation
+                    </h3>
+                    <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">DDC &amp; SCADA</span>
+                </div>
+
+                <!-- 8. STP & Water Treatment -->
+                <div onclick="facilityProFilterCategory('stp')" data-category="stp" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                        <i data-lucide="filter" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
+                    </div>
+                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                        STP &amp; water treatment
+                    </h3>
+                    <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">MBBR, MBR &amp; RO</span>
+                </div>
+
+                <!-- 9. DG Set -->
+                <div onclick="facilityProFilterCategory('dg')" data-category="dg" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                        <i data-lucide="battery-charging" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
+                    </div>
+                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                        DG set
+                    </h3>
+                    <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Sync &amp; AMF Panels</span>
                 </div>
 
             </div>

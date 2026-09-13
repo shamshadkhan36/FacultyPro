@@ -280,21 +280,21 @@ function facilityProFilterCategory(categorySlug) {
                 card.classList.remove('active', 'border-[#0077c8]', 'ring-2', 'ring-[#0077c8]/30', 'bg-blue-50/40');
                 card.classList.add('border-slate-200/90');
                 if (iconBox) {
-                    iconBox.className = 'category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white';
+                    iconBox.className = 'category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white';
                 }
                 categorySlug = 'all';
             } else {
                 card.classList.add('active', 'border-[#0077c8]', 'ring-2', 'ring-[#0077c8]/30', 'bg-blue-50/40');
                 card.classList.remove('border-slate-200/90');
                 if (iconBox) {
-                    iconBox.className = 'category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#0077c8] text-white border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-sm';
+                    iconBox.className = 'category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-[#0077c8] text-white border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-sm';
                 }
             }
         } else {
             card.classList.remove('active', 'border-[#0077c8]', 'ring-2', 'ring-[#0077c8]/30', 'bg-blue-50/40');
             card.classList.add('border-slate-200/90');
             if (iconBox) {
-                iconBox.className = 'category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white';
+                iconBox.className = 'category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white';
             }
         }
     });

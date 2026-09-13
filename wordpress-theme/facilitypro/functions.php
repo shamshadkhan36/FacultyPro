@@ -111,6 +111,39 @@ function facilitypro_enqueue_scripts() {
 }
 add_action('wp_enqueue_scripts', 'facilitypro_enqueue_scripts');
 
+
+// 3. Enqueue Block Editor Assets (Gutenberg styling support)
+function facilitypro_block_editor_assets() {
+    wp_enqueue_style(
+        'facilitypro-fonts',
+        'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap',
+        array(),
+        null
+    );
+    wp_enqueue_script(
+        'tailwindcss-cdn',
+        'https://cdn.tailwindcss.com',
+        array(),
+        null,
+        false
+    );
+    wp_enqueue_script(
+        'lucide-icons',
+        'https://unpkg.com/lucide@latest',
+        array(),
+        null,
+        true
+    );
+    wp_enqueue_style(
+        'facilitypro-custom-css',
+        FACILITYPRO_URI . '/assets/css/facilitypro.css',
+        array(),
+        FACILITYPRO_VERSION
+    );
+}
+add_action('enqueue_block_editor_assets', 'facilitypro_block_editor_assets');
+add_theme_support('editor-styles');
+
 // Include Custom Post Types, AJAX Handlers, Admin Settings, and Component Shortcodes
 require_once FACILITYPRO_DIR . '/inc/custom-post-types.php';
 require_once FACILITYPRO_DIR . '/inc/ajax-handlers.php';

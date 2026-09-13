@@ -19,6 +19,8 @@ function facilitypro_setup() {
     load_theme_textdomain('facilitypro', FACILITYPRO_DIR . '/languages');
     add_theme_support('title-tag');
     add_theme_support('post-thumbnails');
+    add_theme_support('align-wide');
+    add_theme_support('responsive-embeds');
     add_theme_support('custom-logo', array(
         'height'      => 60,
         'width'       => 200,
@@ -109,7 +111,8 @@ function facilitypro_enqueue_scripts() {
 }
 add_action('wp_enqueue_scripts', 'facilitypro_enqueue_scripts');
 
-// Include Custom Post Types, AJAX Handlers, and Admin Settings
+// Include Custom Post Types, AJAX Handlers, Admin Settings, and Component Shortcodes
 require_once FACILITYPRO_DIR . '/inc/custom-post-types.php';
 require_once FACILITYPRO_DIR . '/inc/ajax-handlers.php';
 require_once FACILITYPRO_DIR . '/inc/admin-settings.php';
+require_once FACILITYPRO_DIR . '/inc/shortcodes.php';

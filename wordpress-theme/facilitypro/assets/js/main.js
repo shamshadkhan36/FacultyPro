@@ -271,18 +271,30 @@ function facilityProToggleMobileMenu() {
 }
 
 function facilityProFilterCategory(categorySlug) {
-    // 1. Update Category Cards Active State
+    // 1. Toggle or Select Category Card
     document.querySelectorAll('.category-card').forEach(card => {
         const iconBox = card.querySelector('.category-icon-box');
         if (card.dataset.category === categorySlug) {
-            card.className = 'category-card active group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-[#0077c8] ring-2 ring-[#0077c8]/30 bg-blue-50/40 p-5 sm:p-6 flex flex-col items-center justify-center text-center cursor-pointer shadow-md transition-all duration-300 transform -translate-y-1';
-            if (iconBox) {
-                iconBox.className = 'category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#0077c8] text-white border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3.5 shadow-sm';
+            // Check if already active -> if so, reset to all
+            if (card.classList.contains('active') && categorySlug !== 'all') {
+                card.classList.remove('active', 'border-[#0077c8]', 'ring-2', 'ring-[#0077c8]/30', 'bg-blue-50/40');
+                card.classList.add('border-slate-200/90');
+                if (iconBox) {
+                    iconBox.className = 'category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white';
+                }
+                categorySlug = 'all';
+            } else {
+                card.classList.add('active', 'border-[#0077c8]', 'ring-2', 'ring-[#0077c8]/30', 'bg-blue-50/40');
+                card.classList.remove('border-slate-200/90');
+                if (iconBox) {
+                    iconBox.className = 'category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#0077c8] text-white border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-sm';
+                }
             }
         } else {
-            card.className = 'category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 sm:p-6 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5';
+            card.classList.remove('active', 'border-[#0077c8]', 'ring-2', 'ring-[#0077c8]/30', 'bg-blue-50/40');
+            card.classList.add('border-slate-200/90');
             if (iconBox) {
-                iconBox.className = 'category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3.5 shadow-sm group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white';
+                iconBox.className = 'category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white';
             }
         }
     });

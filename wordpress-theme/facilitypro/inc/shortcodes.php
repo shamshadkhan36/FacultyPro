@@ -1671,115 +1671,93 @@ add_shortcode('facilitypro_hero', 'facilitypro_hero_shortcode');
 
 
 
-// 8. Category Grid Shortcode with Big Symbols [facilitypro_category_pills] and [facilitypro_category_grid]
+// 8. Category Grid Shortcode (Exact 6 User Disciplines with Big Icons) [facilitypro_category_pills] and [facilitypro_category_grid]
 function facilitypro_category_grid_shortcode($atts) {
     ob_start();
     ?>
-    <!-- MEP ENGINEERING DISCIPLINES GRID (BIG SYMBOLS) -->
+    <!-- MEP ENGINEERING DISCIPLINES 6-CARD GRID -->
     <section id="disciplines" class="py-12 sm:py-16 bg-slate-50/70 border-b border-slate-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             <div class="text-center max-w-3xl mx-auto mb-10">
                 <span class="text-xs font-bold uppercase tracking-widest text-[#0077c8] bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
-                    Engineering Disciplines
+                    Plant Engineering Categories
                 </span>
                 <h2 class="text-2xl sm:text-4xl font-extrabold text-[#0b2545] tracking-tight mt-2.5">
-                    Select Your Plant System
+                    Select Your Service Category
                 </h2>
                 <p class="text-slate-600 text-xs sm:text-sm mt-2">
-                    Click any discipline below to filter verified AI diagnostic questions, sizing calculations, and consultant case studies.
+                    Click any discipline below to view verified formulas, AI root-cause derivations, and engineering calculations.
                 </p>
             </div>
 
-            <!-- 8-Card Grid with Large Symbols -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3.5 sm:gap-6" id="category-cards-grid">
+            <!-- 6-Card Grid with Large Isometric-Style Icons -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-5" id="category-cards-grid">
                 
-                <!-- 1. All MEP Systems -->
-                <div onclick="facilityProFilterCategory('all')" data-category="all" class="category-card active group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-[#0077c8] ring-2 ring-[#0077c8]/30 bg-blue-50/40 p-5 sm:p-6 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
-                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#0077c8] text-white border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3.5 shadow-sm group-hover:scale-105">
-                        <i data-lucide="layers" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
-                    </div>
-                    <h3 class="text-xs sm:text-sm md:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
-                        All Plant Systems
-                    </h3>
-                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">15,000+ Cases</span>
-                </div>
-
-                <!-- 2. HVAC & Chilled Water -->
-                <div onclick="facilityProFilterCategory('hvac')" data-category="hvac" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 sm:p-6 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
-                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3.5 shadow-sm group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                <!-- 1. HVAC -->
+                <div onclick="facilityProFilterCategory('hvac')" data-category="hvac" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
+                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="wind" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-xs sm:text-sm md:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
-                        HVAC &amp; Chilled Water
+                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                        HVAC
                     </h3>
-                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">4,820+ Cases</span>
+                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">Chillers &amp; AHUs</span>
                 </div>
 
-                <!-- 3. Plumbing & Piping -->
-                <div onclick="facilityProFilterCategory('plumbing')" data-category="plumbing" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 sm:p-6 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
-                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3.5 shadow-sm group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="droplets" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
-                    </div>
-                    <h3 class="text-xs sm:text-sm md:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
-                        Plumbing &amp; Piping
-                    </h3>
-                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">3,790+ Cases</span>
-                </div>
-
-                <!-- 4. Electrical & Substations -->
-                <div onclick="facilityProFilterCategory('electrical')" data-category="electrical" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 sm:p-6 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
-                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3.5 shadow-sm group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                <!-- 2. Electrical -->
+                <div onclick="facilityProFilterCategory('electrical')" data-category="electrical" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
+                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="zap" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-xs sm:text-sm md:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
-                        Electrical &amp; Power
+                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                        Electrical
                     </h3>
-                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">4,150+ Cases</span>
+                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">Power &amp; Substations</span>
                 </div>
 
-                <!-- 5. Fire Fighting & Life Safety -->
-                <div onclick="facilityProFilterCategory('firefighting')" data-category="firefighting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 sm:p-6 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
-                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3.5 shadow-sm group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                <!-- 3. Fire Fighting -->
+                <div onclick="facilityProFilterCategory('firefighting')" data-category="firefighting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
+                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="flame" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-xs sm:text-sm md:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
-                        Fire Fighting &amp; Safety
+                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                        Fire fighting
                     </h3>
-                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">2,640+ Cases</span>
+                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">NFPA 13 &amp; Pumps</span>
                 </div>
 
-                <!-- 6. BMS & Plant Automation -->
-                <div onclick="facilityProFilterCategory('bms')" data-category="bms" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 sm:p-6 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
-                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3.5 shadow-sm group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="sliders" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
+                <!-- 4. Plumbing -->
+                <div onclick="facilityProFilterCategory('plumbing')" data-category="plumbing" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
+                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                        <i data-lucide="droplets" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-xs sm:text-sm md:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
-                        BMS &amp; Automation
+                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                        Plumbing
                     </h3>
-                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">1,980+ Cases</span>
+                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">Pumps &amp; Drainage</span>
                 </div>
 
-                <!-- 7. STP & Water Treatment -->
-                <div onclick="facilityProFilterCategory('stp')" data-category="stp" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 sm:p-6 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
-                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3.5 shadow-sm group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="filter" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
+                <!-- 5. Painting & Polishing -->
+                <div onclick="facilityProFilterCategory('painting')" data-category="painting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
+                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                        <i data-lucide="paint-roller" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-xs sm:text-sm md:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
-                        STP &amp; Water Treatment
+                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                        Painting &amp; polishing
                     </h3>
-                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">1,450+ Cases</span>
+                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">Epoxy &amp; PU Coating</span>
                 </div>
 
-                <!-- 8. DG Sets & Standby Power -->
-                <div onclick="facilityProFilterCategory('dg')" data-category="dg" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 sm:p-6 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
-                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3.5 shadow-sm group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="battery-charging" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
+                <!-- 6. Solar System -->
+                <div onclick="facilityProFilterCategory('solar')" data-category="solar" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5">
+                    <div class="category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
+                        <i data-lucide="sun" class="w-8 h-8 sm:w-11 sm:h-11 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-xs sm:text-sm md:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
-                        DG Sets &amp; Backup
+                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                        Solar system
                     </h3>
-                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">1,280+ Cases</span>
+                    <span class="text-[10px] sm:text-xs font-semibold text-slate-500 mt-1">Rooftop PV &amp; On-Grid</span>
                 </div>
 
             </div>
@@ -1790,7 +1768,6 @@ function facilitypro_category_grid_shortcode($atts) {
 }
 add_shortcode('facilitypro_category_grid', 'facilitypro_category_grid_shortcode');
 add_shortcode('facilitypro_category_pills', 'facilitypro_category_grid_shortcode');
-
 
 // 9. Popular Questions Shortcode [facilitypro_popular_questions]
 function facilitypro_popular_questions_shortcode($atts) {

@@ -271,14 +271,23 @@ function facilityProToggleMobileMenu() {
 }
 
 function facilityProFilterCategory(categorySlug) {
-    document.querySelectorAll('.category-pill-btn').forEach(btn => {
-        if (btn.dataset.category === categorySlug) {
-            btn.className = 'category-pill-btn active px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900 text-white transition-all shadow-md';
+    // 1. Update Category Cards Active State
+    document.querySelectorAll('.category-card').forEach(card => {
+        const iconBox = card.querySelector('.category-icon-box');
+        if (card.dataset.category === categorySlug) {
+            card.className = 'category-card active group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-[#0077c8] ring-2 ring-[#0077c8]/30 bg-blue-50/40 p-5 sm:p-6 flex flex-col items-center justify-center text-center cursor-pointer shadow-md transition-all duration-300 transform -translate-y-1';
+            if (iconBox) {
+                iconBox.className = 'category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#0077c8] text-white border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3.5 shadow-sm';
+            }
         } else {
-            btn.className = 'category-pill-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all';
+            card.className = 'category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-5 sm:p-6 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5';
+            if (iconBox) {
+                iconBox.className = 'category-icon-box w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-3.5 shadow-sm group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white';
+            }
         }
     });
 
+    // 2. Filter Questions
     const cards = document.querySelectorAll('.question-card');
     cards.forEach(card => {
         if (categorySlug === 'all' || card.dataset.category === categorySlug) {
@@ -287,6 +296,10 @@ function facilityProFilterCategory(categorySlug) {
             card.style.display = 'none';
         }
     });
+
+    if (window.lucide) {
+        lucide.createIcons();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

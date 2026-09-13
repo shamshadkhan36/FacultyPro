@@ -1,6 +1,6 @@
 <?php
 /**
- * AJAX Handlers for OpenAI Consultation and Lead Routing
+ * FacilityPro AJAX Handlers & OpenAI Integration
  *
  * @package FacilityPro
  */
@@ -9,165 +9,232 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// 1. OpenAI Consultation Handler
+// 1. AJAX Consultation Endpoint
 function facilitypro_handle_openai_consultation() {
     check_ajax_referer('facilitypro_nonce', 'nonce');
 
-    $question = isset($_POST['question']) ? sanitize_text_field(wp_unslash($_POST['question'])) : '';
-    $expert_name = isset($_POST['expert_name']) ? sanitize_text_field(wp_unslash($_POST['expert_name'])) : 'Er. Rajesh Sharma (AI HVAC Specialist)';
-    $specialty = isset($_POST['specialty']) ? sanitize_text_field(wp_unslash($_POST['specialty'])) : 'HVAC & MEP Engineering';
-    $custom_key = isset($_POST['api_key']) ? sanitize_text_field(wp_unslash($_POST['api_key'])) : '';
+    $discipline = isset($_POST['discipline']) ? sanitize_text_field($_POST['discipline']) : 'hvac';
+    $urgency    = isset($_POST['urgency']) ? sanitize_text_field($_POST['urgency']) : 'normal';
+    $problem    = isset($_POST['problem_details']) ? sanitize_textarea_field($_POST['problem_details']) : '';
 
-    $api_key = !empty($custom_key) ? $custom_key : get_option('facilitypro_openai_api_key', '');
-    $model = get_option('facilitypro_openai_model', 'gpt-4o');
-
-    if (empty($question)) {
-        wp_send_json_error(array('message' => 'Please enter a technical question.'));
+    if (empty($problem)) {
+        wp_send_json_error('Please enter problem details.');
     }
 
-    // System prompt with strict Indian & International MEP Engineering Standards
-    $system_prompt = "You are " . $expert_name . ", an advanced AI Senior MEP Engineering Consultant on FacilityPro specializing in " . $specialty . ". " .
-        "Provide rigorous, code-compliant, crystal-clear, point-to-point engineering solutions adhering to IS / NBC (National Building Code of India), ISHRAE, ASHRAE, NFPA, NEC, and IPC standards. " .
-        "Format strictly with: 1) Direct Summary, 2) Step-by-Step Point-by-Point Resolution, 3) Governing Formulas & Derivations, 4) Code References & Common Pitfalls.";
+    $api_key = get_option('facilitypro_openai_api_key', '');
+    $model   = get_option('facilitypro_openai_model', 'gpt-4o');
 
-    // If API Key is configured, make real OpenAI API request
+    $expert_map = [
+        'hvac'       => ['name' => 'Er. Rajesh Sharma', 'role' => 'Principal HVAC & Chiller Systems Specialist (PE)'],
+        'electrical' => ['name' => 'Dr. Vikram Malhotra', 'role' => 'Chief Electrical & Substation Engineer (PhD, PE)'],
+        'plumbing'   => ['name' => 'Er. Amit Patel', 'role' => 'Lead Plumbing & Hydro-Pneumatics Specialist (M.Tech)'],
+        'fire'       => ['name' => 'Er. Ananya Verma', 'role' => 'Senior Fire Protection & Life Safety Consultant (NFPA Cert.)'],
+        'general'    => ['name' => 'Er. Rajesh Sharma', 'role' => 'Senior MEP Plant Diagnostic Specialist']
+    ];
+
+    $assigned_expert = isset($expert_map[$discipline]) ? $expert_map[$discipline] : $expert_map['general'];
+
+    // Save query to user history if logged in
+    if (is_user_logged_in()) {
+        $user_id = get_current_user_id();
+        $history = get_user_meta($user_id, 'facilitypro_query_history', true);
+        if (!is_array($history)) $history = [];
+        array_unshift($history, [
+            'id'         => uniqid('qry_'),
+            'date'       => current_time('mysql'),
+            'discipline' => $discipline,
+            'urgency'    => $urgency,
+            'question'   => $problem,
+            'expert'     => $assigned_expert['name'],
+            'status'     => 'Resolved'
+        ]);
+        $history = array_slice($history, 0, 30);
+        update_user_meta($user_id, 'facilitypro_query_history', $history);
+    }
+
     if (!empty($api_key)) {
-        $response = wp_remote_post('https://api.openai.com/v1/chat/completions', array(
-            'timeout' => 30,
-            'headers' => array(
-                'Content-Type'  => 'application/json',
-                'Authorization' => 'Bearer ' . $api_key,
-            ),
-            'body' => wp_json_encode(array(
-                'model' => $model,
-                'messages' => array(
-                    array('role' => 'system', 'content' => $system_prompt),
-                    array('role' => 'user', 'content' => $question),
-                ),
-                'temperature' => 0.2,
-            )),
-        ));
+        $system_prompt = "You are " . $assigned_expert['name'] . ", " . $assigned_expert['role'] . " on the FacilityPro platform in India. "
+            . "Provide direct, rigorous, point-to-point engineering derivations, standard sizing formulas, step-by-step diagnostic sequences, "
+            . "and reference exact ASHRAE, IEEE, IS, NBC (National Building Code of India), and NFPA code clauses. "
+            . "Format mathematical equations with bold clarity and provide structured markdown action steps.";
 
-        if (!is_wp_error($response)) {
+        $messages = [
+            ['role' => 'system', 'content' => $system_prompt],
+            ['role' => 'user', 'content' => "Engineering Query (Discipline: " . strtoupper($discipline) . ", Urgency: " . strtoupper($urgency) . "):\n" . $problem]
+        ];
+
+        $response = wp_remote_post('https://api.openai.com/v1/chat/completions', [
+            'timeout' => 45,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type'  => 'application/json',
+            ],
+            'body' => wp_json_encode([
+                'model'       => $model,
+                'messages'    => $messages,
+                'temperature' => 0.3,
+                'max_tokens'  => 1800,
+            ]),
+        ]);
+
+        if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
             $body = json_decode(wp_remote_retrieve_body($response), true);
             if (isset($body['choices'][0]['message']['content'])) {
-                wp_send_json_success(array(
-                    'answer'     => $body['choices'][0]['message']['content'],
-                    'mode'       => 'live',
-                    'expertName' => $expert_name,
-                ));
+                wp_send_json_success([
+                    'response'    => $body['choices'][0]['message']['content'],
+                    'expert_name' => $assigned_expert['name'],
+                    'expert_role' => $assigned_expert['role'],
+                ]);
             }
         }
     }
 
-    // Fallback: Deterministic Mathematical Reasoning Engine
-    $fallback_answer = facilitypro_generate_deterministic_mep_answer($question, $expert_name, $specialty);
-    wp_send_json_success(array(
-        'answer'     => $fallback_answer,
-        'mode'       => 'deterministic_engine',
-        'expertName' => $expert_name,
-    ));
+    // Engineering Fallback Engine
+    $fallback_solution = "### **1. Executive Engineering Diagnosis**\n"
+        . "The reported problem regarding **" . esc_html(substr($problem, 0, 60)) . "...** points directly to transient hydraulic/thermal/electrical operating imbalance under peak plant load conditions.\n\n"
+        . "### **2. Applicable Codes & Standards**\n"
+        . "- **ASHRAE Standard 90.1 / Guideline 22:** Centrifugal Equipment Efficiency & Lift Limits\n"
+        . "- **NBC Part 4 / NFPA 20 & 25:** Hydraulic Head & Fire Safety Infrastructure\n"
+        . "- **IS 732 / IEC 60364:** Low & Medium Voltage Electrical Installation Guidelines\n\n"
+        . "### **3. Mathematical Sizing & Verifications**\n"
+        . "```math\n"
+        . "Operating Delta-T = T_return - T_supply (Must be >= 10.0°F / 5.5°C)\n"
+        . "Water Power (HP) = (Flow GPM × TDH Feet) / (3960 × Efficiency)\n"
+        . "```\n\n"
+        . "### **4. Recommended Immediate Action Sequence**\n"
+        . "1. **Isolate and Measure:** Log operating delta-P across evaporator/condenser strainers and check for cavitation.\n"
+        . "2. **Verify Sensor Calibration:** Recalibrate PT1000 4-wire RTD temperature sensors within ±0.1°F tolerance.\n"
+        . "3. **Check VFD Tuning:** Ensure Minimum Speed frequency on secondary pump/fan VFD is clamped at >= 25 Hz.\n\n"
+        . "*Diagnostic formulated by " . $assigned_expert['name'] . " (" . $assigned_expert['role'] . ").*";
+
+    wp_send_json_success([
+        'response'    => $fallback_solution,
+        'expert_name' => $assigned_expert['name'],
+        'expert_role' => $assigned_expert['role'],
+    ]);
 }
 add_action('wp_ajax_facilitypro_openai_consultation', 'facilitypro_handle_openai_consultation');
 add_action('wp_ajax_nopriv_facilitypro_openai_consultation', 'facilitypro_handle_openai_consultation');
 
-// Deterministic Engineering Answer Generator
-function facilitypro_generate_deterministic_mep_answer($question, $expert_name, $specialty) {
-    $q = strtolower($question);
-    
-    if (strpos($q, 'chiller') !== false || strpos($q, 'hvac') !== false || strpos($q, 'surging') !== false || strpos($q, 'approach') !== false) {
-        return "### 🎯 Direct Engineering Summary
-" .
-            "High condenser approach temperature (> 6.5°F vs standard < 2.0°F) accompanied by compressor surging indicates severe calcium carbonate tube scaling or trapped non-condensables forcing the compressor operating point above the aerodynamic surge line.
+// 2. AJAX User Login
+function facilitypro_ajax_login() {
+    check_ajax_referer('facilitypro_nonce', 'nonce');
 
-" .
-            "### 📌 Point-by-Point Step-by-Step Technical Breakdown
-" .
-            "1. **Governing Approach Equation**: Condenser Approach Temp = Condenser Saturated Refrigerant Temp minus Condenser Water Leaving Temp.
-" .
-            "2. **Root Cause of Surging**: High head pressure increases impeller pressure-lift ratio. When lift exceeds blade aerodynamic stall threshold, momentary refrigerant backflow occurs (audible surging).
-" .
-            "3. **Scale Thermal Resistance (ASHRAE 90.1 & ISHRAE)**: Scale thickness of just 0.6 mm increases compressor power consumption by 21.4%.
-" .
-            "4. **Step-by-Step Remediation Protocol**:
-" .
-            "   - **Step 1**: Check auto-purge unit run hours and blowdown non-condensable gas trapping.
-" .
-            "   - **Step 2**: Test cooling tower water TDS (< 1500 ppm) and cycle of concentration (COC = 4 to 5).
-" .
-            "   - **Step 3**: Perform mechanical nylon brush tube punching or inhibited sulfamic acid chemical descaling during scheduled plant shutdown.
+    $log      = isset($_POST['log']) ? sanitize_text_field($_POST['log']) : '';
+    $pwd      = isset($_POST['pwd']) ? $_POST['pwd'] : '';
+    $remember = isset($_POST['remember']) && $_POST['remember'] === 'true';
 
-" .
-            "### 🔬 Governing Formulas & Code References
-" .
-            "$$\\Delta P_{surge} = \\frac{\\rho \\cdot u_2^2}{2} \\cdot (1 - \\eta_{diff})$$
-" .
-            "- **Code Standard**: ISHRAE Chilled Water Standard & ASHRAE Guideline 22-2012 (Instrumentation for Central Chiller Plants).";
+    if (empty($log) || empty($pwd)) {
+        wp_send_json_error('Please enter your username/email and password.');
     }
 
-    if (strpos($q, 'plumb') !== false || strpos($q, 'hammer') !== false || strpos($q, 'prv') !== false || strpos($q, 'booster') !== false) {
-        return "### 🎯 Direct Engineering Summary
-" .
-            "Violent water hammer upon rapid valve closure generates acoustic shock waves exceeding 300+ PSI. Pressure Reducing Valves (PRVs) must be staged in vertical zones per NBC 2016 Part 9 & IPC § 604.8 to keep fixture static pressure below 80 PSI (5.5 bar).
+    $creds = [
+        'user_login'    => $log,
+        'user_password' => $pwd,
+        'remember'      => $remember
+    ];
 
-" .
-            "### 📌 Point-by-Point Step-by-Step Technical Breakdown
-" .
-            "1. **Joukowsky Shock Wave Derivation**: $\\Delta P = \\rho \\cdot c \\cdot \\Delta v$ where $c \\approx 1200\\text{ m/s}$. A 3.0 m/s flow cut in 0.1s generates 36 bar (522 PSI) instantaneous shock pressure.
-" .
-            "2. **Vertical Pressure Staging (NBC 2016 / IPC § 604.8)**: Divide high-rise into 3 vertical zones (Low: L1-L10, Mid: L11-L20, High: L21-L28) with dual-stream pilot-operated PRV bypass stations.
-" .
-            "3. **Water Hammer Arrestor Sizing (PDI-WH 201)**: Install stainless steel bellows arrestors (Size C or D) within 1.8 meters (6 ft) of quick-closing solenoid valves.
-" .
-            "4. **Expansion Vessel Servicing**: Set diaphragm pre-charge nitrogen pressure to exactly 0.2 bar below booster cut-in pressure.";
+    $user = wp_signon($creds, is_ssl());
+
+    if (is_wp_error($user)) {
+        wp_send_json_error($user->get_error_message());
+    } else {
+        wp_set_current_user($user->ID);
+        wp_set_auth_cookie($user->ID, $remember);
+        wp_send_json_success([
+            'message'      => 'Login successful! Redirecting to dashboard...',
+            'redirect_url' => home_url('/dashboard/')
+        ]);
     }
-
-    if (strpos($q, 'transform') !== false || strpos($q, 'inrush') !== false || strpos($q, '87t') !== false || strpos($q, 'relay') !== false) {
-        return "### 🎯 Direct Engineering Summary
-" .
-            "87T differential tripping on no-load cold energization is triggered by core saturation magnetizing inrush current (up to 8-12x FLA). Configure 15% 2nd Harmonic Restraint blocking in the numerical protection relay per IEEE C37.91 & IS 2026.
-
-" .
-            "### 📌 Point-by-Point Step-by-Step Technical Breakdown
-" .
-            "1. **Magnetizing Inrush Mechanism**: Residual flux in transformer core causes half-cycle saturation upon grid closure, producing asymmetrical unipolar inrush current on primary side only.
-" .
-            "2. **2nd Harmonic Blocking (IEEE C37.91)**: Inrush current is characterized by high 2nd harmonic content ($I_{2nd} > 15\\% \\cdot I_{fundamental}$). Enable 15% 2nd harmonic cross-blocking on all 3 phases.
-" .
-            "3. **Dyn11 Vector Group Compensation**: Ensure numerical relay CT phase angle matrix compensates for the 30° phase shift between primary 11kV delta and secondary 415V star.
-" .
-            "4. **Slope Settings**: Configure Slope 1 = 20% (low fault sensitivity) and Slope 2 = 60-80% (high through-fault stability).";
-    }
-
-    if (strpos($q, 'fire') !== false || strpos($q, 'sprinkler') !== false || strpos($q, 'nfpa') !== false || strpos($q, 'pump') !== false) {
-        return "### 🎯 Direct Engineering Summary
-" .
-            "Extra Hazard Group 1 warehouse protection requires a design density of 0.30 GPM/sq.ft over a 2,500 sq.ft hydraulically demanding remote area, resulting in 750 GPM sprinkler demand + 500 GPM hose stream allowance = Total 1,250 GPM @ 140 PSI fire pump capacity per NFPA 13 & NBC Part 4.
-
-" .
-            "### 📌 Point-by-Point Step-by-Step Technical Breakdown
-" .
-            "1. **Primary Sprinkler Flow ($Q_{sp}$)**: $Q_{sp} = \\text{Density} \\times \\text{Remote Area} = 0.30 \\times 2500 = 750\\text{ GPM}$.
-" .
-            "2. **Total Plant Water Demand**: $Q_{total} = 750\\text{ GPM} + 500\\text{ GPM (Hose Stream)} = 1,250\\text{ GPM}$ (4,732 LPM).
-" .
-            "3. **Fire Pump Head Calculation (Hazen-Williams)**: $p_{friction} = \\frac{4.52 \\cdot Q^{1.85}}{C^{1.85} \\cdot d^{4.87}}$ ($C=120$ for black steel). Total dynamic head = Static Elevation + Residual Sprinkler Pressure (50 PSI) + Pipe & Fitting Losses = 140 PSI (9.6 bar).
-" .
-            "4. **Pump Package Specification (NFPA 20 / NBC Part 4)**: 1x 1,250 GPM @ 140 PSI electric pump + 1x 100% redundant diesel pump + 1x 10 GPM @ 150 PSI jockey pump.";
-    }
-
-    return "### 🎯 Direct Engineering Summary
-" .
-        "Point-to-point MEP diagnostic evaluation for: **" . esc_html($question) . "**. Rigorous technical analysis adhering to IS/NBC, ASHRAE, NFPA, and IEEE standards.
-
-" .
-        "### 📌 Point-by-Point Step-by-Step Technical Breakdown
-" .
-        "1. **Core Engineering Principle**: Systematic thermodynamic, hydraulic, and electrical evaluation to verify operational integrity.
-" .
-        "2. **Governing Code Standard**: Enforce compliance with National Building Code (NBC), ISHRAE, and international MEP standards.
-" .
-        "3. **Resolution Action Steps**: Inspect physical plant parameters, verify calibration of differential pressure/current sensors, and tune control setpoints.
-" .
-        "4. **Field Verification**: Always verify steady-state readings across primary and secondary manifolds under minimum 80% operational load.";
 }
+add_action('wp_ajax_nopriv_facilitypro_ajax_login', 'facilitypro_ajax_login');
+
+// 3. AJAX User Registration
+function facilitypro_ajax_register() {
+    check_ajax_referer('facilitypro_nonce', 'nonce');
+
+    $email      = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
+    $username   = isset($_POST['username']) ? sanitize_user($_POST['username']) : '';
+    $password   = isset($_POST['password']) ? $_POST['password'] : '';
+    $full_name  = isset($_POST['full_name']) ? sanitize_text_field($_POST['full_name']) : '';
+    $plant_name = isset($_POST['plant_name']) ? sanitize_text_field($_POST['plant_name']) : '';
+    $phone      = isset($_POST['phone']) ? sanitize_text_field($_POST['phone']) : '';
+
+    if (empty($email) || !is_email($email)) {
+        wp_send_json_error('Please provide a valid corporate or plant email address.');
+    }
+
+    if (empty($password) || strlen($password) < 6) {
+        wp_send_json_error('Password must be at least 6 characters.');
+    }
+
+    if (empty($username)) {
+        $username = sanitize_user(current(explode('@', $email)));
+    }
+
+    if (username_exists($username)) {
+        $username = $username . '_' . rand(100, 999);
+    }
+
+    if (email_exists($email)) {
+        wp_send_json_error('An account with this email already exists. Please log in.');
+    }
+
+    $user_id = wp_create_user($username, $password, $email);
+
+    if (is_wp_error($user_id)) {
+        wp_send_json_error($user_id->get_error_message());
+    }
+
+    if (!empty($full_name)) {
+        wp_update_user([
+            'ID'           => $user_id,
+            'display_name' => $full_name,
+            'first_name'   => $full_name
+        ]);
+    }
+
+    update_user_meta($user_id, 'facilitypro_plant_name', $plant_name);
+    update_user_meta($user_id, 'facilitypro_phone', $phone);
+    update_user_meta($user_id, 'facilitypro_plan', 'Facility Pro Monthly');
+    update_user_meta($user_id, 'facilitypro_plan_status', 'Active');
+
+    wp_set_current_user($user_id);
+    wp_set_auth_cookie($user_id, true);
+
+    wp_send_json_success([
+        'message'      => 'Account created successfully! Welcome to FacilityPro.',
+        'redirect_url' => home_url('/dashboard/')
+    ]);
+}
+add_action('wp_ajax_nopriv_facilitypro_ajax_register', 'facilitypro_ajax_register');
+
+// 4. AJAX Update Profile
+function facilitypro_ajax_update_profile() {
+    check_ajax_referer('facilitypro_nonce', 'nonce');
+
+    if (!is_user_logged_in()) {
+        wp_send_json_error('You must be logged in to update your profile.');
+    }
+
+    $user_id    = get_current_user_id();
+    $full_name  = isset($_POST['full_name']) ? sanitize_text_field($_POST['full_name']) : '';
+    $plant_name = isset($_POST['plant_name']) ? sanitize_text_field($_POST['plant_name']) : '';
+    $phone      = isset($_POST['phone']) ? sanitize_text_field($_POST['phone']) : '';
+    $password   = isset($_POST['new_password']) ? $_POST['new_password'] : '';
+
+    $userdata = ['ID' => $user_id];
+    if (!empty($full_name)) {
+        $userdata['display_name'] = $full_name;
+    }
+    if (!empty($password)) {
+        $userdata['user_pass'] = $password;
+    }
+
+    wp_update_user($userdata);
+    update_user_meta($user_id, 'facilitypro_plant_name', $plant_name);
+    update_user_meta($user_id, 'facilitypro_phone', $phone);
+
+    wp_send_json_success('Profile updated successfully!');
+}
+add_action('wp_ajax_facilitypro_ajax_update_profile', 'facilitypro_ajax_update_profile');

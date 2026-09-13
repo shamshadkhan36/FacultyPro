@@ -16,7 +16,7 @@
         <div class="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
             <span class="inline-flex items-center justify-center bg-[#f05423] text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">Live</span>
             <span class="font-medium text-slate-200 text-xs truncate">
-                🔥 <strong>15,000+ Verified Facility Managers Connected:</strong> Point-to-Point MEP AI Diagnostics with licensed Indian PEs & ASHRAE/NFPA code derivations.
+                🔥 <strong>15,000+ Verified Facility Managers Connected:</strong> Point-to-Point MEP AI Diagnostics with licensed Indian PEs &amp; ASHRAE/NFPA code derivations.
             </span>
         </div>
         <div class="hidden md:flex items-center gap-4 shrink-0 text-slate-300 text-xs">
@@ -85,14 +85,32 @@
                 </button>
             </nav>
 
-            <!-- Right Actions -->
+            <!-- Right Actions: Dynamic Logged In vs Logged Out State -->
             <div class="hidden md:flex items-center gap-3">
-                <button type="button" onclick="facilityProOpenAuthModal()" class="px-4 py-2 text-xs font-bold text-slate-700 hover:text-[#0077c8] border border-slate-300 hover:border-[#0077c8] rounded-xl transition-all cursor-pointer shadow-xs">
-                    Log in
-                </button>
-                <button type="button" onclick="facilityProOpenConsultationModal('I would like to start a point-to-point MEP diagnostic session.')" class="px-4 py-2 text-xs font-bold text-white bg-[#0077c8] hover:bg-[#0062a4] rounded-xl transition-all shadow-md shadow-blue-500/20 cursor-pointer">
-                    Start Consultation
-                </button>
+                <?php if (is_user_logged_in()) : 
+                    $curr_u = wp_get_current_user();
+                    $u_name = !empty($curr_u->display_name) ? $curr_u->display_name : $curr_u->user_login;
+                    $u_init = strtoupper(substr($u_name, 0, 2));
+                ?>
+                    <a href="<?php echo esc_url(home_url('/dashboard')); ?>" class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-slate-200 hover:border-[#0077c8] bg-slate-50 transition-all group">
+                        <div class="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center text-xs font-black group-hover:bg-[#0077c8] transition-colors">
+                            <?php echo esc_html($u_init); ?>
+                        </div>
+                        <span class="text-xs font-bold text-slate-800 group-hover:text-[#0077c8]">
+                            <?php echo esc_html(substr($u_name, 0, 15)); ?>
+                        </span>
+                    </a>
+                    <a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="px-3 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors" title="Log Out">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                    </a>
+                <?php else : ?>
+                    <button type="button" onclick="facilityProOpenAuthModal('login')" class="px-4 py-2 text-xs font-bold text-slate-700 hover:text-[#0077c8] border border-slate-300 hover:border-[#0077c8] rounded-xl transition-all cursor-pointer shadow-xs">
+                        Sign In
+                    </button>
+                    <button type="button" onclick="facilityProOpenAuthModal('signup')" class="px-4 py-2 text-xs font-bold text-white bg-[#0077c8] hover:bg-[#0062a4] rounded-xl transition-all shadow-md shadow-blue-500/20 cursor-pointer">
+                        Register
+                    </button>
+                <?php endif; ?>
             </div>
 
             <!-- Mobile Menu Toggle -->
@@ -102,44 +120,6 @@
                 </button>
             </div>
 
-        </div>
-    </div>
-
-    <!-- Mobile Drawer -->
-    <div id="facilitypro-mobile-menu" class="hidden lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-3 animate-in slide-in-from-top duration-200">
-        <div class="grid grid-cols-2 gap-2 pb-2">
-            <button onclick="facilityProOpenConsultationModal('HVAC Chiller diagnostic', 'Er. Rajesh Sharma', 'HVAC & Chilled Water')" class="p-2.5 text-xs font-bold rounded-xl bg-sky-50 text-sky-700 text-left flex items-center gap-2">
-                <i data-lucide="wind" class="w-4 h-4"></i> HVAC
-            </button>
-            <button onclick="facilityProOpenConsultationModal('Plumbing booster and water hammer calculation', 'Er. Amit Patel', 'Plumbing & Drainage')" class="p-2.5 text-xs font-bold rounded-xl bg-blue-50 text-blue-700 text-left flex items-center gap-2">
-                <i data-lucide="droplets" class="w-4 h-4"></i> Plumbing
-            </button>
-            <button onclick="facilityProOpenConsultationModal('Transformer 87T differential protection settings', 'Dr. Vikram Malhotra', 'Electrical & Power')" class="p-2.5 text-xs font-bold rounded-xl bg-amber-50 text-amber-700 text-left flex items-center gap-2">
-                <i data-lucide="zap" class="w-4 h-4"></i> Electrical
-            </button>
-            <button onclick="facilityProOpenConsultationModal('NFPA 13 sprinkler hydraulic flow calculation', 'Er. Ananya Verma', 'Fire & Life Safety')" class="p-2.5 text-xs font-bold rounded-xl bg-rose-50 text-rose-700 text-left flex items-center gap-2">
-                <i data-lucide="flame" class="w-4 h-4"></i> Fire Fighting
-            </button>
-        </div>
-
-        <div class="space-y-1 pt-1 border-t border-slate-100">
-            <a href="<?php echo esc_url(home_url('/')); ?>" class="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:bg-slate-100">Home</a>
-            <a href="<?php echo esc_url(home_url('/calculators')); ?>" class="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:bg-slate-100">6 MEP Calculators</a>
-            <a href="<?php echo esc_url(home_url('/knowledge-hub')); ?>" class="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:bg-slate-100">Knowledge Hub</a>
-            <a href="<?php echo esc_url(home_url('/sop-library')); ?>" class="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:bg-slate-100">SOP Library</a>
-            <a href="<?php echo esc_url(home_url('/checklists')); ?>" class="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:bg-slate-100">Checklists</a>
-            <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:bg-slate-100">Pricing Plans (₹199 / ₹399)</a>
-            <a href="<?php echo esc_url(home_url('/dashboard')); ?>" class="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:bg-slate-100">Engineer Dashboard</a>
-        </div>
-
-        <div class="pt-3 border-t border-slate-100 flex flex-col gap-2">
-            <button onclick="facilityProOpenConsultationModal()" class="w-full py-2.5 rounded-xl font-bold text-xs bg-[#f05423] text-white flex items-center justify-center gap-2 shadow-md shadow-orange-500/20">
-                <i data-lucide="sparkles" class="w-4 h-4"></i>
-                <span>Ask AI Engineering Assistant</span>
-            </button>
-            <button onclick="facilityProOpenAuthModal()" class="w-full py-2.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200 text-slate-800 text-center">
-                Log in / Client Portal
-            </button>
         </div>
     </div>
 </header>

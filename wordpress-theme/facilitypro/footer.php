@@ -167,78 +167,72 @@
 <div id="facilitypro-auth-modal" class="fixed inset-0 z-50 hidden bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-slate-200 space-y-5">
         <div class="flex items-center justify-between">
-            <h3 class="text-xl font-black text-slate-900">FacilityPro Client Portal</h3>
-            <button onclick="facilityProCloseAuthModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
-        </div>
-        <p class="text-xs text-slate-500">Access saved plant sizing calculations, calculation sheets, and assigned Indian AI specialists.</p>
-        <div class="space-y-3">
-            <div>
-                <label class="text-xs font-bold text-slate-700 block mb-1">Corporate / Plant Email</label>
-                <input type="email" placeholder="engineer@facility.com" class="w-full text-xs p-3 rounded-xl border border-slate-300">
-            </div>
-            <div>
-                <label class="text-xs font-bold text-slate-700 block mb-1">Password</label>
-                <input type="password" placeholder="••••••••" class="w-full text-xs p-3 rounded-xl border border-slate-300">
-            </div>
-            <button type="button" onclick="facilityProCloseAuthModal(); alert('Welcome back to FacilityPro!');" class="w-full py-3 rounded-xl bg-[#0077c8] hover:bg-[#0062a4] text-white font-bold text-xs shadow-md">
-                Log In
+            <h3 class="text-xl font-black text-slate-900">Plant Engineer Portal</h3>
+            <button type="button" onclick="facilityProCloseAuthModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <i data-lucide="x" class="w-5 h-5"></i>
             </button>
         </div>
-    </div>
-</div>
-
-<!-- ======================================================== -->
-<!-- FLOATING 24/7 AI CHAT WIDGET                             -->
-<!-- ======================================================== -->
-<div class="fixed bottom-5 right-5 z-40 flex flex-col items-end space-y-3">
-    
-    <!-- Collapsible Chat Box -->
-    <div id="floating-chat-drawer" class="hidden bg-white rounded-3xl shadow-2xl border border-slate-200 w-80 sm:w-96 p-4 space-y-3 animate-in fade-in slide-in-from-bottom duration-200">
-        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-[#0077c8]">
-                    <i data-lucide="sparkles" class="w-4 h-4"></i>
-                </div>
-                <div>
-                    <h4 class="font-bold text-xs text-slate-900">AI MEP Live Helper</h4>
-                    <span class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online &bull; &lt; 5s derivation
-                    </span>
-                </div>
-            </div>
-            <button onclick="facilityProToggleFloatingChat()" class="text-slate-400 hover:text-slate-600 p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
+        
+        <!-- Tab Selector -->
+        <div class="flex border-b border-slate-200">
+            <button type="button" onclick="switchModalAuthTab('login')" id="authModalTabLogin" class="flex-1 pb-3 text-xs font-bold text-center border-b-2 border-[#0077c8] text-[#0077c8] transition-colors cursor-pointer">
+                Sign In
+            </button>
+            <button type="button" onclick="switchModalAuthTab('signup')" id="authModalTabSignup" class="flex-1 pb-3 text-xs font-bold text-center border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
+                Register New Plant
+            </button>
         </div>
 
-        <div class="p-3 rounded-xl bg-blue-50 text-xs text-slate-700 leading-relaxed font-medium">
-            <strong>Er. Rajesh Sharma (AI HVAC):</strong> "Hello! What HVAC, Plumbing, Electrical, or Fire Fighting issue can our AI Engineers troubleshoot for you today?"
-        </div>
+        <!-- Sign In Form -->
+        <form id="modal-login-form" onsubmit="facilityProHandleLogin(event, 'modal')" class="space-y-4">
+            <div id="modal-login-msg" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
 
-        <form onsubmit="facilityProHandleFloatingSubmit(event)" class="space-y-2">
-            <textarea id="floating-chat-input" placeholder="Ask about chiller surging, water hammer, transformer inrush..." rows="2" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-[#0077c8] resize-none text-slate-800"></textarea>
-            <div class="flex items-center justify-between">
-                <span class="text-[10px] text-slate-400">Point-to-Point Solution</span>
-                <button type="submit" class="px-3.5 py-1.5 rounded-xl bg-[#f05423] hover:bg-[#d84315] text-white text-xs font-bold flex items-center gap-1 shadow-xs cursor-pointer">
-                    <span>Ask AI</span>
-                    <i data-lucide="send" class="w-3 h-3"></i>
-                </button>
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Username or Email</label>
+                <input type="text" name="log" placeholder="engineer@facility.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
             </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password</label>
+                <input type="password" name="pwd" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
+            </div>
+
+            <button type="submit" class="w-full py-3.5 px-4 bg-slate-900 hover:bg-[#0077c8] text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                <span>Sign In to Dashboard</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="modal-register-form" onsubmit="facilityProHandleRegister(event, 'modal')" class="space-y-4 hidden">
+            <div id="modal-register-msg" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Full Name</label>
+                <input type="text" name="full_name" placeholder="e.g. Vikram Sharma" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Corporate Email</label>
+                <input type="email" name="email" placeholder="vikram@plant.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Plant Facility Name</label>
+                <input type="text" name="plant_name" placeholder="e.g. Grand Plaza HVAC Operations" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password (min 6 chars)</label>
+                <input type="password" name="password" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required minlength="6">
+            </div>
+
+            <button type="submit" class="w-full py-3.5 px-4 bg-[#f05423] hover:bg-[#d94416] text-white rounded-xl text-xs font-black transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                <span>Create Account &amp; Access</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
         </form>
     </div>
-
-    <!-- Floating Trigger Avatar & Badge -->
-    <div class="flex items-center gap-3">
-        <div onclick="facilityProToggleFloatingChat()" class="hidden sm:flex items-center gap-2 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-xl border border-slate-200 text-xs font-bold text-slate-800 cursor-pointer hover:border-[#0077c8] hover:shadow-2xl transition-all">
-            <i data-lucide="sparkles" class="w-4 h-4 text-[#f05423]"></i>
-            <span>Ask our AI MEP Consultants</span>
-        </div>
-        <div onclick="facilityProToggleFloatingChat()" class="relative cursor-pointer group">
-            <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-white shadow-2xl ring-4 ring-blue-500/30 group-hover:ring-[#f05423] transition-all group-hover:scale-105">
-                <img src="<?php echo esc_url(FACILITYPRO_URI . '/assets/images/avatar_rajesh_sharma.jpg'); ?>" alt="AI MEP Consultant" class="w-full h-full object-cover">
-            </div>
-            <span class="absolute top-0 right-0 w-5 h-5 bg-[#e11d48] text-white font-extrabold text-[11px] rounded-full flex items-center justify-center border-2 border-white shadow-md animate-pulse">1</span>
-        </div>
-    </div>
-
 </div>
 
 <?php wp_footer(); ?>

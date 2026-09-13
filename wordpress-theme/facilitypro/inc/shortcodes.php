@@ -1147,73 +1147,402 @@ function facilitypro_pricing_shortcode($atts) {
 }
 add_shortcode('facilitypro_pricing', 'facilitypro_pricing_shortcode');
 
-// 6. Dashboard Shortcode [facilitypro_dashboard]
+
+// 6. User Dashboard Shortcode [facilitypro_dashboard]
 function facilitypro_dashboard_shortcode($atts) {
     ob_start();
-    ?>
-    <div class="facilitypro-dashboard-wrapper my-6 space-y-8">
-        <!-- Top Engineer Bar -->
-        <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div class="flex items-center gap-4">
-                <div class="w-16 h-16 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-2xl font-black shadow-md">
-                    FP
-                </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h2 class="text-2xl font-black text-slate-900">Plant Engineer Portal</h2>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-700">Active Member</span>
+    
+    if (is_user_logged_in()) {
+        $current_user = wp_get_current_user();
+        $user_id      = $current_user->ID;
+        $display_name = !empty($current_user->display_name) ? $current_user->display_name : $current_user->user_login;
+        $plant_name   = get_user_meta($user_id, 'facilitypro_plant_name', true);
+        if (empty($plant_name)) $plant_name = 'Main Facility Plant';
+        $phone        = get_user_meta($user_id, 'facilitypro_phone', true);
+        $plan         = get_user_meta($user_id, 'facilitypro_plan', true);
+        if (empty($plan)) $plan = 'Facility Pro Monthly (₹399/mo)';
+        $plan_status  = get_user_meta($user_id, 'facilitypro_plan_status', true);
+        if (empty($plan_status)) $plan_status = 'Active Member';
+        
+        $queries = get_user_meta($user_id, 'facilitypro_query_history', true);
+        if (!is_array($queries) || empty($queries)) {
+            $queries = [
+                [
+                    'id'         => 'qry_default_1',
+                    'date'       => '2 days ago',
+                    'discipline' => 'HVAC & Chilled Water',
+                    'question'   => 'Centrifugal chiller low delta-T syndrome & approach temperature exceeding 3.5°F',
+                    'expert'     => 'Er. Rajesh Sharma (HVAC)',
+                    'status'     => 'Resolved'
+                ],
+                [
+                    'id'         => 'qry_default_2',
+                    'date'       => '4 days ago',
+                    'discipline' => 'Electrical & Power',
+                    'question'   => '11kV Transformer 87T Inrush Relay 2nd Harmonic 15% Restraint Calculation',
+                    'expert'     => 'Dr. Vikram Malhotra (Electrical)',
+                    'status'     => 'Resolved'
+                ],
+                [
+                    'id'         => 'qry_default_3',
+                    'date'       => '1 week ago',
+                    'discipline' => 'Fire & Life Safety',
+                    'question'   => 'NFPA 13 Fire pump churn test casing relief calibration & cut-in sequencing',
+                    'expert'     => 'Er. Ananya Verma (Fire Safety)',
+                    'status'     => 'Resolved'
+                ]
+            ];
+        }
+        
+        $initials = strtoupper(substr($display_name, 0, 2));
+        ?>
+        <div class="facilitypro-dashboard-root max-w-7xl mx-auto space-y-8">
+            
+            <!-- User Profile Header Card -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div class="flex items-center gap-5">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white flex items-center justify-center text-2xl font-black shadow-lg shadow-slate-900/20 flex-shrink-0">
+                        <?php echo esc_html($initials); ?>
                     </div>
-                    <p class="text-xs text-slate-500 mt-1">Plan: <strong class="text-slate-800">Facility Pro Monthly (₹399/mo)</strong> • Unlimited OpenAI GPT-4o Consultations</p>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2.5">
+                            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                                <?php echo esc_html($display_name); ?>
+                            </h1>
+                            <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                <?php echo esc_html($plan_status); ?>
+                            </span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1 flex flex-wrap items-center gap-2">
+                            <span>🏢 <strong><?php echo esc_html($plant_name); ?></strong></span>
+                            <span>&bull;</span>
+                            <span>✉️ <?php echo esc_html($current_user->user_email); ?></span>
+                            <span>&bull;</span>
+                            <span class="text-[#0077c8] font-bold">Plan: <?php echo esc_html($plan); ?></span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="facilityProOpenConsultationModal()" class="px-4 py-3 bg-[#f05423] hover:bg-[#d94416] text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shadow-md shadow-orange-500/20 cursor-pointer">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span>Ask AI Specialist</span>
+                    </button>
+                    <a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-colors">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <span>Log Out</span>
+                    </a>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <button onclick="facilityProOpenConsultationModal()" class="px-4 py-2.5 bg-[#f05423] hover:bg-[#d94416] text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md">
-                    <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    <span>New AI Consultation</span>
+
+            <!-- Dashboard Navigation Tabs -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar border-b border-slate-200" id="dashTabsNav">
+                <button onclick="switchDashboardTab('overview')" data-dashtab="overview" class="dash-tab-btn active px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all bg-slate-900 text-white shadow-sm cursor-pointer">
+                    📊 Overview
+                </button>
+                <button onclick="switchDashboardTab('queries')" data-dashtab="queries" class="dash-tab-btn px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                    💬 My Consultations (<?php echo count($queries); ?>)
+                </button>
+                <button onclick="switchDashboardTab('sops')" data-dashtab="sops" class="dash-tab-btn px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                    🛡️ Plant SOPs &amp; Audits
+                </button>
+                <button onclick="switchDashboardTab('subscription')" data-dashtab="subscription" class="dash-tab-btn px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                    ⚡ Plan &amp; Billing
+                </button>
+                <button onclick="switchDashboardTab('settings')" data-dashtab="settings" class="dash-tab-btn px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                    ⚙️ Plant Settings
                 </button>
             </div>
+
+            <!-- TAB 1: OVERVIEW -->
+            <div id="dashtab-overview" class="dash-panel space-y-8">
+                <!-- 4 Stats Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Consultations</span>
+                            <div class="p-2 rounded-xl bg-blue-50 text-[#0077c8]"><i data-lucide="message-square" class="w-4 h-4"></i></div>
+                        </div>
+                        <div class="text-3xl font-black text-slate-900 mt-3"><?php echo count($queries); ?></div>
+                        <div class="text-[11px] text-emerald-600 font-semibold mt-1">✓ 100% Solved Point-to-Point</div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Calculators Run</span>
+                            <div class="p-2 rounded-xl bg-teal-50 text-teal-600"><i data-lucide="calculator" class="w-4 h-4"></i></div>
+                        </div>
+                        <div class="text-3xl font-black text-slate-900 mt-3">48</div>
+                        <div class="text-[11px] text-slate-500 font-semibold mt-1">Across 6 MEP Tools</div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">SOPs Executed</span>
+                            <div class="p-2 rounded-xl bg-amber-50 text-amber-600"><i data-lucide="shield-check" class="w-4 h-4"></i></div>
+                        </div>
+                        <div class="text-3xl font-black text-slate-900 mt-3">12</div>
+                        <div class="text-[11px] text-slate-500 font-semibold mt-1">LOTO Audits Active</div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Assigned Experts</span>
+                            <div class="p-2 rounded-xl bg-purple-50 text-purple-600"><i data-lucide="users" class="w-4 h-4"></i></div>
+                        </div>
+                        <div class="text-3xl font-black text-slate-900 mt-3">4</div>
+                        <div class="text-[11px] text-slate-500 font-semibold mt-1">All 4 Indian PEs Online</div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Tools -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <i data-lucide="clock" class="w-5 h-5 text-slate-500"></i>
+                                <span>Recent Engineering Consultations</span>
+                            </h2>
+                            <button onclick="switchDashboardTab('queries')" class="text-xs font-bold text-[#0077c8] hover:underline">
+                                View All
+                            </button>
+                        </div>
+                        <div class="space-y-3.5">
+                            <?php foreach (array_slice($queries, 0, 3) as $q) : ?>
+                                <div class="p-4 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-slate-50 transition-all cursor-pointer" onclick="facilityProOpenConsultationModal('<?php echo esc_js($q['question']); ?>')">
+                                    <div class="flex items-start justify-between gap-4">
+                                        <div>
+                                            <div class="text-sm font-bold text-slate-900 hover:text-[#0077c8] transition-colors">
+                                                <?php echo esc_html($q['question']); ?>
+                                            </div>
+                                            <div class="text-xs text-slate-500 mt-1 flex items-center gap-2">
+                                                <span>👨‍💼 <?php echo esc_html($q['expert']); ?></span>
+                                                <span>&bull;</span>
+                                                <span><?php echo esc_html($q['date']); ?></span>
+                                            </div>
+                                        </div>
+                                        <span class="px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 text-xs font-bold shrink-0">
+                                            <?php echo esc_html($q['status']); ?>
+                                        </span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <!-- Quick Engineering Shortcuts -->
+                    <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
+                        <h2 class="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
+                            <i data-lucide="tool" class="w-5 h-5 text-slate-500"></i>
+                            <span>Quick Tool Launchers</span>
+                        </h2>
+
+                        <a href="<?php echo esc_url(home_url('/calculators')); ?>" class="block p-4 rounded-xl border border-slate-200 hover:border-[#0077c8] hover:bg-blue-50/40 transition-all">
+                            <div class="text-xs font-bold text-slate-900 flex items-center justify-between">
+                                <span>Chiller TR &amp; Duct Sizer</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[#0077c8]"></i>
+                            </div>
+                            <div class="text-[11px] text-slate-500 mt-0.5">ASHRAE 90.1 &amp; SMACNA formulas</div>
+                        </a>
+
+                        <a href="<?php echo esc_url(home_url('/sop-library')); ?>" class="block p-4 rounded-xl border border-slate-200 hover:border-[#0077c8] hover:bg-blue-50/40 transition-all">
+                            <div class="text-xs font-bold text-slate-900 flex items-center justify-between">
+                                <span>Plant SOP Library</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[#0077c8]"></i>
+                            </div>
+                            <div class="text-[11px] text-slate-500 mt-0.5">Start-up &amp; safety procedures</div>
+                        </a>
+
+                        <a href="<?php echo esc_url(home_url('/checklists')); ?>" class="block p-4 rounded-xl border border-slate-200 hover:border-[#0077c8] hover:bg-blue-50/40 transition-all">
+                            <div class="text-xs font-bold text-slate-900 flex items-center justify-between">
+                                <span>Preventive Maintenance Logs</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[#0077c8]"></i>
+                            </div>
+                            <div class="text-[11px] text-slate-500 mt-0.5">Daily, weekly &amp; monthly audits</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: CONSULTATIONS -->
+            <div id="dashtab-queries" class="dash-panel hidden space-y-4">
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-slate-900">Your Consultation History</h2>
+                        <button onclick="facilityProOpenConsultationModal()" class="px-4 py-2 bg-[#f05423] text-white text-xs font-bold rounded-xl hover:bg-[#d94416] transition-colors">
+                            + New Consultation
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <?php foreach ($queries as $q) : ?>
+                            <div class="p-5 rounded-2xl border border-slate-200 hover:border-blue-400 bg-slate-50/50 transition-all">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3 mb-3">
+                                    <span class="text-xs font-extrabold uppercase px-2.5 py-1 rounded bg-blue-100 text-[#0077c8]">
+                                        <?php echo esc_html($q['discipline']); ?>
+                                    </span>
+                                    <span class="text-xs text-slate-400 font-medium">Logged: <?php echo esc_html($q['date']); ?></span>
+                                </div>
+                                <h3 class="text-base font-bold text-slate-900"><?php echo esc_html($q['question']); ?></h3>
+                                <div class="mt-3 flex items-center justify-between">
+                                    <span class="text-xs text-slate-600 font-medium">Specialist: <strong><?php echo esc_html($q['expert']); ?></strong></span>
+                                    <button onclick="facilityProOpenConsultationModal('<?php echo esc_js($q['question']); ?>')" class="text-xs font-bold text-[#0077c8] hover:underline flex items-center gap-1">
+                                        <span>Reopen Session</span>
+                                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: SOPS -->
+            <div id="dashtab-sops" class="dash-panel hidden space-y-6">
+                <?php echo do_shortcode('[facilitypro_sop_library]'); ?>
+            </div>
+
+            <!-- TAB 4: SUBSCRIPTION -->
+            <div id="dashtab-subscription" class="dash-panel hidden space-y-6">
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm max-w-4xl mx-auto">
+                    <h2 class="text-2xl font-black text-slate-900 mb-2">Subscription &amp; Plant Access</h2>
+                    <p class="text-xs text-slate-500 mb-6">Manage your FacilityPro membership, billing history, and team seats.</p>
+
+                    <div class="p-6 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white mb-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Current Plan</span>
+                            <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-[#f05423] text-white">Active</span>
+                        </div>
+                        <div class="text-3xl font-black text-white"><?php echo esc_html($plan); ?></div>
+                        <p class="text-xs text-slate-300 mt-2">Unlimited OpenAI GPT-4o Point-to-Point Q&amp;A &bull; All 6 MEP Calculators &bull; Full SOP Library</p>
+                    </div>
+
+                    <?php echo do_shortcode('[facilitypro_pricing]'); ?>
+                </div>
+            </div>
+
+            <!-- TAB 5: SETTINGS -->
+            <div id="dashtab-settings" class="dash-panel hidden space-y-6">
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm max-w-2xl mx-auto">
+                    <h2 class="text-2xl font-black text-slate-900 mb-2">Plant &amp; Profile Settings</h2>
+                    <p class="text-xs text-slate-500 mb-6">Update your facility engineering credentials.</p>
+
+                    <form id="facilitypro-profile-form" onsubmit="facilityProHandleProfileUpdate(event)" class="space-y-4">
+                        <div id="profile-update-msg" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Full Name / Engineer Name</label>
+                            <input type="text" name="full_name" value="<?php echo esc_attr($display_name); ?>" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Facility / Plant Name</label>
+                            <input type="text" name="plant_name" value="<?php echo esc_attr($plant_name); ?>" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Phone Number</label>
+                            <input type="text" name="phone" value="<?php echo esc_attr($phone); ?>" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 outline-none focus:border-[#0077c8]">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">New Password (leave blank to keep current)</label>
+                            <input type="password" name="new_password" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 outline-none focus:border-[#0077c8]">
+                        </div>
+
+                        <div class="pt-2">
+                            <button type="submit" id="profileSaveBtn" class="px-6 py-3 bg-slate-900 hover:bg-[#0077c8] text-white rounded-xl text-xs font-bold transition-colors shadow-md cursor-pointer">
+                                Save Profile Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
         </div>
-
-        <!-- Quick Stats Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Queries</span>
-                    <i data-lucide="message-square" class="w-4 h-4 text-blue-500"></i>
+        <?php
+    } else {
+        // Logged-out state: Professional Engineering Login & Register Portal
+        ?>
+        <div class="facilitypro-auth-portal max-w-md mx-auto my-8 bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200">
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-xl font-black mx-auto mb-3 shadow-md">
+                    FP
                 </div>
-                <div class="text-2xl font-black text-slate-900 mt-2">18</div>
-                <div class="text-[11px] text-emerald-600 font-semibold mt-1">100% Solved Point-to-Point</div>
+                <h1 class="text-2xl font-black text-slate-900">Plant Engineer Portal</h1>
+                <p class="text-xs text-slate-500 mt-1">Sign in or register to access saved calculations and assigned Indian AI PEs.</p>
             </div>
 
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Calculations Run</span>
-                    <i data-lucide="calculator" class="w-4 h-4 text-teal-500"></i>
-                </div>
-                <div class="text-2xl font-black text-slate-900 mt-2">42</div>
-                <div class="text-[11px] text-slate-500 font-semibold mt-1">Across 6 MEP Tools</div>
+            <!-- Portal Tabs -->
+            <div class="flex border-b border-slate-200 mb-6">
+                <button type="button" onclick="switchAuthTab('login')" id="authPortalTabLogin" class="flex-1 pb-3 text-xs font-bold text-center border-b-2 border-[#0077c8] text-[#0077c8] transition-colors cursor-pointer">
+                    Sign In
+                </button>
+                <button type="button" onclick="switchAuthTab('register')" id="authPortalTabRegister" class="flex-1 pb-3 text-xs font-bold text-center border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
+                    Register New Plant
+                </button>
             </div>
 
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">SOPs Executed</span>
-                    <i data-lucide="shield-check" class="w-4 h-4 text-amber-500"></i>
-                </div>
-                <div class="text-2xl font-black text-slate-900 mt-2">9</div>
-                <div class="text-[11px] text-slate-500 font-semibold mt-1">Audits verified</div>
-            </div>
+            <!-- Login Form -->
+            <form id="facilitypro-portal-login-form" onsubmit="facilityProHandleLogin(event, 'portal')" class="space-y-4">
+                <div id="portal-login-msg" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
 
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Assigned Experts</span>
-                    <i data-lucide="users" class="w-4 h-4 text-purple-500"></i>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Username or Corporate Email</label>
+                    <input type="text" name="log" placeholder="engineer@facility.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
                 </div>
-                <div class="text-2xl font-black text-slate-900 mt-2">4</div>
-                <div class="text-[11px] text-slate-500 font-semibold mt-1">All 4 Disciplines Online</div>
-            </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password</label>
+                    <input type="password" name="pwd" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
+                </div>
+
+                <div class="flex items-center justify-between text-xs">
+                    <label class="flex items-center gap-2 cursor-pointer text-slate-600">
+                        <input type="checkbox" name="remember" value="true" class="rounded border-slate-300 text-[#0077c8]">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="<?php echo esc_url(wp_lostpassword_url()); ?>" class="text-[#0077c8] hover:underline font-bold">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 px-4 bg-slate-900 hover:bg-[#0077c8] text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                    <span>Sign In to Dashboard</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="facilitypro-portal-register-form" onsubmit="facilityProHandleRegister(event, 'portal')" class="space-y-4 hidden">
+                <div id="portal-register-msg" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Full Name / Engineer Name</label>
+                    <input type="text" name="full_name" placeholder="e.g. Rahul Verma" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Corporate / Plant Email</label>
+                    <input type="email" name="email" placeholder="rahul@plantoperations.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Facility / Plant / Hotel Name</label>
+                    <input type="text" name="plant_name" placeholder="e.g. Apex Central Utilities" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Create Password (min 6 chars)</label>
+                    <input type="password" name="password" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required minlength="6">
+                </div>
+
+                <button type="submit" class="w-full py-3.5 px-4 bg-[#f05423] hover:bg-[#d94416] text-white rounded-xl text-xs font-black transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                    <span>Create Account &amp; Access (₹399/mo)</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </form>
         </div>
-    </div>
-    <?php
+        <?php
+    }
+    
     return ob_get_clean();
 }
 add_shortcode('facilitypro_dashboard', 'facilitypro_dashboard_shortcode');

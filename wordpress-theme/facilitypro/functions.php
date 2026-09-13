@@ -21,6 +21,8 @@ function facilitypro_setup() {
     add_theme_support('post-thumbnails');
     add_theme_support('align-wide');
     add_theme_support('responsive-embeds');
+    add_theme_support('editor-styles');
+    add_editor_style('assets/css/facilitypro.css');
     add_theme_support('custom-logo', array(
         'height'      => 60,
         'width'       => 200,
@@ -36,7 +38,7 @@ function facilitypro_setup() {
 }
 add_action('after_setup_theme', 'facilitypro_setup');
 
-// 2. Enqueue Styles and Scripts
+// 2. Enqueue Styles and Scripts for Frontend
 function facilitypro_enqueue_scripts() {
     // Google Fonts: Plus Jakarta Sans & Inter
     wp_enqueue_style(
@@ -46,7 +48,7 @@ function facilitypro_enqueue_scripts() {
         null
     );
 
-    // Tailwind Play CDN for immediate zero-config responsive rendering
+    // Tailwind Play CDN
     wp_enqueue_script(
         'tailwindcss-cdn',
         'https://cdn.tailwindcss.com',
@@ -112,7 +114,7 @@ function facilitypro_enqueue_scripts() {
 add_action('wp_enqueue_scripts', 'facilitypro_enqueue_scripts');
 
 
-// 3. Enqueue Block Editor Assets (Gutenberg styling support)
+// 3. Enqueue Block Editor Assets (Gutenberg Canvas Styling & Tailwind Injection)
 function facilitypro_block_editor_assets() {
     wp_enqueue_style(
         'facilitypro-fonts',
@@ -140,9 +142,19 @@ function facilitypro_block_editor_assets() {
         array(),
         FACILITYPRO_VERSION
     );
+    wp_enqueue_script(
+        'facilitypro-admin-editor',
+        FACILITYPRO_URI . '/assets/js/admin-editor.js',
+        array('jquery', 'lucide-icons'),
+        FACILITYPRO_VERSION,
+        true
+    );
+    wp_localize_script('facilitypro-admin-editor', 'facilityProEditorData', array(
+        'themeUri' => FACILITYPRO_URI,
+    ));
 }
 add_action('enqueue_block_editor_assets', 'facilitypro_block_editor_assets');
-add_theme_support('editor-styles');
+add_action('admin_enqueue_scripts', 'facilitypro_block_editor_assets');
 
 // Include Custom Post Types, AJAX Handlers, Admin Settings, and Component Shortcodes
 require_once FACILITYPRO_DIR . '/inc/custom-post-types.php';

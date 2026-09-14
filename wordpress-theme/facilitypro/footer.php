@@ -23,15 +23,15 @@
                 </div>
             </div>
 
-            <!-- Col 2: Engineering Disciplines -->
+            <!-- Col 2: MEP Knowledge -->
             <div class="space-y-3">
-                <h4 class="text-xs font-black uppercase tracking-wider text-slate-300">MEP Disciplines</h4>
+                <h4 class="text-xs font-black uppercase tracking-wider text-slate-300">MEP Knowledge</h4>
                 <ul class="space-y-2 text-xs text-slate-400">
-                    <li><a href="<?php echo esc_url(home_url('/#popular')); ?>" onclick="facilityProFilterCategory('hvac')" class="hover:text-white transition-colors">Central HVAC & Chillers</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/#popular')); ?>" onclick="facilityProFilterCategory('plumbing')" class="hover:text-white transition-colors">Plumbing & Booster Pumps</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/#popular')); ?>" onclick="facilityProFilterCategory('electrical')" class="hover:text-white transition-colors">HT/LT Substations & Power</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/#popular')); ?>" onclick="facilityProFilterCategory('firefighting')" class="hover:text-white transition-colors">NFPA 13 Fire Sprinklers</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/calculators')); ?>" class="hover:text-white transition-colors">6 Engineering Calculators</a></li>
+                    <li><a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=hvac')); ?>" class="hover:text-white transition-colors">Central HVAC &amp; Chillers</a></li>
+                    <li><a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=electrical')); ?>" class="hover:text-white transition-colors">HT/LT Substations &amp; Transformers</a></li>
+                    <li><a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=firefighting')); ?>" class="hover:text-white transition-colors">NFPA 13 Fire Sprinklers &amp; Pumps</a></li>
+                    <li><a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=plumbing')); ?>" class="hover:text-white transition-colors">Plumbing &amp; Booster Pumps</a></li>
+                    <li><a href="<?php echo esc_url(home_url('/knowledge-hub/')); ?>" class="text-[#0077c8] hover:underline font-bold transition-colors">Browse All 9 Disciplines &rarr;</a></li>
                 </ul>
             </div>
 

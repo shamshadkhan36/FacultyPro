@@ -62,67 +62,80 @@
                     Home
                 </a>
 
-                <!-- 2. Disciplines Submenu Dropdown -->
-                <div class="relative group" id="navDisciplinesDropdown">
-                    <button type="button" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50/70 transition-all flex items-center gap-1.5 cursor-pointer">
-                        <span>Disciplines</span>
+                <!-- 2. MEP Knowledge Submenu Dropdown -->
+                <div class="relative group" id="navKnowledgeDropdown">
+                    <a href="<?php echo esc_url(home_url('/knowledge-hub/')); ?>" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50/70 transition-all flex items-center gap-1.5 cursor-pointer <?php echo is_page('knowledge-hub') ? 'bg-sky-50 text-[#0077c8]' : ''; ?>">
+                        <span>MEP Knowledge</span>
                         <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition-transform duration-200"></i>
-                    </button>
+                    </a>
                     
-                    <!-- Mega Dropdown Box for Disciplines -->
-                    <div class="absolute top-full left-0 mt-1 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 hidden group-hover:block transition-all duration-200 z-50 animate-in fade-in slide-in-from-top-2">
-                        <div class="px-3 py-1.5 border-b border-slate-100 mb-1.5 flex items-center justify-between">
-                            <span class="text-[10px] font-black uppercase tracking-wider text-[#0077c8]">Engineering Categories</span>
-                            <span class="text-[10px] font-semibold text-slate-400">8 Disciplines</span>
+                    <!-- Mega Dropdown Box for MEP Knowledge & Disciplines -->
+                    <div class="absolute top-full left-0 mt-1 w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 hidden group-hover:block transition-all duration-200 z-50 animate-in fade-in slide-in-from-top-2">
+                        <div class="px-3 py-1.5 border-b border-slate-100 mb-2 flex items-center justify-between">
+                            <span class="text-[10px] font-black uppercase tracking-wider text-[#0077c8]">MEP Knowledge Categories</span>
+                            <span class="text-[10px] font-semibold text-slate-400">9 Disciplines &bull; 27+ Blogs</span>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-1">
-                            <!-- HVAC -->
-                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('hvac')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50 transition-colors">
+                            <!-- 1. HVAC -->
+                            <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=hvac')); ?>" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50 transition-colors">
                                 <i data-lucide="wind" class="w-4 h-4 text-sky-500"></i>
                                 <span>HVAC</span>
                             </a>
 
-                            <!-- Electrical -->
-                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('electrical')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-600 hover:bg-amber-50 transition-colors">
+                            <!-- 2. Electrical -->
+                            <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=electrical')); ?>" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-600 hover:bg-amber-50 transition-colors">
                                 <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
                                 <span>Electrical</span>
                             </a>
 
-                            <!-- Plumbing -->
-                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('plumbing')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors">
-                                <i data-lucide="droplets" class="w-4 h-4 text-blue-500"></i>
-                                <span>Plumbing</span>
-                            </a>
-
-                            <!-- Fire Fighting -->
-                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('firefighting')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-rose-600 hover:bg-rose-50 transition-colors">
+                            <!-- 3. Fire Fighting -->
+                            <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=firefighting')); ?>" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-rose-600 hover:bg-rose-50 transition-colors">
                                 <i data-lucide="flame" class="w-4 h-4 text-rose-500"></i>
                                 <span>Fire fighting</span>
                             </a>
 
-                            <!-- Painting & Polishing -->
-                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('painting')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-purple-600 hover:bg-purple-50 transition-colors">
-                                <i data-lucide="paint-brush" class="w-4 h-4 text-purple-500"></i>
-                                <span>Painting</span>
+                            <!-- 4. Plumbing -->
+                            <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=plumbing')); ?>" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors">
+                                <i data-lucide="droplets" class="w-4 h-4 text-blue-500"></i>
+                                <span>Plumbing</span>
                             </a>
 
-                            <!-- BMS & Automation -->
-                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('bms')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-teal-600 hover:bg-teal-50 transition-colors">
-                                <i data-lucide="cpu" class="w-4 h-4 text-teal-500"></i>
-                                <span>BMS</span>
+                            <!-- 5. Painting & Polishing -->
+                            <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=painting')); ?>" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-purple-600 hover:bg-purple-50 transition-colors">
+                                <i data-lucide="paint-roller" class="w-4 h-4 text-purple-500"></i>
+                                <span>Painting &amp; polishing</span>
                             </a>
 
-                            <!-- STP & Water Treatment -->
-                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('stp')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-cyan-600 hover:bg-cyan-50 transition-colors">
+                            <!-- 6. Solar System -->
+                            <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=solar')); ?>" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-500 hover:bg-amber-50 transition-colors">
+                                <i data-lucide="sun" class="w-4 h-4 text-amber-500"></i>
+                                <span>Solar system</span>
+                            </a>
+
+                            <!-- 7. BMS & Automation -->
+                            <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=bms')); ?>" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-teal-600 hover:bg-teal-50 transition-colors">
+                                <i data-lucide="sliders" class="w-4 h-4 text-teal-500"></i>
+                                <span>BMS &amp; Automation</span>
+                            </a>
+
+                            <!-- 8. STP & Water Treatment -->
+                            <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=stp')); ?>" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-cyan-600 hover:bg-cyan-50 transition-colors">
                                 <i data-lucide="filter" class="w-4 h-4 text-cyan-600"></i>
-                                <span>STP Treatment</span>
+                                <span>STP &amp; water</span>
                             </a>
 
-                            <!-- DG Set -->
-                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('dgset')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 transition-colors">
+                            <!-- 9. DG Set -->
+                            <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=dg')); ?>" class="col-span-2 flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 transition-colors">
                                 <i data-lucide="battery-charging" class="w-4 h-4 text-emerald-600"></i>
-                                <span>DG Set</span>
+                                <span>DG set (Generators &amp; AMF Panels)</span>
+                            </a>
+                        </div>
+
+                        <div class="mt-2 pt-2 border-t border-slate-100">
+                            <a href="<?php echo esc_url(home_url('/knowledge-hub/')); ?>" class="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900 hover:bg-[#0077c8] text-white text-xs font-bold transition-colors shadow-xs">
+                                <span>Browse All Knowledge Blogs (27+)</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                             </a>
                         </div>
                     </div>
@@ -250,38 +263,44 @@
                 <span>Home</span>
             </a>
 
-            <!-- Disciplines Expandable Accordion -->
+            <!-- MEP Knowledge Expandable Accordion -->
             <div>
-                <button type="button" onclick="facilityProToggleMobileAccordion('mobileDisciplinesSubmenu', 'mobileDiscChevron')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-sm text-slate-800 hover:bg-sky-50 hover:text-[#0077c8] transition-colors cursor-pointer">
+                <button type="button" onclick="facilityProToggleMobileAccordion('mobileKnowledgeSubmenu', 'mobileKnowledgeChevron')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-sm text-slate-800 hover:bg-sky-50 hover:text-[#0077c8] transition-colors cursor-pointer">
                     <div class="flex items-center gap-3">
-                        <i data-lucide="layers" class="w-4 h-4 text-sky-500"></i>
-                        <span>Disciplines</span>
+                        <i data-lucide="book-open" class="w-4 h-4 text-sky-500"></i>
+                        <span>MEP Knowledge</span>
                     </div>
-                    <i data-lucide="chevron-down" id="mobileDiscChevron" class="w-4 h-4 text-slate-400 transition-transform"></i>
+                    <i data-lucide="chevron-down" id="mobileKnowledgeChevron" class="w-4 h-4 text-slate-400 transition-transform"></i>
                 </button>
-                <div id="mobileDisciplinesSubmenu" class="hidden pl-4 pr-2 py-2 space-y-1 border-l-2 border-slate-200 ml-5 my-1 bg-slate-50/70 rounded-r-xl">
-                    <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('hvac');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-[#0077c8] rounded-lg hover:bg-white">
-                        <span>❄️ HVAC Systems</span>
+                <div id="mobileKnowledgeSubmenu" class="hidden pl-4 pr-2 py-2 space-y-1 border-l-2 border-slate-200 ml-5 my-1 bg-slate-50/70 rounded-r-xl">
+                    <a href="<?php echo esc_url(home_url('/knowledge-hub/')); ?>" onclick="facilityProCloseMobileMenu();" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-[#0077c8] rounded-lg hover:bg-white">
+                        <span>📖 All Knowledge Blogs</span>
                     </a>
-                    <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('electrical');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-amber-600 rounded-lg hover:bg-white">
-                        <span>⚡ Electrical &amp; Power</span>
+                    <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=hvac')); ?>" onclick="facilityProCloseMobileMenu();" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-[#0077c8] rounded-lg hover:bg-white">
+                        <span>❄️ HVAC</span>
                     </a>
-                    <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('plumbing');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-blue-600 rounded-lg hover:bg-white">
-                        <span>🚰 Plumbing &amp; Piping</span>
+                    <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=electrical')); ?>" onclick="facilityProCloseMobileMenu();" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-amber-600 rounded-lg hover:bg-white">
+                        <span>⚡ Electrical</span>
                     </a>
-                    <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('firefighting');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-rose-600 rounded-lg hover:bg-white">
+                    <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=firefighting')); ?>" onclick="facilityProCloseMobileMenu();" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-rose-600 rounded-lg hover:bg-white">
                         <span>🔥 Fire fighting</span>
                     </a>
-                    <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('painting');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-purple-600 rounded-lg hover:bg-white">
+                    <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=plumbing')); ?>" onclick="facilityProCloseMobileMenu();" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-blue-600 rounded-lg hover:bg-white">
+                        <span>🚰 Plumbing</span>
+                    </a>
+                    <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=painting')); ?>" onclick="facilityProCloseMobileMenu();" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-purple-600 rounded-lg hover:bg-white">
                         <span>🎨 Painting &amp; polishing</span>
                     </a>
-                    <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('bms');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-teal-600 rounded-lg hover:bg-white">
-                        <span>🏢 BMS &amp; automation</span>
+                    <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=solar')); ?>" onclick="facilityProCloseMobileMenu();" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-amber-600 rounded-lg hover:bg-white">
+                        <span>☀️ Solar system</span>
                     </a>
-                    <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('stp');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-cyan-600 rounded-lg hover:bg-white">
+                    <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=bms')); ?>" onclick="facilityProCloseMobileMenu();" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-teal-600 rounded-lg hover:bg-white">
+                        <span>🏢 BMS &amp; Automation</span>
+                    </a>
+                    <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=stp')); ?>" onclick="facilityProCloseMobileMenu();" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-cyan-600 rounded-lg hover:bg-white">
                         <span>💧 STP &amp; water treatment</span>
                     </a>
-                    <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('dgset');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-emerald-600 rounded-lg hover:bg-white">
+                    <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=dg')); ?>" onclick="facilityProCloseMobileMenu();" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-emerald-600 rounded-lg hover:bg-white">
                         <span>⚡ DG set</span>
                     </a>
                 </div>

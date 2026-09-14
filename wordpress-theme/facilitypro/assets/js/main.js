@@ -368,13 +368,13 @@ function facilityProFilterCategory(catId) {
 }
 
 
-// Cycling Disciplines in Hero Section (matching faculty-pro-rho.vercel.app)
+// Cycling Disciplines in Hero Section (Exact User Requested Order)
 const cyclingDisciplines = [
-    'HVAC Specialists',
-    'Plumbing Engineers',
-    'Electrical Consultants',
-    'Fire Safety Experts',
-    'MEP Facility Directors'
+    'HVAC specialists',
+    'facility Expert',
+    'Plumbing specialists',
+    'Electrical consultants',
+    'Fire Safety experts'
 ];
 let cyclingDisciplineIndex = 0;
 
@@ -390,7 +390,7 @@ function initCyclingDisciplines() {
             el.style.opacity = '1';
             el.style.transform = 'translateY(0)';
         }, 250);
-    }, 3200);
+    }, 3000);
 }
 
 function facilityProToggleMobileAccordion(submenuId, chevronId) {

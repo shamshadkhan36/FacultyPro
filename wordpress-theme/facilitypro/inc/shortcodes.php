@@ -1792,16 +1792,16 @@ add_shortcode('facilitypro_dashboard', 'facilitypro_dashboard_shortcode');
 // 7. Hero Section Shortcode [facilitypro_hero]
 function facilitypro_hero_shortcode($atts) {
     $a = shortcode_atts(array(
-        'title'    => 'Real help from real',
-        'subtitle' => 'Talk or text with thousands of verified MEP engineers & OpenAI reasoning for exact, code-compliant point-to-point answers.',
-        'badge'    => 'FacilityPro MEP Point-to-Point Q&A',
+        'title'    => 'Real help for real',
+        'subtitle' => 'Ask any complex HVAC, Electrical, Fire Fighting, Plumbing, Painting & Polishing, Solar, BMS, STP, or DG Set question. Get verified formulas, exact sizing derivation, and Indian IS/NBC code clauses in under 5 seconds.',
+        'badge'    => 'FacilityPro MEP Point-to-Point AI Diagnostics',
     ), $atts);
 
     ob_start();
     ?>
-    <!-- HERO SECTION (Exact Layout matching faculty-pro-rho.vercel.app) -->
+    <!-- HERO SECTION (Exact User Layout) -->
     <section class="relative min-h-[580px] sm:min-h-[640px] flex items-center justify-center overflow-hidden bg-slate-900 text-white">
-        <!-- Background Image of Industrial Plant Room / MEP Facility with Dark Overlay -->
+        <!-- Background Image with Overlay -->
         <div class="absolute inset-0 z-0">
             <img 
                 src="<?php echo esc_url(FACILITYPRO_URI . '/assets/images/bms_control_room.jpg'); ?>" 
@@ -1824,21 +1824,21 @@ function facilitypro_hero_shortcode($atts) {
                             FP
                         </div>
                         <span class="text-xs sm:text-sm font-semibold tracking-wide text-slate-100">
-                            Facility<span class="text-[#ff7849]">Pro</span> MEP Point-to-Point Q&amp;A
+                            Facility<span class="text-[#ff7849]">Pro</span> MEP Point-to-Point AI Diagnostics
                         </span>
                         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
                     </div>
 
-                    <!-- Main Headline with Animated Cycling Disciplines and Orange 24/7 -->
+                    <!-- Main Headline with Exact Cycling Options and Orange 24/7 -->
                     <div class="space-y-2">
                         <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight sm:leading-none">
-                            Real help from real <br class="hidden sm:inline" />
-                            <span id="cyclingDiscipline" class="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-sky-300 transition-all duration-300 inline-block">
-                                HVAC Specialists
+                            Real help for real <br class="hidden sm:inline" />
+                            <span id="cyclingDiscipline" class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-[#ff7849] to-amber-300 transition-all duration-300 inline-block font-black">
+                                HVAC specialists
                             </span>
                             <span class="text-[#ff5722] ml-1 sm:ml-2 font-black">, 24/7</span>
                         </h1>
-                        <p class="text-base sm:text-xl font-normal text-slate-300 max-w-2xl leading-relaxed pt-1">
+                        <p class="text-sm sm:text-base md:text-lg text-slate-200 font-normal leading-relaxed max-w-2xl pt-1">
                             <?php echo esc_html($a['subtitle']); ?>
                         </p>
                     </div>
@@ -1847,19 +1847,19 @@ function facilitypro_hero_shortcode($atts) {
                     <div class="flex items-center gap-2 flex-wrap pt-1">
                         <button onclick="facilityProOpenConsultationModal('Chiller approach temperature high &amp; surging', 'Er. Rajesh Sharma', 'HVAC &amp; Chilled Water')" class="group inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-sm border border-white/15 text-xs text-slate-200 hover:text-white font-medium transition-all duration-200 cursor-pointer shadow-xs hover:scale-105 active:scale-95">
                             <i data-lucide="search" class="w-3 h-3 text-slate-400 group-hover:text-white transition-colors"></i>
-                            <span>Chiller approach temperature high &amp; surging</span>
+                            <span>Chiller surging &amp; approach</span>
                         </button>
                         <button onclick="facilityProOpenConsultationModal('Booster pump head &amp; flow calculation', 'Er. Amit Patel', 'Plumbing &amp; Drainage')" class="group inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-sm border border-white/15 text-xs text-slate-200 hover:text-white font-medium transition-all duration-200 cursor-pointer shadow-xs hover:scale-105 active:scale-95">
                             <i data-lucide="search" class="w-3 h-3 text-slate-400 group-hover:text-white transition-colors"></i>
-                            <span>Booster pump head &amp; flow calculation</span>
+                            <span>Booster pump head &amp; water hammer</span>
                         </button>
                         <button onclick="facilityProOpenConsultationModal('Transformer fault level &amp; relay coordination', 'Dr. Vikram Malhotra', 'Electrical &amp; Power')" class="group inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-sm border border-white/15 text-xs text-slate-200 hover:text-white font-medium transition-all duration-200 cursor-pointer shadow-xs hover:scale-105 active:scale-95">
                             <i data-lucide="search" class="w-3 h-3 text-slate-400 group-hover:text-white transition-colors"></i>
-                            <span>Transformer fault level &amp; relay coordination</span>
+                            <span>Transformer 87T trip</span>
                         </button>
                         <button onclick="facilityProOpenConsultationModal('NFPA 13 sprinkler hydraulic calculation', 'Er. Ananya Verma', 'Fire &amp; Life Safety')" class="group inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-sm border border-white/15 text-xs text-slate-200 hover:text-white font-medium transition-all duration-200 cursor-pointer shadow-xs hover:scale-105 active:scale-95">
                             <i data-lucide="search" class="w-3 h-3 text-slate-400 group-hover:text-white transition-colors"></i>
-                            <span>NFPA 13 sprinkler hydraulic calculation</span>
+                            <span>NFPA 13 sprinklers</span>
                         </button>
                         <button onclick="facilityProOpenConsultationModal('Ask any MEP question...')" class="group inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-sm border border-white/15 text-xs text-slate-200 hover:text-white font-medium transition-all duration-200 cursor-pointer">
                             <i data-lucide="search" class="w-3 h-3 text-slate-400"></i>
@@ -1872,28 +1872,28 @@ function facilitypro_hero_shortcode($atts) {
                         <div class="relative flex flex-col sm:flex-row items-center bg-white rounded-2xl sm:rounded-full p-1.5 sm:p-2 shadow-2xl shadow-black/50 border-2 border-white/20 focus-within:border-[#ff5722] transition-all duration-200">
                             
                             <div class="flex items-center w-full pl-3 sm:pl-4 pr-2 py-2 sm:py-0">
-                                <i data-lucide="wrench" class="w-5 h-5 text-slate-400 mr-2.5 shrink-0 hidden sm:block"></i>
-                                <input
-                                    type="text"
-                                    id="hero-search-input"
-                                    placeholder="Ask about HVAC, Plumbing, Electrical, or Fire Fighting systems..."
-                                    class="w-full bg-transparent text-slate-900 placeholder:text-slate-400 text-sm sm:text-base font-medium focus:outline-none"
+                                <i data-lucide="search" class="w-5 h-5 text-slate-400 mr-2.5 shrink-0 hidden sm:block"></i>
+                                <input 
+                                    type="text" 
+                                    id="hero-search-input" 
+                                    placeholder="e.g., Chiller condenser surging, transformer 87T trip, DG reverse power..." 
+                                    class="w-full bg-transparent text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm md:text-base font-medium focus:outline-none"
                                 />
                             </div>
 
-                            <!-- Orange/Coral Start Chat Button -->
-                            <button
-                                type="submit"
-                                class="w-full sm:w-auto mt-2 sm:mt-0 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl sm:rounded-full bg-gradient-to-r from-[#ff5722] to-[#f05423] hover:from-[#ff6f3c] hover:to-[#ff5722] text-white font-bold text-sm sm:text-base shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-150 cursor-pointer shrink-0"
+                            <!-- Orange Get Solution Button -->
+                            <button 
+                                type="submit" 
+                                class="w-full sm:w-auto mt-2 sm:mt-0 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl sm:rounded-full bg-gradient-to-r from-[#ff5722] to-[#f05423] hover:from-[#ff6f3c] hover:to-[#ff5722] text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-150 cursor-pointer shrink-0"
                             >
-                                <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
-                                <span>Start chat</span>
+                                <span>Get Solution</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4 text-white"></i>
                             </button>
                         </div>
 
                         <!-- Disclaimer text -->
                         <p class="text-[11px] text-slate-400 mt-2.5 text-center sm:text-left">
-                            By chatting, you understand chats may be recorded and agree to our <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="text-sky-400 hover:underline">Terms of Service</a> and <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="text-sky-400 hover:underline">Privacy Policy</a>.
+                            By querying, you agree to our <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="text-sky-400 hover:underline">Terms of Service</a> &amp; verified engineering calculation standards.
                         </p>
                     </form>
 

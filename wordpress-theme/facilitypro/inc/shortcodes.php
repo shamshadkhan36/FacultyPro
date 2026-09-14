@@ -2581,3 +2581,7 @@ function facilitypro_why_choose_us_shortcode($atts) {
     return ob_get_clean();
 }
 add_shortcode('facilitypro_why_choose_us', 'facilitypro_why_choose_us_shortcode');
+
+add_shortcode('facilitypro_knowledge_hub', 'facilitypro_knowledge_hub_shortcode');
+add_shortcode('facilitypro_category_grid', 'facilitypro_category_grid_shortcode');
+add_shortcode('facilitypro_category_pills', 'facilitypro_category_grid_shortcode');

@@ -366,3 +366,43 @@ function facilityProFilterCategory(catId) {
 
     if (window.lucide) lucide.createIcons();
 }
+
+
+// Cycling Disciplines in Hero Section (matching faculty-pro-rho.vercel.app)
+const cyclingDisciplines = [
+    'HVAC Specialists',
+    'Plumbing Engineers',
+    'Electrical Consultants',
+    'Fire Safety Experts',
+    'MEP Facility Directors'
+];
+let cyclingDisciplineIndex = 0;
+
+function initCyclingDisciplines() {
+    const el = document.getElementById('cyclingDiscipline');
+    if (!el) return;
+    setInterval(() => {
+        cyclingDisciplineIndex = (cyclingDisciplineIndex + 1) % cyclingDisciplines.length;
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-6px)';
+        setTimeout(() => {
+            el.textContent = cyclingDisciplines[cyclingDisciplineIndex];
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        }, 250);
+    }, 3200);
+}
+
+function facilityProToggleMobileAccordion(submenuId, chevronId) {
+    const sub = document.getElementById(submenuId);
+    const chev = document.getElementById(chevronId);
+    if (!sub) return;
+    sub.classList.toggle('hidden');
+    if (chev) {
+        chev.classList.toggle('rotate-180');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initCyclingDisciplines();
+});

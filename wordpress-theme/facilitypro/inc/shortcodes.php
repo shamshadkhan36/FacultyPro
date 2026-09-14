@@ -1792,16 +1792,16 @@ add_shortcode('facilitypro_dashboard', 'facilitypro_dashboard_shortcode');
 // 7. Hero Section Shortcode [facilitypro_hero]
 function facilitypro_hero_shortcode($atts) {
     $a = shortcode_atts(array(
-        'title' => 'Plant problems solved with step-by-step mathematical clarity.',
-        'subtitle' => 'Ask any complex HVAC, Plumbing, Electrical, or Fire Fighting question. Get verified formulas, exact sizing derivation, and Indian IS/NBC code clauses from domain-specialized AI Consultants in under 5 seconds.',
-        'badge' => 'FacilityPro MEP Point-to-Point AI Diagnostics',
+        'title'    => 'Real help from real',
+        'subtitle' => 'Talk or text with thousands of verified MEP engineers & OpenAI reasoning for exact, code-compliant point-to-point answers.',
+        'badge'    => 'FacilityPro MEP Point-to-Point Q&A',
     ), $atts);
-    
+
     ob_start();
     ?>
-    <!-- HERO SECTION -->
+    <!-- HERO SECTION (Exact Layout matching faculty-pro-rho.vercel.app) -->
     <section class="relative min-h-[580px] sm:min-h-[640px] flex items-center justify-center overflow-hidden bg-slate-900 text-white">
-        <!-- Background Image with Overlay -->
+        <!-- Background Image of Industrial Plant Room / MEP Facility with Dark Overlay -->
         <div class="absolute inset-0 z-0">
             <img 
                 src="<?php echo esc_url(FACILITYPRO_URI . '/assets/images/bms_control_room.jpg'); ?>" 
@@ -1812,93 +1812,109 @@ function facilitypro_hero_shortcode($atts) {
             <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-black/60"></div>
         </div>
 
-        <!-- Hero Content -->
+        <!-- Main Content Container -->
         <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 text-center sm:text-left">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 
                 <div class="lg:col-span-8 space-y-6">
-                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-lg">
+                    
+                    <!-- Logo Badge in Hero -->
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-lg animate-in fade-in duration-300">
                         <div class="w-5 h-5 rounded-full bg-[#f05423] flex items-center justify-center text-white text-[10px] font-black">
                             FP
                         </div>
                         <span class="text-xs sm:text-sm font-semibold tracking-wide text-slate-100">
-                            <?php echo esc_html($a['badge']); ?>
+                            Facility<span class="text-[#ff7849]">Pro</span> MEP Point-to-Point Q&amp;A
                         </span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
                     </div>
 
-                    <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1]">
-                        Plant problems solved with <br class="hidden sm:inline" />
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-[#ff7849] to-amber-300">
-                            step-by-step mathematical clarity.
-                        </span>
-                    </h1>
+                    <!-- Main Headline with Animated Cycling Disciplines and Orange 24/7 -->
+                    <div class="space-y-2">
+                        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight sm:leading-none">
+                            Real help from real <br class="hidden sm:inline" />
+                            <span id="cyclingDiscipline" class="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-sky-300 transition-all duration-300 inline-block">
+                                HVAC Specialists
+                            </span>
+                            <span class="text-[#ff5722] ml-1 sm:ml-2 font-black">, 24/7</span>
+                        </h1>
+                        <p class="text-base sm:text-xl font-normal text-slate-300 max-w-2xl leading-relaxed pt-1">
+                            <?php echo esc_html($a['subtitle']); ?>
+                        </p>
+                    </div>
 
-                    <p class="text-sm sm:text-lg text-slate-200 font-normal leading-relaxed max-w-2xl">
-                        <?php echo esc_html($a['subtitle']); ?>
-                    </p>
+                    <!-- Quick Prompt Pills with search magnifying glass icon -->
+                    <div class="flex items-center gap-2 flex-wrap pt-1">
+                        <button onclick="facilityProOpenConsultationModal('Chiller approach temperature high &amp; surging', 'Er. Rajesh Sharma', 'HVAC &amp; Chilled Water')" class="group inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-sm border border-white/15 text-xs text-slate-200 hover:text-white font-medium transition-all duration-200 cursor-pointer shadow-xs hover:scale-105 active:scale-95">
+                            <i data-lucide="search" class="w-3 h-3 text-slate-400 group-hover:text-white transition-colors"></i>
+                            <span>Chiller approach temperature high &amp; surging</span>
+                        </button>
+                        <button onclick="facilityProOpenConsultationModal('Booster pump head &amp; flow calculation', 'Er. Amit Patel', 'Plumbing &amp; Drainage')" class="group inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-sm border border-white/15 text-xs text-slate-200 hover:text-white font-medium transition-all duration-200 cursor-pointer shadow-xs hover:scale-105 active:scale-95">
+                            <i data-lucide="search" class="w-3 h-3 text-slate-400 group-hover:text-white transition-colors"></i>
+                            <span>Booster pump head &amp; flow calculation</span>
+                        </button>
+                        <button onclick="facilityProOpenConsultationModal('Transformer fault level &amp; relay coordination', 'Dr. Vikram Malhotra', 'Electrical &amp; Power')" class="group inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-sm border border-white/15 text-xs text-slate-200 hover:text-white font-medium transition-all duration-200 cursor-pointer shadow-xs hover:scale-105 active:scale-95">
+                            <i data-lucide="search" class="w-3 h-3 text-slate-400 group-hover:text-white transition-colors"></i>
+                            <span>Transformer fault level &amp; relay coordination</span>
+                        </button>
+                        <button onclick="facilityProOpenConsultationModal('NFPA 13 sprinkler hydraulic calculation', 'Er. Ananya Verma', 'Fire &amp; Life Safety')" class="group inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-sm border border-white/15 text-xs text-slate-200 hover:text-white font-medium transition-all duration-200 cursor-pointer shadow-xs hover:scale-105 active:scale-95">
+                            <i data-lucide="search" class="w-3 h-3 text-slate-400 group-hover:text-white transition-colors"></i>
+                            <span>NFPA 13 sprinkler hydraulic calculation</span>
+                        </button>
+                        <button onclick="facilityProOpenConsultationModal('Ask any MEP question...')" class="group inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-sm border border-white/15 text-xs text-slate-200 hover:text-white font-medium transition-all duration-200 cursor-pointer">
+                            <i data-lucide="search" class="w-3 h-3 text-slate-400"></i>
+                            <span>Ask anything...</span>
+                        </button>
+                    </div>
 
-                    <!-- Interactive Search Bar -->
-                    <div class="pt-2">
-                        <form onsubmit="facilityProHandleHeroSearch(event)" class="relative flex flex-col sm:flex-row gap-2 max-w-2xl bg-white/95 p-2 rounded-2xl sm:rounded-full shadow-2xl backdrop-blur-md border border-white/40">
-                            <div class="flex items-center pl-3 flex-1">
-                                <i data-lucide="search" class="w-5 h-5 text-slate-400 shrink-0"></i>
-                                <input 
-                                    type="text" 
+                    <!-- Central Question Input Bar -->
+                    <form onsubmit="facilityProHandleHeroSearch(event)" class="pt-2">
+                        <div class="relative flex flex-col sm:flex-row items-center bg-white rounded-2xl sm:rounded-full p-1.5 sm:p-2 shadow-2xl shadow-black/50 border-2 border-white/20 focus-within:border-[#ff5722] transition-all duration-200">
+                            
+                            <div class="flex items-center w-full pl-3 sm:pl-4 pr-2 py-2 sm:py-0">
+                                <i data-lucide="wrench" class="w-5 h-5 text-slate-400 mr-2.5 shrink-0 hidden sm:block"></i>
+                                <input
+                                    type="text"
                                     id="hero-search-input"
-                                    placeholder="e.g., Chiller condenser surging at 85% load, or PRV sizing for 28-story riser..." 
-                                    class="w-full text-xs sm:text-sm py-2.5 px-3 bg-transparent text-slate-800 placeholder:text-slate-400 focus:outline-none font-medium"
+                                    placeholder="Ask about HVAC, Plumbing, Electrical, or Fire Fighting systems..."
+                                    class="w-full bg-transparent text-slate-900 placeholder:text-slate-400 text-sm sm:text-base font-medium focus:outline-none"
                                 />
                             </div>
-                            <button 
-                                type="submit" 
-                                class="bg-[#f05423] hover:bg-[#d84315] text-white font-extrabold text-xs sm:text-sm px-6 py-3 rounded-xl sm:rounded-full transition-all shadow-md shadow-orange-600/30 flex items-center justify-center gap-2 cursor-pointer"
-                            >
-                                <span>Get Solution</span>
-                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                            </button>
-                        </form>
 
-                        <!-- Quick Prompts Pills -->
-                        <div class="mt-3.5 flex flex-wrap items-center gap-2 text-xs text-slate-300">
-                            <span class="font-bold text-slate-400">Popular:</span>
-                            <button onclick="facilityProOpenConsultationModal('Centrifugal chiller condenser high approach temperature & surging under 85% load.', 'Er. Rajesh Sharma', 'HVAC & Chilled Water')" class="bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-full text-slate-200 transition-colors border border-white/10 cursor-pointer">
-                                Chiller Surging &amp; Approach
-                            </button>
-                            <button onclick="facilityProOpenConsultationModal('High-rise riser water hammer and PRV station sizing for 28 stories.', 'Er. Amit Patel', 'Plumbing & Drainage')" class="bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-full text-slate-200 transition-colors border border-white/10 cursor-pointer">
-                                Water Hammer &amp; PRVs
-                            </button>
-                            <button onclick="facilityProOpenConsultationModal('Transformer 87T differential protection tripping on inrush current.', 'Dr. Vikram Malhotra', 'Electrical & Power')" class="bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-full text-slate-200 transition-colors border border-white/10 cursor-pointer">
-                                Transformer 87T Trip
-                            </button>
-                            <button onclick="facilityProOpenConsultationModal('NFPA 13 sprinkler hydraulic flow and fire pump head calculation.', 'Er. Ananya Verma', 'Fire & Life Safety')" class="bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-full text-slate-200 transition-colors border border-white/10 cursor-pointer">
-                                NFPA 13 Sprinklers
+                            <!-- Orange/Coral Start Chat Button -->
+                            <button
+                                type="submit"
+                                class="w-full sm:w-auto mt-2 sm:mt-0 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl sm:rounded-full bg-gradient-to-r from-[#ff5722] to-[#f05423] hover:from-[#ff6f3c] hover:to-[#ff5722] text-white font-bold text-sm sm:text-base shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-150 cursor-pointer shrink-0"
+                            >
+                                <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
+                                <span>Start chat</span>
                             </button>
                         </div>
-                    </div>
+
+                        <!-- Disclaimer text -->
+                        <p class="text-[11px] text-slate-400 mt-2.5 text-center sm:text-left">
+                            By chatting, you understand chats may be recorded and agree to our <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="text-sky-400 hover:underline">Terms of Service</a> and <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="text-sky-400 hover:underline">Privacy Policy</a>.
+                        </p>
+                    </form>
 
                 </div>
 
-                <!-- Right Quick Card Preview -->
-                <div class="hidden lg:block lg:col-span-4">
-                    <div class="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/20 shadow-2xl space-y-4">
-                        <div class="flex items-center justify-between pb-3 border-b border-white/10">
-                            <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                                AI Engine Active
-                            </span>
-                            <span class="text-[10px] text-slate-300">OpenAI GPT-4o</span>
+                <!-- Right Trust Column / Award Seal -->
+                <div class="hidden lg:flex lg:col-span-4 flex-col items-center justify-center space-y-4">
+                    <div class="relative p-6 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-center max-w-xs shadow-2xl">
+                        <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-tr from-amber-400 to-amber-200 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/20 mb-3">
+                            <i data-lucide="award" class="w-9 h-9 stroke-[2] text-amber-900"></i>
                         </div>
-                        <div class="space-y-2">
-                            <div class="text-xs text-slate-300 font-bold uppercase tracking-wider">Governing Standards</div>
-                            <div class="text-sm font-bold text-white leading-tight">National Building Code (NBC), ISHRAE, ASHRAE, NFPA &amp; IEEE</div>
+                        <h3 class="text-lg font-bold text-white tracking-tight">100% Verified MEP Engineers</h3>
+                        <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                            Licensed Professional Engineers (PE), ASHRAE Fellows, NFPA CFPS &amp; IEEE Senior Members.
+                        </p>
+                        
+                        <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-center gap-3 text-xs text-amber-300 font-semibold">
+                            <span class="flex items-center gap-1"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> 24/7 Active</span>
+                            <span>&bull;</span>
+                            <span class="flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Verified Credentials</span>
                         </div>
-                        <div class="p-3 bg-white/5 rounded-2xl border border-white/10 text-xs text-slate-200 leading-relaxed">
-                            "Instant derivations for pipe friction loss, transformer inrush harmonics, Joukowsky water hammer, and chiller kW/TR."
-                        </div>
-                        <button onclick="facilityProOpenConsultationModal()" class="w-full py-2.5 rounded-xl bg-white text-[#0b2545] font-bold text-xs hover:bg-slate-100 transition-colors flex items-center justify-center gap-1.5 shadow-md">
-                            <span>Open Diagnostic Studio</span>
-                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                        </button>
                     </div>
                 </div>
 

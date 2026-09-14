@@ -16,7 +16,7 @@
         <div class="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
             <span class="inline-flex items-center justify-center bg-[#f05423] text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">Live</span>
             <span class="font-medium text-slate-200 text-xs truncate">
-                🔥 <strong>15,000+ Verified Facility Managers Connected:</strong> Point-to-Point MEP AI Diagnostics with licensed Indian PEs &amp; ASHRAE/NFPA code derivations.
+                🔥 <strong>15,000+ Verified Facility Managers Connected:</strong> Point-to-Point MEP AI Diagnostics with licensed PEs &amp; ASHRAE/NFPA code derivations.
             </span>
         </div>
         <div class="hidden md:flex items-center gap-4 shrink-0 text-slate-300 text-xs">
@@ -31,7 +31,7 @@
     </div>
 </div>
 
-<!-- Main Sticky Navigation Bar -->
+<!-- Main Sticky Navigation Bar with Clean Sub-menus -->
 <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 sm:h-20">
@@ -54,88 +54,120 @@
                 </a>
             </div>
 
-            <!-- Desktop Nav Items (Exact User Menus: 1. Home, 2. HVAC, 3. Electrical, 4. Plumbing, 5. Mechanical (Dropdown), 6. SOPs, 7. Pricing) -->
-            <nav class="hidden lg:flex items-center gap-1">
+            <!-- Desktop Nav Items with Organized Sub-menus / Dropdowns -->
+            <nav class="hidden lg:flex items-center gap-1.5">
                 
                 <!-- 1. Home -->
                 <a href="<?php echo esc_url(home_url('/')); ?>" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50/70 transition-all <?php echo is_front_page() ? 'bg-sky-50 text-[#0077c8]' : ''; ?>">
                     Home
                 </a>
 
-                <!-- 2. HVAC -->
-                <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('hvac')" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50/70 transition-all">
-                    HVAC
-                </a>
-
-                <!-- 3. Electrical -->
-                <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('electrical')" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50/70 transition-all">
-                    Electrical
-                </a>
-
-                <!-- 4. Plumbing -->
-                <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('plumbing')" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50/70 transition-all">
-                    Plumbing
-                </a>
-
-                <!-- 5. Mechanical (Dropdown with Sub-menus: Fire fighting, Painting & polishing, BMS & automation, STP & water treatment, DG set, Calculation tools) -->
-                <div class="relative group" id="navMechanicalDropdown">
-                    <button type="button" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50/70 transition-all flex items-center gap-1 cursor-pointer">
-                        <span>Mechanical</span>
+                <!-- 2. Disciplines Submenu Dropdown -->
+                <div class="relative group" id="navDisciplinesDropdown">
+                    <button type="button" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50/70 transition-all flex items-center gap-1.5 cursor-pointer">
+                        <span>Disciplines</span>
                         <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition-transform duration-200"></i>
                     </button>
                     
-                    <!-- Dropdown Sub-menu -->
-                    <div class="absolute top-full left-0 mt-1 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 hidden group-hover:block transition-all duration-200 z-50 animate-in fade-in slide-in-from-top-2">
-                        <div class="px-3 py-1.5 border-b border-slate-100 mb-1">
-                            <span class="text-[10px] font-black uppercase tracking-wider text-[#0077c8]">Mechanical &amp; Plant Systems</span>
+                    <!-- Mega Dropdown Box for Disciplines -->
+                    <div class="absolute top-full left-0 mt-1 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 hidden group-hover:block transition-all duration-200 z-50 animate-in fade-in slide-in-from-top-2">
+                        <div class="px-3 py-1.5 border-b border-slate-100 mb-1.5 flex items-center justify-between">
+                            <span class="text-[10px] font-black uppercase tracking-wider text-[#0077c8]">Engineering Categories</span>
+                            <span class="text-[10px] font-semibold text-slate-400">8 Disciplines</span>
                         </div>
                         
-                        <!-- Fire Fighting -->
-                        <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('firefighting')" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-rose-600 hover:bg-rose-50 transition-colors">
-                            <i data-lucide="flame" class="w-4 h-4 text-rose-500"></i>
-                            <span>Fire fighting</span>
-                        </a>
+                        <div class="grid grid-cols-2 gap-1">
+                            <!-- HVAC -->
+                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('hvac')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50 transition-colors">
+                                <i data-lucide="wind" class="w-4 h-4 text-sky-500"></i>
+                                <span>HVAC</span>
+                            </a>
 
-                        <!-- Painting & Polishing -->
-                        <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('painting')" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-purple-600 hover:bg-purple-50 transition-colors">
-                            <i data-lucide="paint-brush" class="w-4 h-4 text-purple-500"></i>
-                            <span>Painting &amp; polishing</span>
-                        </a>
+                            <!-- Electrical -->
+                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('electrical')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-600 hover:bg-amber-50 transition-colors">
+                                <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
+                                <span>Electrical</span>
+                            </a>
 
-                        <!-- BMS & Automation -->
-                        <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('bms')" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-teal-600 hover:bg-teal-50 transition-colors">
-                            <i data-lucide="cpu" class="w-4 h-4 text-teal-500"></i>
-                            <span>BMS &amp; automation</span>
-                        </a>
+                            <!-- Plumbing -->
+                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('plumbing')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors">
+                                <i data-lucide="droplets" class="w-4 h-4 text-blue-500"></i>
+                                <span>Plumbing</span>
+                            </a>
 
-                        <!-- STP & Water Treatment -->
-                        <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('stp')" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-cyan-600 hover:bg-cyan-50 transition-colors">
-                            <i data-lucide="filter" class="w-4 h-4 text-cyan-600"></i>
-                            <span>STP &amp; water treatment</span>
-                        </a>
+                            <!-- Fire Fighting -->
+                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('firefighting')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-rose-600 hover:bg-rose-50 transition-colors">
+                                <i data-lucide="flame" class="w-4 h-4 text-rose-500"></i>
+                                <span>Fire fighting</span>
+                            </a>
 
-                        <!-- DG Set -->
-                        <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('dgset')" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 transition-colors">
-                            <i data-lucide="battery-charging" class="w-4 h-4 text-emerald-600"></i>
-                            <span>DG set</span>
-                        </a>
+                            <!-- Painting & Polishing -->
+                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('painting')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-purple-600 hover:bg-purple-50 transition-colors">
+                                <i data-lucide="paint-brush" class="w-4 h-4 text-purple-500"></i>
+                                <span>Painting</span>
+                            </a>
 
-                        <div class="border-t border-slate-100 my-1"></div>
+                            <!-- BMS & Automation -->
+                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('bms')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-teal-600 hover:bg-teal-50 transition-colors">
+                                <i data-lucide="cpu" class="w-4 h-4 text-teal-500"></i>
+                                <span>BMS</span>
+                            </a>
+
+                            <!-- STP & Water Treatment -->
+                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('stp')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-cyan-600 hover:bg-cyan-50 transition-colors">
+                                <i data-lucide="filter" class="w-4 h-4 text-cyan-600"></i>
+                                <span>STP Treatment</span>
+                            </a>
+
+                            <!-- DG Set -->
+                            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProFilterCategory('dgset')" class="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 transition-colors">
+                                <i data-lucide="battery-charging" class="w-4 h-4 text-emerald-600"></i>
+                                <span>DG Set</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Tools & Resources Submenu Dropdown -->
+                <div class="relative group" id="navToolsDropdown">
+                    <button type="button" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50/70 transition-all flex items-center gap-1.5 cursor-pointer">
+                        <span>Tools &amp; SOPs</span>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition-transform duration-200"></i>
+                    </button>
+                    
+                    <!-- Dropdown Sub-menu for Tools -->
+                    <div class="absolute top-full left-0 mt-1 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 hidden group-hover:block transition-all duration-200 z-50 animate-in fade-in slide-in-from-top-2">
+                        <div class="px-3 py-1.5 border-b border-slate-100 mb-1">
+                            <span class="text-[10px] font-black uppercase tracking-wider text-[#0077c8]">Engineering Resources</span>
+                        </div>
+
+                        <!-- SOP Library -->
+                        <a href="<?php echo esc_url(home_url('/sop-library')); ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50 transition-colors">
+                            <i data-lucide="file-text" class="w-4 h-4 text-[#0077c8]"></i>
+                            <span>SOP Library</span>
+                        </a>
 
                         <!-- Calculation Tools -->
-                        <a href="<?php echo esc_url(home_url('/calculators')); ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-[#0077c8] hover:bg-sky-50 transition-colors">
-                            <i data-lucide="calculator" class="w-4 h-4 text-[#0077c8]"></i>
-                            <span>Calculation tools</span>
+                        <a href="<?php echo esc_url(home_url('/calculators')); ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50 transition-colors">
+                            <i data-lucide="calculator" class="w-4 h-4 text-teal-600"></i>
+                            <span>Calculation Tools</span>
+                        </a>
+
+                        <!-- Maintenance Checklists -->
+                        <a href="<?php echo esc_url(home_url('/checklists')); ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50 transition-colors">
+                            <i data-lucide="check-square" class="w-4 h-4 text-indigo-600"></i>
+                            <span>Maintenance Checklists</span>
+                        </a>
+
+                        <!-- Knowledge Hub -->
+                        <a href="<?php echo esc_url(home_url('/knowledge-hub')); ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50 transition-colors">
+                            <i data-lucide="book-open" class="w-4 h-4 text-amber-600"></i>
+                            <span>Knowledge Hub</span>
                         </a>
                     </div>
                 </div>
 
-                <!-- 6. SOPs -->
-                <a href="<?php echo esc_url(home_url('/sop-library')); ?>" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50/70 transition-all <?php echo is_page('sop-library') ? 'bg-sky-50 text-[#0077c8]' : ''; ?>">
-                    SOPs
-                </a>
-
-                <!-- 7. Pricing -->
+                <!-- 4. Pricing -->
                 <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0077c8] hover:bg-sky-50/70 transition-all <?php echo is_page('pricing') ? 'bg-sky-50 text-[#0077c8]' : ''; ?>">
                     Pricing
                 </a>
@@ -210,42 +242,33 @@
         </div>
 
         <!-- Drawer Navigation List -->
-        <div class="flex-1 overflow-y-auto p-4 space-y-1.5">
+        <div class="flex-1 overflow-y-auto p-4 space-y-2">
             
-            <!-- 1. Home -->
+            <!-- Home -->
             <a href="<?php echo esc_url(home_url('/')); ?>" onclick="facilityProCloseMobileMenu()" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm text-slate-800 hover:bg-sky-50 hover:text-[#0077c8] transition-colors">
                 <i data-lucide="home" class="w-4 h-4 text-[#0077c8]"></i>
                 <span>Home</span>
             </a>
 
-            <!-- 2. HVAC -->
-            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('hvac');" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm text-slate-800 hover:bg-sky-50 hover:text-[#0077c8] transition-colors">
-                <i data-lucide="wind" class="w-4 h-4 text-sky-500"></i>
-                <span>HVAC</span>
-            </a>
-
-            <!-- 3. Electrical -->
-            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('electrical');" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm text-slate-800 hover:bg-amber-50 hover:text-amber-700 transition-colors">
-                <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
-                <span>Electrical</span>
-            </a>
-
-            <!-- 4. Plumbing -->
-            <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('plumbing');" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm text-slate-800 hover:bg-blue-50 hover:text-blue-700 transition-colors">
-                <i data-lucide="droplets" class="w-4 h-4 text-blue-500"></i>
-                <span>Plumbing</span>
-            </a>
-
-            <!-- 5. Mechanical (Expandable Accordion) -->
+            <!-- Disciplines Expandable Accordion -->
             <div>
-                <button type="button" onclick="facilityProToggleMobileMechanical()" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-sm text-slate-800 hover:bg-sky-50 hover:text-[#0077c8] transition-colors cursor-pointer">
+                <button type="button" onclick="facilityProToggleMobileAccordion('mobileDisciplinesSubmenu', 'mobileDiscChevron')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-sm text-slate-800 hover:bg-sky-50 hover:text-[#0077c8] transition-colors cursor-pointer">
                     <div class="flex items-center gap-3">
-                        <i data-lucide="cog" class="w-4 h-4 text-[#0077c8]"></i>
-                        <span>Mechanical</span>
+                        <i data-lucide="layers" class="w-4 h-4 text-sky-500"></i>
+                        <span>Disciplines</span>
                     </div>
-                    <i data-lucide="chevron-down" id="mobileMechChevron" class="w-4 h-4 text-slate-400 transition-transform"></i>
+                    <i data-lucide="chevron-down" id="mobileDiscChevron" class="w-4 h-4 text-slate-400 transition-transform"></i>
                 </button>
-                <div id="mobileMechanicalSubmenu" class="hidden pl-4 pr-2 py-2 space-y-1 border-l-2 border-slate-200 ml-5 my-1 bg-slate-50/70 rounded-r-xl">
+                <div id="mobileDisciplinesSubmenu" class="hidden pl-4 pr-2 py-2 space-y-1 border-l-2 border-slate-200 ml-5 my-1 bg-slate-50/70 rounded-r-xl">
+                    <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('hvac');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-[#0077c8] rounded-lg hover:bg-white">
+                        <span>❄️ HVAC Systems</span>
+                    </a>
+                    <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('electrical');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-amber-600 rounded-lg hover:bg-white">
+                        <span>⚡ Electrical &amp; Power</span>
+                    </a>
+                    <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('plumbing');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-blue-600 rounded-lg hover:bg-white">
+                        <span>🚰 Plumbing &amp; Piping</span>
+                    </a>
                     <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('firefighting');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-rose-600 rounded-lg hover:bg-white">
                         <span>🔥 Fire fighting</span>
                     </a>
@@ -253,71 +276,74 @@
                         <span>🎨 Painting &amp; polishing</span>
                     </a>
                     <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('bms');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-teal-600 rounded-lg hover:bg-white">
-                        <span>🎛️ BMS &amp; automation</span>
+                        <span>🏢 BMS &amp; automation</span>
                     </a>
                     <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('stp');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-cyan-600 rounded-lg hover:bg-white">
-                        <span>🧪 STP &amp; water treatment</span>
+                        <span>💧 STP &amp; water treatment</span>
                     </a>
                     <a href="<?php echo esc_url(home_url('/#disciplines')); ?>" onclick="facilityProCloseMobileMenu(); facilityProFilterCategory('dgset');" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-emerald-600 rounded-lg hover:bg-white">
-                        <span>🔋 DG set</span>
-                    </a>
-                    <a href="<?php echo esc_url(home_url('/calculators')); ?>" onclick="facilityProCloseMobileMenu()" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-[#0077c8] rounded-lg hover:bg-white">
-                        <span>🔢 Calculation tools</span>
+                        <span>⚡ DG set</span>
                     </a>
                 </div>
             </div>
 
-            <!-- 6. SOPs -->
-            <a href="<?php echo esc_url(home_url('/sop-library')); ?>" onclick="facilityProCloseMobileMenu()" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm text-slate-800 hover:bg-sky-50 hover:text-[#0077c8] transition-colors">
-                <i data-lucide="shield-check" class="w-4 h-4 text-amber-500"></i>
-                <span>SOPs</span>
-            </a>
-
-            <!-- 7. Pricing -->
-            <a href="<?php echo esc_url(home_url('/pricing')); ?>" onclick="facilityProCloseMobileMenu()" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm text-slate-800 hover:bg-sky-50 hover:text-[#0077c8] transition-colors">
-                <i data-lucide="credit-card" class="w-4 h-4 text-indigo-500"></i>
-                <span>Pricing</span>
-            </a>
-
-            <!-- Dashboard Link in Mobile Drawer -->
-            <a href="<?php echo esc_url(home_url('/dashboard')); ?>" onclick="facilityProCloseMobileMenu()" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm text-slate-800 hover:bg-sky-50 hover:text-[#0077c8] transition-colors">
-                <i data-lucide="layout-dashboard" class="w-4 h-4 text-purple-500"></i>
-                <span>Dashboard</span>
-            </a>
-
-            <!-- Ask AI Action Button -->
-            <div class="pt-3">
-                <button type="button" onclick="facilityProCloseMobileMenu(); facilityProOpenConsultationModal();" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#f05423] to-[#d94416] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer">
-                    <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    <span>Ask AI Specialist</span>
+            <!-- Tools & Resources Expandable Accordion -->
+            <div>
+                <button type="button" onclick="facilityProToggleMobileAccordion('mobileToolsSubmenu', 'mobileToolsChevron')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-sm text-slate-800 hover:bg-sky-50 hover:text-[#0077c8] transition-colors cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="file-text" class="w-4 h-4 text-[#0077c8]"></i>
+                        <span>Tools &amp; SOPs</span>
+                    </div>
+                    <i data-lucide="chevron-down" id="mobileToolsChevron" class="w-4 h-4 text-slate-400 transition-transform"></i>
                 </button>
+                <div id="mobileToolsSubmenu" class="hidden pl-4 pr-2 py-2 space-y-1 border-l-2 border-slate-200 ml-5 my-1 bg-slate-50/70 rounded-r-xl">
+                    <a href="<?php echo esc_url(home_url('/sop-library')); ?>" onclick="facilityProCloseMobileMenu()" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-[#0077c8] rounded-lg hover:bg-white">
+                        <span>📚 SOP Library</span>
+                    </a>
+                    <a href="<?php echo esc_url(home_url('/calculators')); ?>" onclick="facilityProCloseMobileMenu()" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-[#0077c8] rounded-lg hover:bg-white">
+                        <span>🧮 Calculation Tools</span>
+                    </a>
+                    <a href="<?php echo esc_url(home_url('/checklists')); ?>" onclick="facilityProCloseMobileMenu()" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-[#0077c8] rounded-lg hover:bg-white">
+                        <span>📋 Maintenance Checklists</span>
+                    </a>
+                    <a href="<?php echo esc_url(home_url('/knowledge-hub')); ?>" onclick="facilityProCloseMobileMenu()" class="flex items-center gap-2 py-1.5 px-2 text-xs font-bold text-slate-700 hover:text-[#0077c8] rounded-lg hover:bg-white">
+                        <span>📖 Knowledge Hub</span>
+                    </a>
+                </div>
             </div>
 
+            <!-- Pricing -->
+            <a href="<?php echo esc_url(home_url('/pricing')); ?>" onclick="facilityProCloseMobileMenu()" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm text-slate-800 hover:bg-sky-50 hover:text-[#0077c8] transition-colors">
+                <i data-lucide="tag" class="w-4 h-4 text-emerald-600"></i>
+                <span>Pricing Plans</span>
+            </a>
+
+            <!-- Ask AI Assistant Button -->
+            <button type="button" onclick="facilityProCloseMobileMenu(); facilityProOpenConsultationModal('Calculate NFPA 13 sprinkler water demand for warehouse.')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm text-[#f05423] bg-orange-50 hover:bg-orange-100 transition-colors border border-orange-200">
+                <i data-lucide="sparkles" class="w-4 h-4 text-[#f05423]"></i>
+                <span>Ask AI Engineering Assistant</span>
+            </button>
         </div>
 
-        <!-- Drawer Footer with Auth & Emergency -->
-        <div class="p-4 border-t border-slate-200 bg-slate-50 space-y-3">
+        <!-- Drawer Footer with Auth -->
+        <div class="p-4 border-t border-slate-200 bg-slate-50 space-y-2">
             <?php if (is_user_logged_in()) : ?>
-                <a href="<?php echo esc_url(home_url('/dashboard')); ?>" class="w-full py-2.5 px-3 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center gap-2">
+                <a href="<?php echo esc_url(home_url('/dashboard')); ?>" onclick="facilityProCloseMobileMenu()" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all shadow-md">
                     <i data-lucide="user" class="w-4 h-4"></i>
-                    <span>My Plant Account</span>
+                    <span>Open My Dashboard</span>
                 </a>
-                <a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="block text-center text-xs font-semibold text-rose-600 hover:underline">
-                    Log Out
+                <a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="w-full flex items-center justify-center gap-2 py-2 px-4 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-xl transition-colors">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    <span>Log Out</span>
                 </a>
             <?php else : ?>
-                <div class="grid grid-cols-2 gap-2">
-                    <button type="button" onclick="facilityProCloseMobileMenu(); facilityProOpenAuthModal('login')" class="py-2.5 px-3 rounded-xl border border-slate-300 font-bold text-xs text-slate-700 hover:bg-slate-100 cursor-pointer">
-                        Sign In
-                    </button>
-                    <button type="button" onclick="facilityProCloseMobileMenu(); facilityProOpenAuthModal('signup')" class="py-2.5 px-3 rounded-xl bg-[#0077c8] text-white font-bold text-xs shadow-sm cursor-pointer">
-                        Register
-                    </button>
-                </div>
+                <button type="button" onclick="facilityProCloseMobileMenu(); facilityProOpenAuthModal('login')" class="w-full py-2.5 px-4 text-xs font-bold text-slate-800 bg-white border border-slate-300 hover:border-[#0077c8] rounded-xl transition-all shadow-xs">
+                    Sign In
+                </button>
+                <button type="button" onclick="facilityProCloseMobileMenu(); facilityProOpenAuthModal('signup')" class="w-full py-2.5 px-4 text-xs font-bold text-white bg-[#0077c8] hover:bg-[#0062a4] rounded-xl transition-all shadow-md shadow-blue-500/20">
+                    Register New Account
+                </button>
             <?php endif; ?>
-            <a href="tel:+919876543210" class="block text-center text-[11px] font-bold text-slate-500 hover:text-slate-800">
-                📞 Emergency: +91 98765 43210
-            </a>
         </div>
 
     </div>

@@ -489,7 +489,7 @@ function facilitypro_calculators_shortcode($atts) {
 }
 add_shortcode('facilitypro_calculators', 'facilitypro_calculators_shortcode');
 
-// 2. Knowledge Hub Shortcode [facilitypro_knowledge_hub] (Dynamic WP_Query)
+// 2. Knowledge Hub Shortcode [facilitypro_knowledge_hub] (Dynamic WP_Query with 9 Disciplines)
 function facilitypro_knowledge_hub_shortcode($atts) {
     ob_start();
     
@@ -503,7 +503,7 @@ function facilitypro_knowledge_hub_shortcode($atts) {
     );
     $kb_query = new WP_Query($query_args);
     
-    $db_articles = array();
+    $all_articles = array();
     if ($kb_query->have_posts()) {
         while ($kb_query->have_posts()) {
             $kb_query->the_post();
@@ -511,13 +511,16 @@ function facilitypro_knowledge_hub_shortcode($atts) {
             $disc = get_post_meta($pid, 'kb_discipline', true);
             if (empty($disc)) {
                 $t = strtolower(get_the_title());
-                if (strpos($t, 'hvac') !== false || strpos($t, 'chiller') !== false) $disc = 'hvac';
-                elseif (strpos($t, 'elec') !== false || strpos($t, 'transformer') !== false) $disc = 'electrical';
-                elseif (strpos($t, 'plumb') !== false || strpos($t, 'pump') !== false) $disc = 'plumbing';
-                elseif (strpos($t, 'fire') !== false) $disc = 'fire';
-                elseif (strpos($t, 'dg') !== false) $disc = 'dg';
-                elseif (strpos($t, 'bms') !== false) $disc = 'bms';
-                else $disc = 'general';
+                if (strpos($t, 'hvac') !== false || strpos($t, 'chiller') !== false || strpos($t, 'duct') !== false) $disc = 'hvac';
+                elseif (strpos($t, 'elec') !== false || strpos($t, 'transformer') !== false || strpos($t, 'volt') !== false) $disc = 'electrical';
+                elseif (strpos($t, 'fire') !== false || strpos($t, 'sprinkler') !== false) $disc = 'firefighting';
+                elseif (strpos($t, 'plumb') !== false || strpos($t, 'water hammer') !== false || strpos($t, 'pump') !== false || strpos($t, 'drain') !== false) $disc = 'plumbing';
+                elseif (strpos($t, 'paint') !== false || strpos($t, 'epoxy') !== false) $disc = 'painting';
+                elseif (strpos($t, 'solar') !== false || strpos($t, 'pv') !== false) $disc = 'solar';
+                elseif (strpos($t, 'bms') !== false || strpos($t, 'bacnet') !== false) $disc = 'bms';
+                elseif (strpos($t, 'stp') !== false || strpos($t, 'mbr') !== false || strpos($t, 'sewage') !== false) $disc = 'stp';
+                elseif (strpos($t, 'dg') !== false || strpos($t, 'generator') !== false) $disc = 'dg';
+                else $disc = 'hvac';
             }
             $code_ref = get_post_meta($pid, 'kb_code_ref', true);
             if (empty($code_ref)) $code_ref = 'ASHRAE / NBC 2016';
@@ -527,12 +530,12 @@ function facilitypro_knowledge_hub_shortcode($atts) {
                 $excerpt = wp_trim_words(strip_tags(get_the_content()), 28, '...');
             }
 
-            $db_articles[] = array(
+            $all_articles[] = array(
                 'id'         => 'db-kb-' . $pid,
                 'discipline' => $disc,
                 'title'      => get_the_title(),
                 'category'   => ucfirst($disc) . ' Engineering',
-                'readTime'   => '5 min read',
+                'readTime'   => get_post_meta($pid, 'kb_read_time', true) ?: '6 min read',
                 'codeRef'    => $code_ref,
                 'summary'    => $excerpt,
                 'permalink'  => get_permalink(),
@@ -541,97 +544,40 @@ function facilitypro_knowledge_hub_shortcode($atts) {
         }
         wp_reset_postdata();
     }
-
-    // Default Seed Articles
-    $seed_articles = array(
-        array(
-            'id' => 'kb-hvac-1',
-            'discipline' => 'hvac',
-            'title' => 'Centrifugal Chiller Surge Identification & Aerodynamic Lift Control',
-            'category' => 'HVAC & Chilled Water',
-            'readTime' => '6 min read',
-            'codeRef' => 'ASHRAE Guideline 22 / Standard 90.1',
-            'summary' => 'Comprehensive analysis of compressor surge dynamics under low evaporator load or excessive condenser water entering temperatures.',
-            'permalink' => '#'
-        ),
-        array(
-            'id' => 'kb-elec-1',
-            'discipline' => 'electrical',
-            'title' => 'Transformer 87T Differential Relay Harmonic Restraint & Inrush Protection',
-            'category' => 'Electrical & Power',
-            'readTime' => '7 min read',
-            'codeRef' => 'IEEE C37.91 / IEC 60255 / NFPA 70',
-            'summary' => 'Preventing nuisance trips during transformer grid energization while preserving high sensitivity for internal faults.',
-            'permalink' => '#'
-        ),
-        array(
-            'id' => 'kb-plumb-1',
-            'discipline' => 'plumbing',
-            'title' => 'High-Rise Hydro-Pneumatic Water Supply & Water Hammer Arrestor Design',
-            'category' => 'Plumbing & Drainage',
-            'readTime' => '5 min read',
-            'codeRef' => 'IPC § 604 / ASPE Data Book / PDI-WH 201',
-            'summary' => 'Hydraulic principles for vertical pressure zoning, booster pump staging, and water hammer mitigation.',
-            'permalink' => '#'
-        ),
-        array(
-            'id' => 'kb-bms-1',
-            'discipline' => 'bms',
-            'title' => 'BMS DDC Architecture, BACnet MS/TP vs IP & Chiller Plant Optimization',
-            'category' => 'BMS & Automation',
-            'readTime' => '6 min read',
-            'codeRef' => 'ASHRAE Standard 135 (BACnet) / Guideline 36',
-            'summary' => 'Building Management System DDC controller networking, sensor calibration, and high-efficiency sequences.',
-            'permalink' => '#'
-        ),
-        array(
-            'id' => 'kb-dg-1',
-            'discipline' => 'dg',
-            'title' => 'Diesel Generator (DG Set) Synchronizing, AMF Logic & Wet Stacking',
-            'category' => 'DG Sets & Backup',
-            'readTime' => '6 min read',
-            'codeRef' => 'NFPA 110 (Level 1 Emergency Systems) / ISO 8528',
-            'summary' => 'Emergency power infrastructure, Auto Mains Failure (AMF) changeover sequences, and unburned fuel mitigation.',
-            'permalink' => '#'
-        ),
-        array(
-            'id' => 'kb-fire-1',
-            'discipline' => 'fire',
-            'title' => 'NFPA 25 Weekly Fire Pump Churn Testing & Hydraulic Characteristic Curves',
-            'category' => 'Fire & Life Safety',
-            'readTime' => '8 min read',
-            'codeRef' => 'NFPA 20 / NFPA 25 / NBC Part 4',
-            'summary' => 'Weekly electric & diesel fire pump inspection protocol and casing relief valve settings.',
-            'permalink' => '#'
-        )
-    );
-
-    $all_articles = array_merge($db_articles, $seed_articles);
     ?>
     <div class="facilitypro-kb-wrapper my-6 space-y-8" id="knowledgeHubRoot">
         
-        <!-- Filter Tabs -->
+        <!-- Filter Tabs for ALL 9 Disciplines -->
         <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar" id="kbFilterNav">
             <button onclick="facilityProFilterKb('all')" data-kbfilter="all" class="kb-filter-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-900 text-white shadow-sm border border-slate-900 cursor-pointer">
-                All Articles (<?php echo count($all_articles); ?>)
+                All Blogs (<?php echo count($all_articles); ?>)
             </button>
             <button onclick="facilityProFilterKb('hvac')" data-kbfilter="hvac" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                HVAC &amp; Chillers
+                HVAC
             </button>
             <button onclick="facilityProFilterKb('electrical')" data-kbfilter="electrical" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                Electrical Systems
+                Electrical
+            </button>
+            <button onclick="facilityProFilterKb('firefighting')" data-kbfilter="firefighting" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                Fire fighting
             </button>
             <button onclick="facilityProFilterKb('plumbing')" data-kbfilter="plumbing" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                Plumbing &amp; Water
+                Plumbing
             </button>
-            <button onclick="facilityProFilterKb('fire')" data-kbfilter="fire" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                Fire &amp; Life Safety
+            <button onclick="facilityProFilterKb('painting')" data-kbfilter="painting" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                Painting &amp; polishing
+            </button>
+            <button onclick="facilityProFilterKb('solar')" data-kbfilter="solar" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                Solar system
             </button>
             <button onclick="facilityProFilterKb('bms')" data-kbfilter="bms" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                BMS Automation
+                BMS &amp; Automation
+            </button>
+            <button onclick="facilityProFilterKb('stp')" data-kbfilter="stp" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                STP Treatment
             </button>
             <button onclick="facilityProFilterKb('dg')" data-kbfilter="dg" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                DG Sets
+                DG Set
             </button>
         </div>
 
@@ -639,9 +585,8 @@ function facilitypro_knowledge_hub_shortcode($atts) {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="kbCardsGrid">
             <?php foreach ($all_articles as $art) : 
                 $link = (!empty($art['permalink']) && $art['permalink'] !== '#') ? esc_url($art['permalink']) : 'javascript:void(0)';
-                $has_link = (!empty($art['permalink']) && $art['permalink'] !== '#');
             ?>
-                <div class="kb-card bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col justify-between group" data-discipline="<?php echo esc_attr($art['discipline']); ?>">
+                <div class="kb-card bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:border-[#0077c8] transition-all flex flex-col justify-between group cursor-pointer" data-discipline="<?php echo esc_attr($art['discipline']); ?>" onclick="window.location.href='<?php echo $link; ?>'">
                     <div>
                         <div class="flex items-center justify-between gap-2 mb-3">
                             <span class="px-2.5 py-1 rounded-lg bg-sky-50 text-[#0077c8] text-[11px] font-bold uppercase tracking-wider">
@@ -653,13 +598,9 @@ function facilitypro_knowledge_hub_shortcode($atts) {
                         </div>
 
                         <h3 class="text-base font-black text-slate-900 group-hover:text-[#0077c8] transition-colors line-clamp-2 leading-snug">
-                            <?php if ($has_link) : ?>
-                                <a href="<?php echo $link; ?>" class="hover:underline">
-                                    <?php echo esc_html($art['title']); ?>
-                                </a>
-                            <?php else : ?>
+                            <a href="<?php echo $link; ?>" class="hover:underline">
                                 <?php echo esc_html($art['title']); ?>
-                            <?php endif; ?>
+                            </a>
                         </h3>
 
                         <p class="text-xs text-slate-600 mt-2.5 line-clamp-3 leading-relaxed">
@@ -673,13 +614,11 @@ function facilitypro_knowledge_hub_shortcode($atts) {
                         </span>
 
                         <div class="flex items-center gap-1.5 shrink-0">
-                            <?php if ($has_link) : ?>
-                                <a href="<?php echo $link; ?>" class="px-3 py-1.5 bg-slate-900 hover:bg-[#0077c8] text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-1">
-                                    <span>Read Article</span>
-                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                                </a>
-                            <?php endif; ?>
-                            <button onclick="facilityProOpenConsultationModal('Calculate formula derivation for: <?php echo esc_js($art['title']); ?>')" class="p-2 text-slate-500 hover:text-[#f05423] hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" title="Ask AI Specialist">
+                            <a href="<?php echo $link; ?>" class="px-3.5 py-1.5 bg-slate-900 hover:bg-[#0077c8] text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-1 shadow-xs">
+                                <span>Read Full Blog</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </a>
+                            <button type="button" onclick="event.stopPropagation(); facilityProOpenConsultationModal('Technical query regarding: <?php echo esc_js($art['title']); ?>')" class="p-2 text-slate-500 hover:text-[#f05423] hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" title="Ask AI Specialist">
                                 <i data-lucide="sparkles" class="w-4 h-4 text-[#f05423]"></i>
                             </button>
                         </div>
@@ -692,8 +631,6 @@ function facilitypro_knowledge_hub_shortcode($atts) {
     <?php
     return ob_get_clean();
 }
-add_shortcode('facilitypro_knowledge_hub', 'facilitypro_knowledge_hub_shortcode');
-
 
 // 3. SOP Library Shortcode [facilitypro_sop_library] (Dynamic WP_Query)
 function facilitypro_sop_library_shortcode($atts) {
@@ -1928,136 +1865,260 @@ add_shortcode('facilitypro_hero', 'facilitypro_hero_shortcode');
 
 
 
-// 8. Category Grid Shortcode (9 Disciplines, 4 in a row mobile & desktop) [facilitypro_category_pills] and [facilitypro_category_grid]
+// 8. Category Grid Shortcode (9 Disciplines + Direct Blog Previews) [facilitypro_category_pills] and [facilitypro_category_grid]
 function facilitypro_category_grid_shortcode($atts) {
     ob_start();
+    
+    // Query published articles from database
+    $articles_query = new WP_Query(array(
+        'post_type'      => array('mep_knowledge', 'post'),
+        'post_status'    => 'publish',
+        'posts_per_page' => 30,
+        'orderby'        => 'date',
+        'order'          => 'DESC'
+    ));
     ?>
     <!-- MEP ENGINEERING DISCIPLINES 4-IN-A-ROW GRID -->
-    <section id="disciplines" class="py-8 sm:py-14 bg-slate-50/70 border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
+    <section id="disciplines" class="py-10 sm:py-16 bg-slate-50/70 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-10">
             
-            <div class="text-center max-w-3xl mx-auto mb-6 sm:mb-10">
+            <div class="text-center max-w-3xl mx-auto mb-6">
                 <span class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#0077c8] bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
                     Plant Engineering Categories
                 </span>
-                <h2 class="text-xl sm:text-3xl lg:text-4xl font-extrabold text-[#0b2545] tracking-tight mt-2">
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0b2545] tracking-tight mt-2">
                     Select Your Service Category
                 </h2>
-                <p class="text-slate-600 text-[11px] sm:text-xs md:text-sm mt-1.5">
-                    Click any discipline below to view verified formulas, AI root-cause derivations, and engineering calculations.
+                <p class="text-slate-600 text-xs sm:text-sm mt-1.5">
+                    Click any discipline below to instantly view technical blogs, verified formulas, and engineering solutions.
                 </p>
             </div>
 
-            <!-- 4-in-a-row Grid on BOTH Mobile & Desktop -->
-            <div class="grid grid-cols-4 gap-2 sm:gap-4 lg:gap-5" id="category-cards-grid">
+            <!-- 4-in-a-row Grid on BOTH Mobile & Desktop (Exact layout from user screenshot) -->
+            <div class="grid grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5" id="category-cards-grid">
                 
                 <!-- 1. HVAC -->
-                <div onclick="facilityProFilterCategory('hvac')" data-category="hvac" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div onclick="facilityProFilterCategory('hvac')" data-category="hvac" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="wind" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         HVAC
                     </h3>
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Chillers &amp; AHUs</span>
+                    <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
+                        <span>View Blogs</span>
+                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    </span>
                 </div>
 
                 <!-- 2. Electrical -->
-                <div onclick="facilityProFilterCategory('electrical')" data-category="electrical" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div onclick="facilityProFilterCategory('electrical')" data-category="electrical" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="zap" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Electrical
                     </h3>
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Substations &amp; LT</span>
+                    <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
+                        <span>View Blogs</span>
+                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    </span>
                 </div>
 
                 <!-- 3. Fire Fighting -->
-                <div onclick="facilityProFilterCategory('firefighting')" data-category="firefighting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div onclick="facilityProFilterCategory('firefighting')" data-category="firefighting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="flame" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Fire fighting
                     </h3>
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">NFPA 13 &amp; Pumps</span>
+                    <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
+                        <span>View Blogs</span>
+                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    </span>
                 </div>
 
                 <!-- 4. Plumbing -->
-                <div onclick="facilityProFilterCategory('plumbing')" data-category="plumbing" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div onclick="facilityProFilterCategory('plumbing')" data-category="plumbing" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="droplets" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Plumbing
                     </h3>
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Pumps &amp; Risers</span>
+                    <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
+                        <span>View Blogs</span>
+                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    </span>
                 </div>
 
                 <!-- 5. Painting & Polishing -->
-                <div onclick="facilityProFilterCategory('painting')" data-category="painting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div onclick="facilityProFilterCategory('painting')" data-category="painting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="paint-roller" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Painting &amp; polishing
                     </h3>
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Epoxy &amp; PU Coating</span>
+                    <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
+                        <span>View Blogs</span>
+                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    </span>
                 </div>
 
                 <!-- 6. Solar System -->
-                <div onclick="facilityProFilterCategory('solar')" data-category="solar" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div onclick="facilityProFilterCategory('solar')" data-category="solar" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="sun" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Solar system
                     </h3>
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Rooftop PV &amp; On-Grid</span>
+                    <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
+                        <span>View Blogs</span>
+                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    </span>
                 </div>
 
                 <!-- 7. BMS & Automation -->
-                <div onclick="facilityProFilterCategory('bms')" data-category="bms" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div onclick="facilityProFilterCategory('bms')" data-category="bms" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="sliders" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         BMS &amp; Automation
                     </h3>
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">DDC &amp; SCADA</span>
+                    <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
+                        <span>View Blogs</span>
+                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    </span>
                 </div>
 
                 <!-- 8. STP & Water Treatment -->
-                <div onclick="facilityProFilterCategory('stp')" data-category="stp" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div onclick="facilityProFilterCategory('stp')" data-category="stp" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="filter" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         STP &amp; water treatment
                     </h3>
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">MBBR, MBR &amp; RO</span>
+                    <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
+                        <span>View Blogs</span>
+                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    </span>
                 </div>
 
                 <!-- 9. DG Set -->
-                <div onclick="facilityProFilterCategory('dg')" data-category="dg" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div onclick="facilityProFilterCategory('dg')" data-category="dg" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="battery-charging" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
-                    <h3 class="text-[10px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
+                    <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         DG set
                     </h3>
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Sync &amp; AMF Panels</span>
+                    <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
+                        <span>View Blogs</span>
+                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    </span>
                 </div>
 
             </div>
+
+            <!-- DYNAMIC FEATURED BLOGS & SOLUTIONS GRID (Filtered on category click) -->
+            <div class="mt-12 pt-8 border-t border-slate-200" id="featured-blogs-section">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-[#0077c8] bg-sky-50 px-2.5 py-1 rounded-md border border-sky-100" id="currentFilterLabel">
+                            Showing All Engineering Articles
+                        </span>
+                        <h3 class="text-xl sm:text-2xl font-black text-slate-900 mt-1">
+                            Technical Blogs &amp; Plant Diagnostic Guides
+                        </h3>
+                    </div>
+                    <a href="<?php echo esc_url(home_url('/knowledge-hub/')); ?>" class="text-xs font-bold text-[#0077c8] hover:underline flex items-center gap-1">
+                        <span>Browse Full Knowledge Hub (All 9 Disciplines)</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="homeBlogCardsGrid">
+                    <?php
+                    if ($articles_query->have_posts()) :
+                        while ($articles_query->have_posts()) : $articles_query->the_post();
+                            $p_id = get_the_ID();
+                            $disc = get_post_meta($p_id, 'kb_discipline', true);
+                            if (empty($disc)) {
+                                $t = strtolower(get_the_title());
+                                if (strpos($t, 'hvac') !== false || strpos($t, 'chiller') !== false || strpos($t, 'duct') !== false) $disc = 'hvac';
+                                elseif (strpos($t, 'elec') !== false || strpos($t, 'transformer') !== false || strpos($t, 'volt') !== false) $disc = 'electrical';
+                                elseif (strpos($t, 'fire') !== false || strpos($t, 'sprinkler') !== false) $disc = 'firefighting';
+                                elseif (strpos($t, 'plumb') !== false || strpos($t, 'water hammer') !== false || strpos($t, 'pump') !== false || strpos($t, 'drain') !== false) $disc = 'plumbing';
+                                elseif (strpos($t, 'paint') !== false || strpos($t, 'epoxy') !== false) $disc = 'painting';
+                                elseif (strpos($t, 'solar') !== false || strpos($t, 'pv') !== false) $disc = 'solar';
+                                elseif (strpos($t, 'bms') !== false || strpos($t, 'bacnet') !== false) $disc = 'bms';
+                                elseif (strpos($t, 'stp') !== false || strpos($t, 'mbr') !== false || strpos($t, 'sewage') !== false) $disc = 'stp';
+                                elseif (strpos($t, 'dg') !== false || strpos($t, 'generator') !== false) $disc = 'dg';
+                                else $disc = 'hvac';
+                            }
+                            $code_ref = get_post_meta($p_id, 'kb_code_ref', true);
+                            if (empty($code_ref)) $code_ref = 'ASHRAE / NBC 2016';
+                            ?>
+                            <div class="blog-card bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:border-[#0077c8] transition-all flex flex-col justify-between group transform hover:-translate-y-1 cursor-pointer" data-discipline="<?php echo esc_attr($disc); ?>" onclick="window.location.href='<?php the_permalink(); ?>'">
+                                <div>
+                                    <div class="flex items-center justify-between gap-2 mb-3">
+                                        <span class="px-2.5 py-1 rounded-lg bg-sky-50 text-[#0077c8] text-[11px] font-bold uppercase tracking-wider">
+                                            <?php echo esc_html(strtoupper($disc)); ?>
+                                        </span>
+                                        <span class="text-[11px] font-medium text-slate-400">
+                                            <?php echo get_the_date('M d, Y'); ?>
+                                        </span>
+                                    </div>
+
+                                    <h4 class="text-base font-black text-slate-900 group-hover:text-[#0077c8] transition-colors line-clamp-2 leading-snug">
+                                        <a href="<?php the_permalink(); ?>" class="hover:underline">
+                                            <?php the_title(); ?>
+                                        </a>
+                                    </h4>
+
+                                    <p class="text-xs text-slate-600 mt-2.5 line-clamp-3 leading-relaxed">
+                                        <?php echo wp_trim_words(get_the_excerpt(), 24, '...'); ?>
+                                    </p>
+                                </div>
+
+                                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                                    <span class="text-[10px] font-semibold text-slate-400 truncate">
+                                        📖 <?php echo esc_html($code_ref); ?>
+                                    </span>
+
+                                    <a href="<?php the_permalink(); ?>" class="px-3.5 py-1.5 bg-slate-900 hover:bg-[#0077c8] text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 shadow-xs">
+                                        <span>Read Full Blog</span>
+                                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <?php
+                        endwhile;
+                        wp_reset_postdata();
+                    endif;
+                    ?>
+                </div>
+            </div>
+
         </div>
     </section>
     <?php
     return ob_get_clean();
 }
-add_shortcode('facilitypro_category_grid', 'facilitypro_category_grid_shortcode');
-add_shortcode('facilitypro_category_pills', 'facilitypro_category_grid_shortcode');
 
 // 9. Popular Questions Shortcode [facilitypro_popular_questions]
 function facilitypro_popular_questions_shortcode($atts) {

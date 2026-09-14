@@ -334,49 +334,113 @@ function facilityProToggleMobileMechanical() {
 }
 
 function facilityProFilterCategory(catId) {
-    // 1. Highlight Grid Cards
+    let target = (catId || 'all').toLowerCase();
+    if (target === 'fire') target = 'firefighting';
+    if (target === 'dgset') target = 'dg';
+
+    // 1. Highlight Category Cards
     document.querySelectorAll('.category-card').forEach(card => {
-        if (catId === 'all' || card.dataset.category === catId) {
-            card.classList.remove('opacity-30', 'grayscale');
+        let cCat = card.dataset.category ? card.dataset.category.toLowerCase() : '';
+        if (cCat === 'fire') cCat = 'firefighting';
+        if (cCat === 'dgset') cCat = 'dg';
+
+        if (target === 'all' || cCat === target) {
+            card.classList.remove('opacity-40', 'grayscale');
             card.classList.add('opacity-100');
-            if (card.dataset.category === catId) {
+            if (cCat === target) {
                 card.classList.add('border-[#0077c8]', 'bg-sky-50/50', 'ring-2', 'ring-[#0077c8]/20');
             } else {
                 card.classList.remove('border-[#0077c8]', 'bg-sky-50/50', 'ring-2', 'ring-[#0077c8]/20');
             }
         } else {
             card.classList.remove('border-[#0077c8]', 'bg-sky-50/50', 'ring-2', 'ring-[#0077c8]/20');
-            card.classList.add('opacity-30', 'grayscale');
+            card.classList.add('opacity-40', 'grayscale');
         }
     });
 
-    // 2. Trigger SOP & KB filtering if present
-    if (typeof facilityProFilterKb === 'function') {
-        facilityProFilterKb(catId);
-    }
-    if (typeof facilityProFilterSop === 'function') {
-        facilityProFilterSop(catId);
+    // 2. Filter Homepage Featured Blog Cards
+    const blogCards = document.querySelectorAll('#homeBlogCardsGrid .blog-card');
+    let visibleCount = 0;
+    blogCards.forEach(card => {
+        let bDisc = card.dataset.discipline ? card.dataset.discipline.toLowerCase() : '';
+        if (bDisc === 'fire') bDisc = 'firefighting';
+        if (bDisc === 'dgset') bDisc = 'dg';
+
+        if (target === 'all' || bDisc === target) {
+            card.style.display = 'flex';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    // 3. Update Filter Label on Homepage
+    const labelEl = document.getElementById('currentFilterLabel');
+    if (labelEl) {
+        if (target === 'all') {
+            labelEl.textContent = 'Showing All Engineering Articles';
+        } else {
+            labelEl.textContent = 'Filtered: ' + target.toUpperCase() + ' (' + visibleCount + ' articles)';
+        }
     }
 
-    // 3. Scroll to disciplines section
-    const disciplinesEl = document.getElementById('disciplines');
-    if (disciplinesEl) {
-        disciplinesEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // 4. Scroll smoothly to Featured Blogs on homepage
+    const blogSec = document.getElementById('featured-blogs-section');
+    if (blogSec && target !== 'all') {
+        blogSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+
+    // 5. Also trigger Knowledge Hub filtering if on Knowledge Hub page
+    facilityProFilterKb(target);
 
     if (window.lucide) lucide.createIcons();
 }
 
+function facilityProFilterKb(catId) {
+    let target = (catId || 'all').toLowerCase();
+    if (target === 'fire') target = 'firefighting';
+    if (target === 'dgset') target = 'dg';
 
-// Cycling Disciplines in Hero Section (Exact User Requested Order)
-const cyclingDisciplines = [
-    'HVAC specialists',
-    'facility Expert',
-    'Plumbing specialists',
-    'Electrical consultants',
-    'Fire Safety experts'
-];
-let cyclingDisciplineIndex = 0;
+    // Update Knowledge Hub Filter Buttons
+    document.querySelectorAll('.kb-filter-btn').forEach(btn => {
+        let bFilter = btn.dataset.kbfilter ? btn.dataset.kbfilter.toLowerCase() : '';
+        if (bFilter === 'fire') bFilter = 'firefighting';
+        if (bFilter === 'dgset') bFilter = 'dg';
+
+        if (bFilter === target) {
+            btn.className = 'kb-filter-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-900 text-white shadow-sm border border-slate-900 cursor-pointer';
+        } else {
+            btn.className = 'kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer';
+        }
+    });
+
+    // Filter Knowledge Hub Cards
+    const kbCards = document.querySelectorAll('#kbCardsGrid .kb-card');
+    kbCards.forEach(card => {
+        let cardDisc = card.dataset.discipline ? card.dataset.discipline.toLowerCase() : '';
+        if (cardDisc === 'fire') cardDisc = 'firefighting';
+        if (cardDisc === 'dgset') cardDisc = 'dg';
+
+        if (target === 'all' || cardDisc === target) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    if (window.lucide) lucide.createIcons();
+}
+
+// Auto-filter on page load if ?discipline= is in URL
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const discParam = urlParams.get('discipline');
+        if (discParam) {
+            facilityProFilterCategory(discParam);
+        }
+    } catch (e) {}
+});
 
 function initCyclingDisciplines() {
     const el = document.getElementById('cyclingDiscipline');

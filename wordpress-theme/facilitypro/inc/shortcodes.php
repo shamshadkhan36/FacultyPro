@@ -489,10 +489,15 @@ function facilitypro_calculators_shortcode($atts) {
 }
 add_shortcode('facilitypro_calculators', 'facilitypro_calculators_shortcode');
 
-// 2. Knowledge Hub Shortcode [facilitypro_knowledge_hub] (Dynamic WP_Query with 9 Disciplines)
+// 2. Knowledge Hub Shortcode [facilitypro_knowledge_hub] (Dynamic WP_Query with 9 Disciplines & Server Pre-filter)
 function facilitypro_knowledge_hub_shortcode($atts) {
     ob_start();
     
+    // Read ?discipline= query parameter from URL
+    $selected_disc = isset($_GET['discipline']) ? sanitize_text_field(strtolower(trim($_GET['discipline']))) : 'all';
+    if ($selected_disc === 'fire') $selected_disc = 'firefighting';
+    if ($selected_disc === 'dgset') $selected_disc = 'dg';
+
     // Query Custom Post Type 'mep_knowledge' and standard 'post' from WordPress Database
     $query_args = array(
         'post_type'      => array('mep_knowledge', 'post'),
@@ -544,49 +549,41 @@ function facilitypro_knowledge_hub_shortcode($atts) {
         }
         wp_reset_postdata();
     }
+
+    $tabs = array(
+        'all'          => 'All Blogs (' . count($all_articles) . ')',
+        'hvac'         => 'HVAC',
+        'electrical'   => 'Electrical',
+        'firefighting' => 'Fire fighting',
+        'plumbing'     => 'Plumbing',
+        'painting'     => 'Painting & polishing',
+        'solar'        => 'Solar system',
+        'bms'          => 'BMS & Automation',
+        'stp'          => 'STP Treatment',
+        'dg'           => 'DG Set'
+    );
     ?>
     <div class="facilitypro-kb-wrapper my-6 space-y-8" id="knowledgeHubRoot">
         
         <!-- Filter Tabs for ALL 9 Disciplines -->
         <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar" id="kbFilterNav">
-            <button onclick="facilityProFilterKb('all')" data-kbfilter="all" class="kb-filter-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-900 text-white shadow-sm border border-slate-900 cursor-pointer">
-                All Blogs (<?php echo count($all_articles); ?>)
-            </button>
-            <button onclick="facilityProFilterKb('hvac')" data-kbfilter="hvac" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                HVAC
-            </button>
-            <button onclick="facilityProFilterKb('electrical')" data-kbfilter="electrical" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                Electrical
-            </button>
-            <button onclick="facilityProFilterKb('firefighting')" data-kbfilter="firefighting" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                Fire fighting
-            </button>
-            <button onclick="facilityProFilterKb('plumbing')" data-kbfilter="plumbing" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                Plumbing
-            </button>
-            <button onclick="facilityProFilterKb('painting')" data-kbfilter="painting" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                Painting &amp; polishing
-            </button>
-            <button onclick="facilityProFilterKb('solar')" data-kbfilter="solar" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                Solar system
-            </button>
-            <button onclick="facilityProFilterKb('bms')" data-kbfilter="bms" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                BMS &amp; Automation
-            </button>
-            <button onclick="facilityProFilterKb('stp')" data-kbfilter="stp" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                STP Treatment
-            </button>
-            <button onclick="facilityProFilterKb('dg')" data-kbfilter="dg" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                DG Set
-            </button>
+            <?php foreach ($tabs as $key => $label) : 
+                $is_active = ($selected_disc === $key);
+            ?>
+                <a href="<?php echo $key === 'all' ? esc_url(home_url('/knowledge-hub/')) : esc_url(home_url('/knowledge-hub/?discipline=' . $key)); ?>" class="kb-filter-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all shadow-xs <?php echo $is_active ? 'bg-slate-900 text-white border border-slate-900' : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'; ?>" data-kbfilter="<?php echo esc_attr($key); ?>">
+                    <?php echo esc_html($label); ?>
+                </a>
+            <?php endforeach; ?>
         </div>
 
         <!-- Articles Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="kbCardsGrid">
             <?php foreach ($all_articles as $art) : 
                 $link = (!empty($art['permalink']) && $art['permalink'] !== '#') ? esc_url($art['permalink']) : 'javascript:void(0)';
+                $art_disc = $art['discipline'];
+                $is_visible = ($selected_disc === 'all' || $selected_disc === $art_disc);
             ?>
-                <div class="kb-card bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:border-[#0077c8] transition-all flex flex-col justify-between group cursor-pointer" data-discipline="<?php echo esc_attr($art['discipline']); ?>" onclick="window.location.href='<?php echo $link; ?>'">
+                <div class="kb-card bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:border-[#0077c8] transition-all flex flex-col justify-between group cursor-pointer" style="<?php echo $is_visible ? 'display: flex;' : 'display: none;'; ?>" data-discipline="<?php echo esc_attr($art_disc); ?>" onclick="window.location.href='<?php echo $link; ?>'">
                     <div>
                         <div class="flex items-center justify-between gap-2 mb-3">
                             <span class="px-2.5 py-1 rounded-lg bg-sky-50 text-[#0077c8] text-[11px] font-bold uppercase tracking-wider">
@@ -1865,7 +1862,7 @@ add_shortcode('facilitypro_hero', 'facilitypro_hero_shortcode');
 
 
 
-// 8. Category Grid Shortcode (9 Disciplines + Direct Blog Previews) [facilitypro_category_pills] and [facilitypro_category_grid]
+// 8. Category Grid Shortcode (9 Disciplines with Direct Blog Links) [facilitypro_category_pills] and [facilitypro_category_grid]
 function facilitypro_category_grid_shortcode($atts) {
     ob_start();
     
@@ -1873,7 +1870,7 @@ function facilitypro_category_grid_shortcode($atts) {
     $articles_query = new WP_Query(array(
         'post_type'      => array('mep_knowledge', 'post'),
         'post_status'    => 'publish',
-        'posts_per_page' => 30,
+        'posts_per_page' => 24,
         'orderby'        => 'date',
         'order'          => 'DESC'
     ));
@@ -1890,15 +1887,15 @@ function facilitypro_category_grid_shortcode($atts) {
                     Select Your Service Category
                 </h2>
                 <p class="text-slate-600 text-xs sm:text-sm mt-1.5">
-                    Click any discipline below to instantly view technical blogs, verified formulas, and engineering solutions.
+                    Click any discipline below to open its technical blogs, verified formulas, and engineering solutions.
                 </p>
             </div>
 
-            <!-- 4-in-a-row Grid on BOTH Mobile & Desktop (Exact layout from user screenshot) -->
+            <!-- 4-in-a-row Grid on BOTH Mobile & Desktop (Direct Navigation on Click) -->
             <div class="grid grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5" id="category-cards-grid">
                 
                 <!-- 1. HVAC -->
-                <div onclick="facilityProFilterCategory('hvac')" data-category="hvac" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=hvac')); ?>" data-category="hvac" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="wind" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
@@ -1910,10 +1907,10 @@ function facilitypro_category_grid_shortcode($atts) {
                         <span>View Blogs</span>
                         <i data-lucide="arrow-right" class="w-3 h-3"></i>
                     </span>
-                </div>
+                </a>
 
                 <!-- 2. Electrical -->
-                <div onclick="facilityProFilterCategory('electrical')" data-category="electrical" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=electrical')); ?>" data-category="electrical" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="zap" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
@@ -1925,10 +1922,10 @@ function facilitypro_category_grid_shortcode($atts) {
                         <span>View Blogs</span>
                         <i data-lucide="arrow-right" class="w-3 h-3"></i>
                     </span>
-                </div>
+                </a>
 
                 <!-- 3. Fire Fighting -->
-                <div onclick="facilityProFilterCategory('firefighting')" data-category="firefighting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=firefighting')); ?>" data-category="firefighting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="flame" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
@@ -1940,10 +1937,10 @@ function facilitypro_category_grid_shortcode($atts) {
                         <span>View Blogs</span>
                         <i data-lucide="arrow-right" class="w-3 h-3"></i>
                     </span>
-                </div>
+                </a>
 
                 <!-- 4. Plumbing -->
-                <div onclick="facilityProFilterCategory('plumbing')" data-category="plumbing" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=plumbing')); ?>" data-category="plumbing" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="droplets" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
@@ -1955,10 +1952,10 @@ function facilitypro_category_grid_shortcode($atts) {
                         <span>View Blogs</span>
                         <i data-lucide="arrow-right" class="w-3 h-3"></i>
                     </span>
-                </div>
+                </a>
 
                 <!-- 5. Painting & Polishing -->
-                <div onclick="facilityProFilterCategory('painting')" data-category="painting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=painting')); ?>" data-category="painting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="paint-roller" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
@@ -1970,10 +1967,10 @@ function facilitypro_category_grid_shortcode($atts) {
                         <span>View Blogs</span>
                         <i data-lucide="arrow-right" class="w-3 h-3"></i>
                     </span>
-                </div>
+                </a>
 
                 <!-- 6. Solar System -->
-                <div onclick="facilityProFilterCategory('solar')" data-category="solar" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=solar')); ?>" data-category="solar" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="sun" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
@@ -1985,10 +1982,10 @@ function facilitypro_category_grid_shortcode($atts) {
                         <span>View Blogs</span>
                         <i data-lucide="arrow-right" class="w-3 h-3"></i>
                     </span>
-                </div>
+                </a>
 
                 <!-- 7. BMS & Automation -->
-                <div onclick="facilityProFilterCategory('bms')" data-category="bms" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=bms')); ?>" data-category="bms" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="sliders" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
@@ -2000,10 +1997,10 @@ function facilitypro_category_grid_shortcode($atts) {
                         <span>View Blogs</span>
                         <i data-lucide="arrow-right" class="w-3 h-3"></i>
                     </span>
-                </div>
+                </a>
 
                 <!-- 8. STP & Water Treatment -->
-                <div onclick="facilityProFilterCategory('stp')" data-category="stp" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=stp')); ?>" data-category="stp" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="filter" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
@@ -2015,10 +2012,10 @@ function facilitypro_category_grid_shortcode($atts) {
                         <span>View Blogs</span>
                         <i data-lucide="arrow-right" class="w-3 h-3"></i>
                     </span>
-                </div>
+                </a>
 
                 <!-- 9. DG Set -->
-                <div onclick="facilityProFilterCategory('dg')" data-category="dg" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=dg')); ?>" data-category="dg" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
                         <i data-lucide="battery-charging" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
                     </div>
@@ -2030,11 +2027,11 @@ function facilitypro_category_grid_shortcode($atts) {
                         <span>View Blogs</span>
                         <i data-lucide="arrow-right" class="w-3 h-3"></i>
                     </span>
-                </div>
+                </a>
 
             </div>
 
-            <!-- DYNAMIC FEATURED BLOGS & SOLUTIONS GRID (Filtered on category click) -->
+            <!-- DYNAMIC FEATURED BLOGS & SOLUTIONS GRID -->
             <div class="mt-12 pt-8 border-t border-slate-200" id="featured-blogs-section">
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                     <div>

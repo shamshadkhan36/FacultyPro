@@ -489,11 +489,62 @@ function facilitypro_calculators_shortcode($atts) {
 }
 add_shortcode('facilitypro_calculators', 'facilitypro_calculators_shortcode');
 
-// 2. Knowledge Hub Shortcode [facilitypro_knowledge_hub]
+// 2. Knowledge Hub Shortcode [facilitypro_knowledge_hub] (Dynamic WP_Query)
 function facilitypro_knowledge_hub_shortcode($atts) {
     ob_start();
-    $articles = [
-        [
+    
+    // Query Custom Post Type 'mep_knowledge' and standard 'post' from WordPress Database
+    $query_args = array(
+        'post_type'      => array('mep_knowledge', 'post'),
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'orderby'        => 'date',
+        'order'          => 'DESC'
+    );
+    $kb_query = new WP_Query($query_args);
+    
+    $db_articles = array();
+    if ($kb_query->have_posts()) {
+        while ($kb_query->have_posts()) {
+            $kb_query->the_post();
+            $pid = get_the_ID();
+            $disc = get_post_meta($pid, 'kb_discipline', true);
+            if (empty($disc)) {
+                $t = strtolower(get_the_title());
+                if (strpos($t, 'hvac') !== false || strpos($t, 'chiller') !== false) $disc = 'hvac';
+                elseif (strpos($t, 'elec') !== false || strpos($t, 'transformer') !== false) $disc = 'electrical';
+                elseif (strpos($t, 'plumb') !== false || strpos($t, 'pump') !== false) $disc = 'plumbing';
+                elseif (strpos($t, 'fire') !== false) $disc = 'fire';
+                elseif (strpos($t, 'dg') !== false) $disc = 'dg';
+                elseif (strpos($t, 'bms') !== false) $disc = 'bms';
+                else $disc = 'general';
+            }
+            $code_ref = get_post_meta($pid, 'kb_code_ref', true);
+            if (empty($code_ref)) $code_ref = 'ASHRAE / NBC 2016';
+            
+            $excerpt = get_the_excerpt();
+            if (empty($excerpt)) {
+                $excerpt = wp_trim_words(strip_tags(get_the_content()), 28, '...');
+            }
+
+            $db_articles[] = array(
+                'id'         => 'db-kb-' . $pid,
+                'discipline' => $disc,
+                'title'      => get_the_title(),
+                'category'   => ucfirst($disc) . ' Engineering',
+                'readTime'   => '5 min read',
+                'codeRef'    => $code_ref,
+                'summary'    => $excerpt,
+                'permalink'  => get_permalink(),
+                'date'       => get_the_date('M d, Y')
+            );
+        }
+        wp_reset_postdata();
+    }
+
+    // Default Seed Articles
+    $seed_articles = array(
+        array(
             'id' => 'kb-hvac-1',
             'discipline' => 'hvac',
             'title' => 'Centrifugal Chiller Surge Identification & Aerodynamic Lift Control',
@@ -501,13 +552,9 @@ function facilitypro_knowledge_hub_shortcode($atts) {
             'readTime' => '6 min read',
             'codeRef' => 'ASHRAE Guideline 22 / Standard 90.1',
             'summary' => 'Comprehensive analysis of compressor surge dynamics under low evaporator load or excessive condenser water entering temperatures.',
-            'keyPoints' => [
-                'Surge Mechanism: Occurs when refrigerant pressure ratio exceeds aerodynamic lift capacity.',
-                'Condenser Approach: Maintain approach temp < 2.0°F (1.1°C) to prevent condenser fouling.',
-                'VSD Anti-Surge Tuning: Set VFD low-speed frequency above calculated surge envelope.'
-            ]
-        ],
-        [
+            'permalink' => '#'
+        ),
+        array(
             'id' => 'kb-elec-1',
             'discipline' => 'electrical',
             'title' => 'Transformer 87T Differential Relay Harmonic Restraint & Inrush Protection',
@@ -515,13 +562,9 @@ function facilitypro_knowledge_hub_shortcode($atts) {
             'readTime' => '7 min read',
             'codeRef' => 'IEEE C37.91 / IEC 60255 / NFPA 70',
             'summary' => 'Preventing nuisance trips during transformer grid energization while preserving high sensitivity for internal faults.',
-            'keyPoints' => [
-                'Inrush Magnetizing Current: Draws peak inrush currents up to 8-12x Full Load Amps.',
-                '2nd Harmonic Blocking (15%): Restrains magnetizing inrush from true internal short circuits.',
-                'Vector Group Compensation: Software CT phase shift matrix matching Dyn11 30° phase angle.'
-            ]
-        ],
-        [
+            'permalink' => '#'
+        ),
+        array(
             'id' => 'kb-plumb-1',
             'discipline' => 'plumbing',
             'title' => 'High-Rise Hydro-Pneumatic Water Supply & Water Hammer Arrestor Design',
@@ -529,13 +572,9 @@ function facilitypro_knowledge_hub_shortcode($atts) {
             'readTime' => '5 min read',
             'codeRef' => 'IPC § 604 / ASPE Data Book / PDI-WH 201',
             'summary' => 'Hydraulic principles for vertical pressure zoning, booster pump staging, and water hammer mitigation.',
-            'keyPoints' => [
-                'Vertical Pressure Zoning: Fixture static pressure restricted to <= 80 PSI (5.5 bar).',
-                'Joukowsky Shock Waves: Install PDI-WH 201 certified stainless steel bellows arrestors.',
-                'Tank Pre-charge: Nitrogen pre-charge at 0.2 bar (3 PSI) below pump cut-in pressure.'
-            ]
-        ],
-        [
+            'permalink' => '#'
+        ),
+        array(
             'id' => 'kb-bms-1',
             'discipline' => 'bms',
             'title' => 'BMS DDC Architecture, BACnet MS/TP vs IP & Chiller Plant Optimization',
@@ -543,13 +582,9 @@ function facilitypro_knowledge_hub_shortcode($atts) {
             'readTime' => '6 min read',
             'codeRef' => 'ASHRAE Standard 135 (BACnet) / Guideline 36',
             'summary' => 'Building Management System DDC controller networking, sensor calibration, and high-efficiency sequences.',
-            'keyPoints' => [
-                'BACnet Topology: BACnet/IP for supervisory tier and BACnet MS/TP for field DDCs.',
-                'Delta-T Optimization: Prevent Low Delta-T Syndrome by variable flow sequencing.',
-                'Sensor Calibration: 4-wire PT1000 RTDs calibrated within ±0.1°F (±0.05°C).'
-            ]
-        ],
-        [
+            'permalink' => '#'
+        ),
+        array(
             'id' => 'kb-dg-1',
             'discipline' => 'dg',
             'title' => 'Diesel Generator (DG Set) Synchronizing, AMF Logic & Wet Stacking',
@@ -557,13 +592,9 @@ function facilitypro_knowledge_hub_shortcode($atts) {
             'readTime' => '6 min read',
             'codeRef' => 'NFPA 110 (Level 1 Emergency Systems) / ISO 8528',
             'summary' => 'Emergency power infrastructure, Auto Mains Failure (AMF) changeover sequences, and unburned fuel mitigation.',
-            'keyPoints' => [
-                'Wet Stacking Prevention: Schedule annual 2-hour 100% resistive load bank tests.',
-                'AMF Changeover Time: Emergency life-safety generators must start and transfer load in <= 10s.',
-                'Auto-Synchronizing: Digital engine governors equalize kW and kVAR distribution.'
-            ]
-        ],
-        [
+            'permalink' => '#'
+        ),
+        array(
             'id' => 'kb-fire-1',
             'discipline' => 'fire',
             'title' => 'NFPA 25 Weekly Fire Pump Churn Testing & Hydraulic Characteristic Curves',
@@ -571,292 +602,324 @@ function facilitypro_knowledge_hub_shortcode($atts) {
             'readTime' => '8 min read',
             'codeRef' => 'NFPA 20 / NFPA 25 / NBC Part 4',
             'summary' => 'Weekly electric & diesel fire pump inspection protocol and casing relief valve settings.',
-            'keyPoints' => [
-                'Weekly Churn Duration: Electric pump 10 mins; Diesel pump 30 mins (NFPA 25 § 8.3.1).',
-                'Casing Relief Valve: Must discharge continuous stream of cold water during churn.',
-                'Characteristic Curves: Head at 150% flow must not degrade below 65% rated head.'
-            ]
-        ]
-    ];
-    ?>
-    <div class="facilitypro-knowledgehub-wrapper my-6">
-        <!-- Search and Filter Bar -->
-        <div class="mb-8 bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="relative w-full md:w-96">
-                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-                <input 
-                    type="text" 
-                    id="kbSearchInput" 
-                    placeholder="Search articles by code, fault, or standard..." 
-                    class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 outline-none focus:border-[#0077c8]"
-                    oninput="filterKbArticles()"
-                />
-            </div>
+            'permalink' => '#'
+        )
+    );
 
-            <!-- Filter Pills -->
-            <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 no-scrollbar" id="kbFilterTabs">
-                <button onclick="filterKbDiscipline('all')" class="kb-tab-btn active px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white transition-all cursor-pointer">
-                    All Disciplines
-                </button>
-                <button onclick="filterKbDiscipline('hvac')" class="kb-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer">
-                    HVAC
-                </button>
-                <button onclick="filterKbDiscipline('electrical')" class="kb-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer">
-                    Electrical
-                </button>
-                <button onclick="filterKbDiscipline('plumbing')" class="kb-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer">
-                    Plumbing
-                </button>
-                <button onclick="filterKbDiscipline('bms')" class="kb-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer">
-                    BMS
-                </button>
-                <button onclick="filterKbDiscipline('dg')" class="kb-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer">
-                    DG Sets
-                </button>
-                <button onclick="filterKbDiscipline('fire')" class="kb-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer">
-                    Fire Safety
-                </button>
-            </div>
+    $all_articles = array_merge($db_articles, $seed_articles);
+    ?>
+    <div class="facilitypro-kb-wrapper my-6 space-y-8" id="knowledgeHubRoot">
+        
+        <!-- Filter Tabs -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar" id="kbFilterNav">
+            <button onclick="facilityProFilterKb('all')" data-kbfilter="all" class="kb-filter-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-900 text-white shadow-sm border border-slate-900 cursor-pointer">
+                All Articles (<?php echo count($all_articles); ?>)
+            </button>
+            <button onclick="facilityProFilterKb('hvac')" data-kbfilter="hvac" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                HVAC &amp; Chillers
+            </button>
+            <button onclick="facilityProFilterKb('electrical')" data-kbfilter="electrical" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                Electrical Systems
+            </button>
+            <button onclick="facilityProFilterKb('plumbing')" data-kbfilter="plumbing" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                Plumbing &amp; Water
+            </button>
+            <button onclick="facilityProFilterKb('fire')" data-kbfilter="fire" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                Fire &amp; Life Safety
+            </button>
+            <button onclick="facilityProFilterKb('bms')" data-kbfilter="bms" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                BMS Automation
+            </button>
+            <button onclick="facilityProFilterKb('dg')" data-kbfilter="dg" class="kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                DG Sets
+            </button>
         </div>
 
         <!-- Articles Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="kbArticlesGrid">
-            <?php foreach ($articles as $art) : ?>
-                <div class="kb-card bg-white rounded-2xl p-6 border border-slate-200 hover:border-blue-400 hover:shadow-xl transition-all flex flex-col justify-between" data-discipline="<?php echo esc_attr($art['discipline']); ?>" data-search="<?php echo esc_attr(strtolower($art['title'] . ' ' . $art['summary'] . ' ' . $art['codeRef'])); ?>">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="kbCardsGrid">
+            <?php foreach ($all_articles as $art) : 
+                $link = (!empty($art['permalink']) && $art['permalink'] !== '#') ? esc_url($art['permalink']) : 'javascript:void(0)';
+                $has_link = (!empty($art['permalink']) && $art['permalink'] !== '#');
+            ?>
+                <div class="kb-card bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col justify-between group" data-discipline="<?php echo esc_attr($art['discipline']); ?>">
                     <div>
-                        <div class="flex items-center justify-between text-xs mb-3">
-                            <span class="px-2.5 py-1 rounded-full font-bold bg-blue-50 text-[#0077c8]">
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <span class="px-2.5 py-1 rounded-lg bg-sky-50 text-[#0077c8] text-[11px] font-bold uppercase tracking-wider">
                                 <?php echo esc_html($art['category']); ?>
                             </span>
-                            <span class="text-slate-400 font-medium flex items-center gap-1">
-                                <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                            <span class="text-[11px] font-medium text-slate-400">
                                 <?php echo esc_html($art['readTime']); ?>
                             </span>
                         </div>
-                        <h3 class="text-lg font-bold text-slate-900 leading-snug hover:text-[#0077c8] transition-colors cursor-pointer" onclick="facilityProOpenConsultationModal('Need engineering deep-dive on: <?php echo esc_js($art['title']); ?> (Ref: <?php echo esc_js($art['codeRef']); ?>)')">
-                            <?php echo esc_html($art['title']); ?>
+
+                        <h3 class="text-base font-black text-slate-900 group-hover:text-[#0077c8] transition-colors line-clamp-2 leading-snug">
+                            <?php if ($has_link) : ?>
+                                <a href="<?php echo $link; ?>" class="hover:underline">
+                                    <?php echo esc_html($art['title']); ?>
+                                </a>
+                            <?php else : ?>
+                                <?php echo esc_html($art['title']); ?>
+                            <?php endif; ?>
                         </h3>
-                        <div class="mt-2 text-xs font-mono font-semibold text-slate-500 bg-slate-100 inline-block px-2 py-0.5 rounded">
-                            <?php echo esc_html($art['codeRef']); ?>
-                        </div>
-                        <p class="text-xs text-slate-600 mt-3 leading-relaxed">
+
+                        <p class="text-xs text-slate-600 mt-2.5 line-clamp-3 leading-relaxed">
                             <?php echo esc_html($art['summary']); ?>
                         </p>
-
-                        <div class="mt-4 pt-3 border-t border-slate-100 space-y-2">
-                            <div class="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Key Engineering Principles:</div>
-                            <ul class="text-xs text-slate-600 space-y-1.5 list-disc pl-4">
-                                <?php foreach ($art['keyPoints'] as $pt) : ?>
-                                    <li><?php echo esc_html(substr($pt, 0, 110) . '...'); ?></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
                     </div>
 
-                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                        <button onclick="facilityProOpenConsultationModal('Consultation on <?php echo esc_js($art['title']); ?> - Ref: <?php echo esc_js($art['codeRef']); ?>')" class="text-xs font-bold text-[#0077c8] hover:text-[#005a96] flex items-center gap-1">
-                            <span>Ask AI Expert</span>
-                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                        </button>
-                        <button onclick="facilityProOpenConsultationModal('Explain step-by-step resolution for <?php echo esc_js($art['title']); ?>')" class="px-3 py-1.5 bg-slate-900 hover:bg-[#f05423] text-white text-xs font-bold rounded-lg transition-colors">
-                            Deep Dive
-                        </button>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <span class="text-[10px] font-semibold text-slate-400 truncate">
+                            📖 <?php echo esc_html($art['codeRef']); ?>
+                        </span>
+
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <?php if ($has_link) : ?>
+                                <a href="<?php echo $link; ?>" class="px-3 py-1.5 bg-slate-900 hover:bg-[#0077c8] text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-1">
+                                    <span>Read Article</span>
+                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                </a>
+                            <?php endif; ?>
+                            <button onclick="facilityProOpenConsultationModal('Calculate formula derivation for: <?php echo esc_js($art['title']); ?>')" class="p-2 text-slate-500 hover:text-[#f05423] hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" title="Ask AI Specialist">
+                                <i data-lucide="sparkles" class="w-4 h-4 text-[#f05423]"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             <?php endforeach; ?>
         </div>
+
     </div>
     <?php
     return ob_get_clean();
 }
 add_shortcode('facilitypro_knowledge_hub', 'facilitypro_knowledge_hub_shortcode');
 
-// 3. SOP Library Shortcode [facilitypro_sop_library]
+
+// 3. SOP Library Shortcode [facilitypro_sop_library] (Dynamic WP_Query)
 function facilitypro_sop_library_shortcode($atts) {
     ob_start();
-    $sops = [
-        [
-            'id' => 'sop-hvac-01',
-            'code' => 'SOP-HVAC-01',
-            'title' => 'Centrifugal Chiller Plant Normal Start & Stop Procedure',
-            'category' => 'HVAC & Chilled Water',
+    
+    // 1. Query Custom Post Type 'mep_sop' from WordPress Database
+    $query_args = array(
+        'post_type'      => 'mep_sop',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'orderby'        => 'date',
+        'order'          => 'DESC'
+    );
+    $sop_query = new WP_Query($query_args);
+    
+    $db_sops = array();
+    if ($sop_query->have_posts()) {
+        while ($sop_query->have_posts()) {
+            $sop_query->the_post();
+            $pid = get_the_ID();
+            $disc = get_post_meta($pid, 'sop_discipline', true);
+            if (empty($disc)) {
+                $t = strtolower(get_the_title());
+                if (strpos($t, 'hvac') !== false || strpos($t, 'chiller') !== false) $disc = 'hvac';
+                elseif (strpos($t, 'elec') !== false || strpos($t, 'transformer') !== false || strpos($t, 'vcb') !== false) $disc = 'electrical';
+                elseif (strpos($t, 'plumb') !== false || strpos($t, 'pump') !== false || strpos($t, 'drain') !== false) $disc = 'plumbing';
+                elseif (strpos($t, 'fire') !== false || strpos($t, 'sprinkler') !== false) $disc = 'fire';
+                elseif (strpos($t, 'dg') !== false || strpos($t, 'generator') !== false) $disc = 'dg';
+                elseif (strpos($t, 'bms') !== false || strpos($t, 'automation') !== false) $disc = 'bms';
+                elseif (strpos($t, 'stp') !== false || strpos($t, 'water') !== false) $disc = 'stp';
+                else $disc = 'general';
+            }
+            $code = get_post_meta($pid, 'sop_code', true);
+            if (empty($code)) $code = 'SOP-' . str_pad($pid, 3, '0', STR_PAD_LEFT);
+            $ver = get_post_meta($pid, 'sop_version', true);
+            if (empty($ver)) $ver = 'v1.0';
+            
+            $excerpt = get_the_excerpt();
+            if (empty($excerpt)) {
+                $excerpt = wp_trim_words(strip_tags(get_the_content()), 28, '...');
+            }
+
+            $db_sops[] = array(
+                'id'         => 'db-sop-' . $pid,
+                'code'       => $code,
+                'title'      => get_the_title(),
+                'discipline' => $disc,
+                'category'   => ucfirst($disc) . ' Engineering',
+                'version'    => $ver,
+                'author'     => get_the_author() ? get_the_author() : 'FacilityPro PE Board',
+                'purpose'    => $excerpt,
+                'permalink'  => get_permalink(),
+                'date'       => get_the_date('M d, Y'),
+                'is_db'      => true
+            );
+        }
+        wp_reset_postdata();
+    }
+
+    // Default Seed SOPs
+    $seed_sops = array(
+        array(
+            'id'         => 'sop-hvac-01',
+            'code'       => 'SOP-HVAC-01',
+            'title'      => 'Centrifugal Chiller Plant Normal Start & Stop Procedure',
+            'category'   => 'HVAC & Chilled Water',
             'discipline' => 'hvac',
-            'version' => 'v2.4',
-            'author' => 'Er. Rajesh Sharma (AI HVAC Expert)',
-            'purpose' => 'Standard operating procedure for the safe sequential start-up, operational monitoring, and shutdown of water-cooled centrifugal chiller plants.',
-            'ppe' => ['Safety Shoes', 'Safety Glasses / Face Shield', 'Hearing Protection (Ear Muffs)', 'Nitrile Gloves'],
-            'hazards' => ['High pressure refrigerant R-134a / R-1234ze', 'Rotating compressor impellers & fan blades', '415V/3.3kV High voltage starter panels', 'Water hammer risk'],
-            'steps' => [
-                ['stepNumber' => 1, 'title' => 'Energize Cooling Tower & Condenser Water Circuit', 'description' => 'Start the cooling tower fan on VFD low speed (20 Hz). Start the designated condenser water pump (CWP). Verify condenser water flow switch proves on BMS within 15 seconds.'],
-                ['stepNumber' => 2, 'title' => 'Energize Primary / Secondary Chilled Water Pumps', 'description' => 'Start primary chilled water pump (PCHWP). Open motorized isolation valve on the active chiller evaporator barrel. Confirm differential pressure across evaporator barrel is between 0.3 - 0.6 bar (4.5 - 9 PSI).'],
-                ['stepNumber' => 3, 'title' => 'Initiate Chiller Microprocessor Start Command', 'description' => 'Switch chiller control panel from LOCAL OFF to AUTO / REMOTE START. The unit will initiate lubrication pre-lube cycle for 60 seconds (Oil pressure >= 25 PSI above suction).'],
-                ['stepNumber' => 4, 'title' => 'Monitor Compressor Acceleration & Soft-Start', 'description' => 'Observe motor starter ramp up (Star-Delta or VFD). Verify running current stabilizes below Full Load Amps (FLA). Confirm guide vanes modulate slowly from minimum position.'],
-                ['stepNumber' => 5, 'title' => 'Verify Steady-State Operating Parameters', 'description' => 'After 15 minutes of operation, log parameters: Chilled Water Leaving (44°F / 6.7°C), Condenser Entering (85°F / 29.4°C), Approach Temperature (< 2.0°F), Oil Temp (130-145°F), Motor Amps.'],
-                ['stepNumber' => 6, 'title' => 'Chiller Normal Shutdown Sequence', 'description' => 'Select NORMAL STOP on panel. Microprocessor unloads guide vanes to 0%, opens recycle bypass, trips main compressor motor, runs post-lube oil pump for 180 seconds, and shuts down chilled/condenser water pumps after 5 minutes.']
-            ]
-        ],
-        [
-            'id' => 'sop-elec-01',
-            'code' => 'SOP-ELEC-01',
-            'title' => '11kV / 415V Substation Transformer Cold Energization Procedure',
-            'category' => 'Electrical & Power',
+            'version'    => 'v2.4',
+            'author'     => 'Er. Rajesh Sharma (AI HVAC Expert)',
+            'purpose'    => 'Standard operating procedure for the safe sequential start-up, operational monitoring, and shutdown of water-cooled centrifugal chiller plants.',
+            'date'       => 'Verified Standard',
+            'permalink'  => '#'
+        ),
+        array(
+            'id'         => 'sop-elec-01',
+            'code'       => 'SOP-ELEC-01',
+            'title'      => '11kV / 415V Substation Transformer Cold Energization Procedure',
+            'category'   => 'Electrical & Power',
             'discipline' => 'electrical',
-            'version' => 'v3.1',
-            'author' => 'Dr. Vikram Malhotra (AI Electrical Expert)',
-            'purpose' => 'Step-by-step safety standard for switching, cold energization, and phase synchronization of 11kV oil-immersed & dry-type power transformers.',
-            'ppe' => ['Arc Flash Suit Category 4 (40 cal/cm²)', '11kV Insulated Rubber Gloves (Class 2)', 'Full Face Shield', 'Safety Helmet with Flash Protection'],
-            'hazards' => ['11,000V Lethal Electric Shock & Arc Flash Hazard', 'Transformer inrush explosion risk', 'Residual capacitive charge in HT cables'],
-            'steps' => [
-                ['stepNumber' => 1, 'title' => 'Clear Work Area & Remove Safety Earthing', 'description' => 'Ensure all personnel have exited the HT switchgear room. Remove portable discharge grounding leads from 11kV bus terminals. Close and lock transformer bay mesh doors.'],
-                ['stepNumber' => 2, 'title' => 'Verify LV Air Circuit Breaker (ACB) is Racked Out / Open', 'description' => 'Ensure the secondary 415V Main Incomer ACB is in the OPEN / ISOLATED position. Transformer must NEVER be energized with secondary load connected.'],
-                ['stepNumber' => 3, 'title' => 'Charge Vacuum Circuit Breaker (VCB) Spring Mechanism', 'description' => 'On the 11kV HT switchgear panel, charge the VCB closing spring (either via motor or manual charging handle). Confirm "SPRING CHARGED" optical indicator is GREEN.'],
-                ['stepNumber' => 4, 'title' => 'Close 11kV VCB Breaker (Cold Energization)', 'description' => 'Stand clear outside the arc flash boundary zone. Press the VCB CLOSE pushbutton. Listen for smooth transformer core hum without metallic rattling or arcing sounds.'],
-                ['stepNumber' => 5, 'title' => 'Check Secondary Voltage & Phase Sequence', 'description' => 'At the LV incomer voltmeter, check 3-phase line-to-line voltages (415V ± 2%) and line-to-neutral (240V ± 2%). Confirm phase rotation indicator is clockwise (R-Y-B).'],
-                ['stepNumber' => 6, 'title' => 'Close LV Incomer & Synchronize Load', 'description' => 'Close the 415V Main Incomer ACB. Sequentially energize downstream motor control centers (MCC) and sub-distribution boards while monitoring phase load balance.']
-            ]
-        ],
-        [
-            'id' => 'sop-dg-01',
-            'code' => 'SOP-DG-01',
-            'title' => 'Diesel Generator (DG Set) Weekly Auto Mains Failure (AMF) Run Test',
-            'category' => 'DG Sets & Backup',
+            'version'    => 'v3.1',
+            'author'     => 'Dr. Vikram Malhotra (AI Electrical Expert)',
+            'purpose'    => 'Step-by-step safety standard for switching, cold energization, and phase synchronization of 11kV oil-immersed & dry-type power transformers.',
+            'date'       => 'Verified Standard',
+            'permalink'  => '#'
+        ),
+        array(
+            'id'         => 'sop-dg-01',
+            'code'       => 'SOP-DG-01',
+            'title'      => 'Diesel Generator (DG Set) Weekly Auto Mains Failure (AMF) Run Test',
+            'category'   => 'DG Sets & Backup',
             'discipline' => 'dg',
-            'version' => 'v2.0',
-            'author' => 'Dr. Vikram Malhotra (AI Electrical Expert)',
-            'purpose' => 'Standard weekly inspection and on-load testing of emergency diesel generators to guarantee compliance with NFPA 110 Level 1 emergency power standards.',
-            'ppe' => ['Hearing Protection (Ear Plugs / Muffs)', 'Safety Glasses', 'High-Grip Oil-Resistant Gloves', 'Safety Shoes'],
-            'hazards' => ['Hot exhaust manifold (> 500°C)', 'High pressure diesel fuel injection leaks (2000+ bar)', 'Automatic remote starting without warning'],
-            'steps' => [
-                ['stepNumber' => 1, 'title' => 'Perform Pre-Start Physical Walkaround', 'description' => 'Check for any oil, water, or diesel fuel leaks beneath engine bed. Ensure intake louvers are unobstructed and exhaust flap is free to open.'],
-                ['stepNumber' => 2, 'title' => 'Initiate Manual Test Run (No-Load Mode)', 'description' => 'Turn selector switch on Deep Sea / ComAp controller to MANUAL and press START. Engine must crank, fire, and reach 1500 RPM (50 Hz) or 1800 RPM (60 Hz) within 6 seconds.'],
-                ['stepNumber' => 3, 'title' => 'Verify Alternator Voltage & Lube Oil Pressure', 'description' => 'Confirm generated voltage stabilizes at 415V ± 1%. Confirm lube oil pressure builds rapidly to 4.5 - 6.0 bar (65 - 85 PSI).'],
-                ['stepNumber' => 4, 'title' => 'Simulate Grid Power Failure (On-Load AMF Test)', 'description' => 'During scheduled maintenance window: Open mains incomer breaker. Confirm ATS transfers essential emergency load to DG within 10 seconds. Run under load for minimum 30 minutes.'],
-                ['stepNumber' => 5, 'title' => 'Restore Grid & Cool-Down Sequence', 'description' => 'Re-close mains utility power. Confirm ATS transfers load back to grid seamlessly. Allow DG engine to idle at no-load for 5 minutes cool-down before automatic shutdown.'],
-                ['stepNumber' => 6, 'title' => 'Return Controller to AUTO Ready Mode', 'description' => 'Set mode selector switch back to "AUTO". Log run hours, fuel consumption, battery voltage, and oil pressure in DG Plant Log Book.']
-            ]
-        ],
-        [
-            'id' => 'sop-fire-01',
-            'code' => 'SOP-FIRE-01',
-            'title' => 'Weekly Fire Pump Churn & Automatic Pressure Switch Cut-In Test',
-            'category' => 'Fire & Life Safety',
+            'version'    => 'v2.0',
+            'author'     => 'Dr. Vikram Malhotra (AI Electrical Expert)',
+            'purpose'    => 'Standard weekly inspection and on-load testing of emergency diesel generators to guarantee compliance with NFPA 110 Level 1 emergency power standards.',
+            'date'       => 'Verified Standard',
+            'permalink'  => '#'
+        ),
+        array(
+            'id'         => 'sop-fire-01',
+            'code'       => 'SOP-FIRE-01',
+            'title'      => 'Weekly Fire Pump Churn & Automatic Pressure Switch Cut-In Test',
+            'category'   => 'Fire & Life Safety',
             'discipline' => 'fire',
-            'version' => 'v3.0',
-            'author' => 'Er. Ananya Verma (AI Fire Safety Expert)',
-            'purpose' => 'Executing NFPA 25 weekly inspection, testing, and maintenance (ITM) protocol for main electric, diesel backup, and jockey fire pumps.',
-            'ppe' => ['Safety Shoes', 'Safety Glasses', 'Protective Gloves', 'Reflective High-Vis Vest'],
-            'hazards' => ['High pressure water spray (> 150 PSI)', 'Automatic starting of heavy 150kW electric motors and diesel engines'],
-            'steps' => [
-                ['stepNumber' => 1, 'title' => 'Notify Security & BMS Control Room', 'description' => 'Place fire alarm monitoring station in TEST mode to prevent false municipal fire brigade dispatch during hydro-pressure drops.'],
-                ['stepNumber' => 2, 'title' => 'Inspect Suction OS&Y Valves', 'description' => 'Confirm all suction and discharge gate valves are OPEN and padlocked. Check reservoir level is 100% full.'],
-                ['stepNumber' => 3, 'title' => 'Execute Jockey Pump Pressure Restoration Test', 'description' => 'Crack open test drain valve on sensing line. Jockey pump must cut in at 9.5 bar and cut out automatically at 10.5 bar.'],
-                ['stepNumber' => 4, 'title' => 'Initiate Electric Main Fire Pump Churn Run', 'description' => 'Bleed sensing line further. Main electric fire pump must auto-start at 8.0 bar. Run for 10 minutes continuously under churn (zero flow). Check casing relief valve flows cold water.'],
-                ['stepNumber' => 5, 'title' => 'Initiate Diesel Fire Pump Auto Cut-In', 'description' => 'Isolate electric pump power. Drop pressure to 7.0 bar. Diesel engine pump must crank and fire within 15 seconds. Run for 30 minutes minimum (NFPA 25 § 8.3.1).'],
-                ['stepNumber' => 6, 'title' => 'Restore Systems & Log Parameters', 'description' => 'Close test drain valves, reset controllers to AUTO, confirm static pressure returns to 10.5 bar, and log run times in NFPA 25 Fire Register.']
-            ]
-        ]
-    ];
+            'version'    => 'v3.0',
+            'author'     => 'Er. Ananya Verma (AI Fire Safety Expert)',
+            'purpose'    => 'Executing NFPA 25 weekly inspection, testing, and maintenance (ITM) protocol for main electric, diesel backup, and jockey fire pumps.',
+            'date'       => 'Verified Standard',
+            'permalink'  => '#'
+        ),
+        array(
+            'id'         => 'sop-plumb-01',
+            'code'       => 'SOP-PLUMB-01',
+            'title'      => 'Hydro-Pneumatic Booster Pump Staging & Bladder Tank Pre-Charge Audit',
+            'category'   => 'Plumbing & Drainage',
+            'discipline' => 'plumbing',
+            'version'    => 'v1.8',
+            'author'     => 'Er. Amit Patel (AI Plumbing Expert)',
+            'purpose'    => 'Comprehensive procedure for adjusting variable frequency drives, pressure transmitters, and nitrogen pre-charge.',
+            'date'       => 'Verified Standard',
+            'permalink'  => '#'
+        ),
+        array(
+            'id'         => 'sop-stp-01',
+            'code'       => 'SOP-STP-01',
+            'title'      => 'Sewage Treatment Plant (STP) MBBR Aeration & Sludge Return Protocol',
+            'category'   => 'STP & Water Treatment',
+            'discipline' => 'stp',
+            'version'    => 'v2.1',
+            'author'     => 'Er. Amit Patel (AI Plumbing Expert)',
+            'purpose'    => 'Dissolved oxygen (DO) monitoring, MLSS concentration balancing, and chlorine dosing for secondary treated effluent compliance.',
+            'date'       => 'Verified Standard',
+            'permalink'  => '#'
+        )
+    );
+
+    $all_sops = array_merge($db_sops, $seed_sops);
     ?>
-    <div class="facilitypro-sop-wrapper my-6 space-y-6">
-        <?php foreach ($sops as $idx => $sop) : ?>
-            <div class="sop-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all hover:shadow-md">
-                
-                <!-- Header Bar -->
-                <div class="p-6 bg-slate-900 text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="facilitypro-sop-wrapper my-6 space-y-8" id="sopLibraryRoot">
+        
+        <!-- Filter Pills Bar -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar" id="sopFilterNav">
+            <button onclick="facilityProFilterSop('all')" data-sopfilter="all" class="sop-filter-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-900 text-white shadow-sm border border-slate-900 cursor-pointer">
+                All Disciplines (<?php echo count($all_sops); ?>)
+            </button>
+            <button onclick="facilityProFilterSop('hvac')" data-sopfilter="hvac" class="sop-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                HVAC &amp; Chillers
+            </button>
+            <button onclick="facilityProFilterSop('electrical')" data-sopfilter="electrical" class="sop-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                Electrical &amp; HT
+            </button>
+            <button onclick="facilityProFilterSop('fire')" data-sopfilter="fire" class="sop-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                Fire Fighting
+            </button>
+            <button onclick="facilityProFilterSop('plumbing')" data-sopfilter="plumbing" class="sop-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                Plumbing &amp; Booster
+            </button>
+            <button onclick="facilityProFilterSop('dg')" data-sopfilter="dg" class="sop-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                DG Sets
+            </button>
+            <button onclick="facilityProFilterSop('stp')" data-sopfilter="stp" class="sop-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                STP &amp; Water
+            </button>
+            <button onclick="facilityProFilterSop('general')" data-sopfilter="general" class="sop-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                Facility &amp; Hotel SOPs
+            </button>
+        </div>
+
+        <!-- SOP Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="sopCardsGrid">
+            <?php foreach ($all_sops as $sop) : 
+                $link = (!empty($sop['permalink']) && $sop['permalink'] !== '#') ? esc_url($sop['permalink']) : 'javascript:void(0)';
+                $has_link = (!empty($sop['permalink']) && $sop['permalink'] !== '#');
+            ?>
+                <div class="sop-card bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col justify-between group" data-discipline="<?php echo esc_attr($sop['discipline']); ?>">
                     <div>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="px-2.5 py-0.5 rounded bg-[#f05423] text-white text-[11px] font-extrabold uppercase tracking-wider">
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-[#0077c8] text-[11px] font-black uppercase tracking-wider">
                                 <?php echo esc_html($sop['code']); ?>
                             </span>
-                            <span class="text-xs text-slate-300 font-medium">
-                                <?php echo esc_html($sop['category']); ?> • <?php echo esc_html($sop['version']); ?>
+                            <span class="text-[11px] font-bold text-slate-400">
+                                <?php echo esc_html($sop['version']); ?>
                             </span>
                         </div>
-                        <h2 class="text-xl font-bold text-white tracking-tight">
-                            <?php echo esc_html($sop['title']); ?>
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-1">
-                            Author: <?php echo esc_html($sop['author']); ?>
+
+                        <h3 class="text-base font-black text-slate-900 group-hover:text-[#0077c8] transition-colors line-clamp-2 leading-snug">
+                            <?php if ($has_link) : ?>
+                                <a href="<?php echo $link; ?>" class="hover:underline">
+                                    <?php echo esc_html($sop['title']); ?>
+                                </a>
+                            <?php else : ?>
+                                <?php echo esc_html($sop['title']); ?>
+                            <?php endif; ?>
+                        </h3>
+
+                        <p class="text-xs text-slate-600 mt-2.5 line-clamp-3 leading-relaxed">
+                            <?php echo esc_html($sop['purpose']); ?>
                         </p>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="window.print()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">
-                            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
-                            <span>Print SOP</span>
-                        </button>
-                        <button onclick="facilityProOpenConsultationModal('Need urgent advice during execution of <?php echo esc_js($sop['code']); ?>: <?php echo esc_js($sop['title']); ?>')" class="px-4 py-2 bg-[#f05423] hover:bg-[#d94416] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors shadow-md">
-                            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                            <span>Ask AI on this SOP</span>
-                        </button>
-                    </div>
-                </div>
 
-                <div class="p-6 sm:p-8 space-y-6">
-                    <!-- Purpose -->
-                    <div>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Purpose & Scope</h3>
-                        <p class="text-sm font-medium text-slate-700 leading-relaxed"><?php echo esc_html($sop['purpose']); ?></p>
-                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <span class="text-[11px] text-slate-500 font-medium truncate">
+                            👤 <?php echo esc_html($sop['author']); ?>
+                        </span>
 
-                    <!-- Hazards & PPE Badges -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-rose-50 border border-rose-200 rounded-xl p-4">
-                            <h4 class="text-xs font-bold text-rose-800 uppercase tracking-wider flex items-center gap-1.5 mb-2">
-                                <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600"></i>
-                                <span>Identified Critical Hazards</span>
-                            </h4>
-                            <ul class="text-xs text-rose-900 space-y-1 list-disc pl-4">
-                                <?php foreach ($sop['hazards'] as $h) : ?>
-                                    <li><?php echo esc_html($h); ?></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
-                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                            <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider flex items-center gap-1.5 mb-2">
-                                <i data-lucide="shield-check" class="w-4 h-4 text-[#0077c8]"></i>
-                                <span>Mandatory PPE Required</span>
-                            </h4>
-                            <div class="flex flex-wrap gap-1.5 mt-2">
-                                <?php foreach ($sop['ppe'] as $p) : ?>
-                                    <span class="px-2.5 py-1 bg-white text-blue-900 border border-blue-200 rounded-lg text-xs font-semibold">
-                                        <?php echo esc_html($p); ?>
-                                    </span>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step Checklist -->
-                    <div>
-                        <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-2">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Interactive Execution Steps</h3>
-                            <span class="text-xs text-slate-400 font-medium">Tick as you verify on site</span>
-                        </div>
-                        <div class="space-y-3">
-                            <?php foreach ($sop['steps'] as $st) : ?>
-                                <label class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer group">
-                                    <input type="checkbox" class="sop-step-chk mt-1 w-4 h-4 text-[#0077c8] rounded border-slate-300 focus:ring-[#0077c8]">
-                                    <div class="flex-1">
-                                        <div class="text-sm font-bold text-slate-900 group-hover:text-[#0077c8] transition-colors">
-                                            Step <?php echo esc_html($st['stepNumber']); ?>: <?php echo esc_html($st['title']); ?>
-                                        </div>
-                                        <div class="text-xs text-slate-600 mt-1 leading-relaxed">
-                                            <?php echo esc_html($st['description']); ?>
-                                        </div>
-                                    </div>
-                                </label>
-                            <?php endforeach; ?>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <?php if ($has_link) : ?>
+                                <a href="<?php echo $link; ?>" class="px-3 py-1.5 bg-slate-900 hover:bg-[#0077c8] text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-1">
+                                    <span>Read SOP</span>
+                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                </a>
+                            <?php endif; ?>
+                            <button onclick="facilityProOpenConsultationModal('Clarify standard operating procedure for: <?php echo esc_js($sop['title']); ?>')" class="p-2 text-slate-500 hover:text-[#f05423] hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" title="Ask AI Specialist">
+                                <i data-lucide="sparkles" class="w-4 h-4 text-[#f05423]"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
+            <?php endforeach; ?>
+        </div>
 
-            </div>
-        <?php endforeach; ?>
     </div>
     <?php
     return ob_get_clean();
 }
 add_shortcode('facilitypro_sop_library', 'facilitypro_sop_library_shortcode');
+
 
 // 4. Checklists Shortcode [facilitypro_checklists]
 function facilitypro_checklists_shortcode($atts) {

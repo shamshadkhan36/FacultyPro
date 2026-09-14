@@ -356,3 +356,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+
+
+// Filter SOP Library Cards
+function facilityProFilterSop(discipline) {
+    document.querySelectorAll('.sop-filter-btn').forEach(btn => {
+        if (btn.dataset.sopfilter === discipline) {
+            btn.className = 'sop-filter-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-900 text-white shadow-sm border border-slate-900 cursor-pointer';
+        } else {
+            btn.className = 'sop-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer';
+        }
+    });
+
+    document.querySelectorAll('.sop-card').forEach(card => {
+        if (discipline === 'all' || card.dataset.discipline === discipline) {
+            card.classList.remove('hidden');
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+    if (window.lucide) lucide.createIcons();
+}
+
+// Filter Knowledge Hub Articles
+function facilityProFilterKb(discipline) {
+    document.querySelectorAll('.kb-filter-btn').forEach(btn => {
+        if (btn.dataset.kbfilter === discipline) {
+            btn.className = 'kb-filter-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-900 text-white shadow-sm border border-slate-900 cursor-pointer';
+        } else {
+            btn.className = 'kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer';
+        }
+    });
+
+    document.querySelectorAll('.kb-card').forEach(card => {
+        if (discipline === 'all' || card.dataset.discipline === discipline) {
+            card.classList.remove('hidden');
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+    if (window.lucide) lucide.createIcons();
+}

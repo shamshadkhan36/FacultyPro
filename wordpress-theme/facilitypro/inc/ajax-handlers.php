@@ -139,10 +139,21 @@ function facilitypro_ajax_login() {
     if (is_wp_error($user)) {
         wp_send_json_error($user->get_error_message());
     } else {
+        $status = get_user_meta($user->ID, 'facilitypro_account_status', true);
+        if ($status === 'rejected') {
+            wp_send_json_error('Your account application was rejected by the administrator. Please contact support for assistance.');
+        }
+
         wp_set_current_user($user->ID);
         wp_set_auth_cookie($user->ID, $remember);
+        
+        $msg = ($status === 'pending' && !user_can($user->ID, 'manage_options')) 
+            ? 'Login successful! Your account is pending Admin review.' 
+            : 'Login successful! Redirecting to dashboard...';
+
         wp_send_json_success([
-            'message'      => 'Login successful! Redirecting to dashboard...',
+            'message'      => $msg,
+            'status'       => $status,
             'redirect_url' => home_url('/dashboard/')
         ]);
     }
@@ -194,16 +205,20 @@ function facilitypro_ajax_register() {
         ]);
     }
 
+    // Default registration is set to PENDING admin approval
+    update_user_meta($user_id, 'facilitypro_account_status', 'pending');
+    update_user_meta($user_id, 'facilitypro_registered_at', current_time('mysql'));
     update_user_meta($user_id, 'facilitypro_plant_name', $plant_name);
     update_user_meta($user_id, 'facilitypro_phone', $phone);
     update_user_meta($user_id, 'facilitypro_plan', 'Facility Pro Monthly');
-    update_user_meta($user_id, 'facilitypro_plan_status', 'Active');
+    update_user_meta($user_id, 'facilitypro_plan_status', 'Pending Approval');
 
     wp_set_current_user($user_id);
     wp_set_auth_cookie($user_id, true);
 
     wp_send_json_success([
-        'message'      => 'Account created successfully! Welcome to FacilityPro.',
+        'message'      => 'Account registered successfully! Your registration is submitted for Admin review.',
+        'status'       => 'pending',
         'redirect_url' => home_url('/dashboard/')
     ]);
 }
@@ -238,3 +253,193 @@ function facilitypro_ajax_update_profile() {
     wp_send_json_success('Profile updated successfully!');
 }
 add_action('wp_ajax_facilitypro_ajax_update_profile', 'facilitypro_ajax_update_profile');
+
+// 5. AJAX Admin User Status Management (Approve / Reject / Pending)
+function facilitypro_ajax_admin_update_user_status() {
+    check_ajax_referer('facilitypro_nonce', 'nonce');
+
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Unauthorized. Only administrators can approve or reject users.');
+    }
+
+    $target_user_id = isset($_POST['target_user_id']) ? absint($_POST['target_user_id']) : 0;
+    $target_status  = isset($_POST['target_status']) ? sanitize_key($_POST['target_status']) : '';
+
+    if (!$target_user_id || !in_array($target_status, ['approved', 'rejected', 'pending'], true)) {
+        wp_send_json_error('Invalid user ID or status.');
+    }
+
+    $target_user = get_userdata($target_user_id);
+    if (!$target_user) {
+        wp_send_json_error('Target user not found.');
+    }
+
+    // Do not allow modifying administrator accounts
+    if (user_can($target_user_id, 'manage_options')) {
+        wp_send_json_error('Cannot change status of an Administrator.');
+    }
+
+    update_user_meta($target_user_id, 'facilitypro_account_status', $target_status);
+    update_user_meta($target_user_id, 'facilitypro_status_updated_at', current_time('mysql'));
+
+    if ($target_status === 'approved') {
+        update_user_meta($target_user_id, 'facilitypro_plan_status', 'Active Member');
+        $msg = sprintf('User "%s" has been approved and granted full dashboard access.', esc_html($target_user->display_name));
+    } elseif ($target_status === 'rejected') {
+        update_user_meta($target_user_id, 'facilitypro_plan_status', 'Application Declined');
+        $msg = sprintf('User "%s" registration has been rejected.', esc_html($target_user->display_name));
+    } else {
+        update_user_meta($target_user_id, 'facilitypro_plan_status', 'Pending Approval');
+        $msg = sprintf('User "%s" reset to pending approval.', esc_html($target_user->display_name));
+    }
+
+    // Calculate remaining pending users
+    $all_users = get_users(['role__not_in' => ['administrator']]);
+    $pending_count = 0;
+    foreach ($all_users as $u) {
+        $st = get_user_meta($u->ID, 'facilitypro_account_status', true);
+        if ($st === 'pending' || empty($st)) {
+            $pending_count++;
+        }
+    }
+
+    wp_send_json_success([
+        'message'       => $msg,
+        'user_id'       => $target_user_id,
+        'new_status'    => $target_status,
+        'pending_count' => $pending_count
+    ]);
+}
+add_action('wp_ajax_facilitypro_admin_update_user_status', 'facilitypro_ajax_admin_update_user_status');
+
+// 6. AJAX Admin Save Premium File (Add or Edit)
+function facilitypro_ajax_admin_save_premium_file() {
+    check_ajax_referer('facilitypro_nonce', 'nonce');
+
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Unauthorized. Only administrators can upload or edit premium files.');
+    }
+
+    $post_id     = isset($_POST['file_id']) ? absint($_POST['file_id']) : 0;
+    $title       = isset($_POST['file_title']) ? sanitize_text_field($_POST['file_title']) : '';
+    $description = isset($_POST['file_description']) ? sanitize_textarea_field($_POST['file_description']) : '';
+    $discipline  = isset($_POST['file_discipline']) ? sanitize_text_field($_POST['file_discipline']) : 'hvac';
+    $file_format = isset($_POST['file_format']) ? sanitize_text_field($_POST['file_format']) : 'XLSX';
+    $file_size   = isset($_POST['file_size']) ? sanitize_text_field($_POST['file_size']) : '2.5 MB';
+    $file_url    = isset($_POST['file_url']) ? esc_url_raw($_POST['file_url']) : '';
+    $access_lvl  = isset($_POST['file_access']) ? sanitize_text_field($_POST['file_access']) : 'pro';
+    $file_price  = isset($_POST['file_price']) ? sanitize_text_field($_POST['file_price']) : '₹399 / Included in Pro';
+
+    if (empty($title)) {
+        wp_send_json_error('Please enter a file title.');
+    }
+
+    if (empty($file_url)) {
+        $file_url = home_url('/wp-content/themes/facilitypro/assets/downloads/' . sanitize_title($title) . '.' . strtolower($file_format));
+    }
+
+    $post_data = [
+        'post_title'   => $title,
+        'post_content' => $description,
+        'post_status'  => 'publish',
+        'post_type'    => 'mep_premium_file',
+    ];
+
+    if ($post_id > 0) {
+        $post_data['ID'] = $post_id;
+        $saved_id = wp_update_post($post_data);
+    } else {
+        $saved_id = wp_insert_post($post_data);
+    }
+
+    if (is_wp_error($saved_id) || !$saved_id) {
+        wp_send_json_error('Failed to save premium file.');
+    }
+
+    update_post_meta($saved_id, '_mep_discipline', $discipline);
+    update_post_meta($saved_id, '_mep_file_format', strtoupper($file_format));
+    update_post_meta($saved_id, '_mep_file_size', $file_size);
+    update_post_meta($saved_id, '_mep_file_url', $file_url);
+    update_post_meta($saved_id, '_mep_access_level', $access_lvl);
+    update_post_meta($saved_id, '_mep_file_price', $file_price);
+
+    // Attach discipline taxonomy if term exists
+    wp_set_object_terms($saved_id, $discipline, 'mep_discipline');
+
+    wp_send_json_success([
+        'message' => 'Premium file saved successfully!',
+        'file_id' => $saved_id
+    ]);
+}
+add_action('wp_ajax_facilitypro_admin_save_premium_file', 'facilitypro_ajax_admin_save_premium_file');
+
+// 7. AJAX Admin Delete Premium File
+function facilitypro_ajax_admin_delete_premium_file() {
+    check_ajax_referer('facilitypro_nonce', 'nonce');
+
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Unauthorized. Only administrators can delete files.');
+    }
+
+    $file_id = isset($_POST['file_id']) ? absint($_POST['file_id']) : 0;
+    if (!$file_id) {
+        wp_send_json_error('Invalid file ID.');
+    }
+
+    $deleted = wp_delete_post($file_id, true);
+    if ($deleted) {
+        wp_send_json_success(['message' => 'Premium file removed successfully.']);
+    } else {
+        wp_send_json_error('Could not delete file.');
+    }
+}
+add_action('wp_ajax_facilitypro_admin_delete_premium_file', 'facilitypro_ajax_admin_delete_premium_file');
+
+// 8. AJAX Verify & Download Premium File
+function facilitypro_ajax_download_premium_file() {
+    check_ajax_referer('facilitypro_nonce', 'nonce');
+
+    if (!is_user_logged_in()) {
+        wp_send_json_error([
+            'requires_auth' => true,
+            'message'       => 'Please log in to download premium engineering assets.'
+        ]);
+    }
+
+    $user_id   = get_current_user_id();
+    $is_admin  = current_user_can('manage_options');
+    $status    = get_user_meta($user_id, 'facilitypro_account_status', true);
+    $plan_stat = get_user_meta($user_id, 'facilitypro_plan_status', true);
+
+    $file_id = isset($_POST['file_id']) ? absint($_POST['file_id']) : 0;
+    $post    = get_post($file_id);
+
+    if (!$post || $post->post_type !== 'mep_premium_file') {
+        wp_send_json_error('Requested file not found.');
+    }
+
+    $access_lvl = get_post_meta($file_id, '_mep_access_level', true) ?: 'pro';
+    $file_url   = get_post_meta($file_id, '_mep_file_url', true);
+
+    // Admin or Approved Active Member
+    $is_unlocked = $is_admin || ($status === 'approved' && ($plan_stat === 'Active' || $plan_stat === 'Active Member' || empty($plan_stat)));
+
+    if ($access_lvl === 'free' || $is_unlocked) {
+        // Track download count
+        $dl_count = absint(get_post_meta($file_id, '_mep_download_count', true));
+        update_post_meta($file_id, '_mep_download_count', $dl_count + 1);
+
+        wp_send_json_success([
+            'download_url' => $file_url ?: home_url('/dashboard/'),
+            'file_title'   => $post->post_title,
+            'message'      => 'Download verified! Starting file download...'
+        ]);
+    } else {
+        wp_send_json_error([
+            'locked'   => true,
+            'message'  => 'This premium calculation template is locked for Pro Members. Please activate your FacilityPro Pro subscription or contact Admin for instant unlock.',
+            'plan_url' => home_url('/pricing/')
+        ]);
+    }
+}
+add_action('wp_ajax_facilitypro_download_premium_file', 'facilitypro_ajax_download_premium_file');

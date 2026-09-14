@@ -76,8 +76,25 @@ function facilitypro_register_cpts() {
         'show_in_rest'=> true,
     ));
 
+    // 5. Premium Engineering Vault Files & Blueprints
+    register_post_type('mep_premium_file', array(
+        'labels' => array(
+            'name'          => __('Premium Vault Files', 'facilitypro'),
+            'singular_name' => __('Premium File', 'facilitypro'),
+            'add_new_item'  => __('Add New Premium File', 'facilitypro'),
+            'edit_item'     => __('Edit Premium File', 'facilitypro'),
+            'all_items'     => __('All Premium Files', 'facilitypro'),
+        ),
+        'public'      => true,
+        'has_archive' => false,
+        'rewrite'     => array('slug' => 'premium-file', 'with_front' => false),
+        'supports'    => array('title', 'editor', 'excerpt', 'thumbnail', 'custom-fields', 'author'),
+        'menu_icon'   => 'dashicons-media-spreadsheet',
+        'show_in_rest'=> true,
+    ));
+
     // Discipline Taxonomy for filtering
-    register_taxonomy('mep_discipline', array('mep_expert', 'mep_question', 'mep_sop', 'mep_knowledge'), array(
+    register_taxonomy('mep_discipline', array('mep_expert', 'mep_question', 'mep_sop', 'mep_knowledge', 'mep_premium_file'), array(
         'labels' => array(
             'name'          => __('MEP Disciplines', 'facilitypro'),
             'singular_name' => __('Discipline', 'facilitypro'),

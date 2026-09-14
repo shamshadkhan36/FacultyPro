@@ -232,7 +232,7 @@
 </header>
 
 <!-- Mobile Navigation Sidebar Drawer (Slide-out from Left) -->
-<div id="mobileSidebarDrawer" class="fixed inset-0 z-50 hidden transition-all duration-300" style="display: none;">
+<div id="mobileSidebarDrawer" class="fixed inset-0 z-[99999] hidden transition-all duration-300" style="display: none;">
     <!-- Backdrop Overlay -->
     <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" id="mobileDrawerBackdrop" onclick="facilityProCloseMobileMenu()"></div>
     

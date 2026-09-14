@@ -1188,22 +1188,138 @@ function facilitypro_pricing_shortcode($atts) {
 add_shortcode('facilitypro_pricing', 'facilitypro_pricing_shortcode');
 
 
-// 6. User Dashboard Shortcode [facilitypro_dashboard] (With Left Navigation Sidebar)
+// 6. User Dashboard Shortcode [facilitypro_dashboard] (With Left Navigation Sidebar & All Menu Tabs)
 function facilitypro_dashboard_shortcode($atts) {
     ob_start();
     
     if (is_user_logged_in()) {
-        $current_user = wp_get_current_user();
-        $user_id      = $current_user->ID;
-        $display_name = !empty($current_user->display_name) ? $current_user->display_name : $current_user->user_login;
-        $plant_name   = get_user_meta($user_id, 'facilitypro_plant_name', true);
+        $current_user   = wp_get_current_user();
+        $user_id        = $current_user->ID;
+        $is_admin       = current_user_can('manage_options');
+        $display_name   = !empty($current_user->display_name) ? $current_user->display_name : $current_user->user_login;
+        $plant_name     = get_user_meta($user_id, 'facilitypro_plant_name', true);
         if (empty($plant_name)) $plant_name = 'Main Facility Plant';
-        $phone        = get_user_meta($user_id, 'facilitypro_phone', true);
-        $plan         = get_user_meta($user_id, 'facilitypro_plan', true);
+        $phone          = get_user_meta($user_id, 'facilitypro_phone', true);
+        $plan           = get_user_meta($user_id, 'facilitypro_plan', true);
         if (empty($plan)) $plan = 'Facility Pro Monthly (₹399/mo)';
-        $plan_status  = get_user_meta($user_id, 'facilitypro_plan_status', true);
-        if (empty($plan_status)) $plan_status = 'Active Member';
+        $plan_status    = get_user_meta($user_id, 'facilitypro_plan_status', true);
+        if (empty($plan_status)) $plan_status = $is_admin ? 'Admin Session' : 'Active Member';
         
+        $account_status = get_user_meta($user_id, 'facilitypro_account_status', true);
+        if ($is_admin) {
+            $account_status = 'approved';
+        } elseif (empty($account_status)) {
+            $account_status = 'pending';
+        }
+
+        // 1. REJECTED USER VIEW
+        if (!$is_admin && $account_status === 'rejected') {
+            ?>
+            <div class="facilitypro-rejected-review max-w-xl mx-auto my-12 bg-white rounded-3xl p-8 shadow-xl border border-rose-200 text-center space-y-4">
+                <div class="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto shadow-sm">
+                    <i data-lucide="shield-alert" class="w-8 h-8"></i>
+                </div>
+                <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                    Registration Declined
+                </div>
+                <h1 class="text-2xl font-black text-slate-900">Application Under Review / Declined</h1>
+                <p class="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
+                    Your registration for plant <strong><?php echo esc_html($plant_name); ?></strong> was not approved at this time. If you believe this is an error or need immediate access, please contact our administrator directly.
+                </p>
+                <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <a href="tel:+919876543210" class="w-full sm:w-auto px-5 py-2.5 bg-[#0077c8] hover:bg-[#005fa3] text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2">
+                        <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+                        <span>Contact Admin (+91 98765 43210)</span>
+                    </a>
+                    <a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors">
+                        Log Out
+                    </a>
+                </div>
+            </div>
+            <?php
+            return ob_get_clean();
+        }
+
+        // 2. PENDING USER VIEW (Waiting for Admin approval)
+        if (!$is_admin && $account_status === 'pending') {
+            ?>
+            <div class="facilitypro-pending-review max-w-3xl mx-auto my-8 bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-amber-200">
+                <!-- Icon & Status Header -->
+                <div class="text-center space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto shadow-inner">
+                        <i data-lucide="clock" class="w-8 h-8 animate-pulse"></i>
+                    </div>
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                        <span>Registration Status: Pending Admin Verification</span>
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-black text-slate-900">Welcome, <?php echo esc_html($display_name); ?></h1>
+                    <p class="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
+                        Your registration for <strong><?php echo esc_html($plant_name); ?></strong> has been received. Our Admin team will review and approve your account shortly before granting access to diagnostic calculators and SOPs.
+                    </p>
+                </div>
+
+                <!-- Verification Progress / Steps -->
+                <div class="my-8 p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                    <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider">Approval Sequence:</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <div class="p-3.5 bg-white rounded-xl border border-emerald-200 flex items-center gap-2.5">
+                            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-[11px] shrink-0">✓</span>
+                            <div>
+                                <div class="font-bold text-slate-900">1. Details Received</div>
+                                <div class="text-[10px] text-emerald-600 font-semibold">Submitted Successfully</div>
+                            </div>
+                        </div>
+                        <div class="p-3.5 bg-white rounded-xl border border-amber-300 shadow-sm flex items-center gap-2.5">
+                            <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-black text-[11px] shrink-0">⏳</span>
+                            <div>
+                                <div class="font-bold text-slate-900">2. Admin Review</div>
+                                <div class="text-[10px] text-amber-600 font-semibold">In Verification Queue</div>
+                            </div>
+                        </div>
+                        <div class="p-3.5 bg-white/60 rounded-xl border border-slate-200 flex items-center gap-2.5 opacity-75">
+                            <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center font-black text-[11px] shrink-0">🔒</span>
+                            <div>
+                                <div class="font-bold text-slate-700">3. Portal Activation</div>
+                                <div class="text-[10px] text-slate-400">Unlocks on Approval</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Registration Summary -->
+                <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 mb-6">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Submitted Registration Details</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+                        <div><span class="text-slate-500">Engineer / User Name:</span> <strong class="text-slate-800 ml-1"><?php echo esc_html($display_name); ?></strong></div>
+                        <div><span class="text-slate-500">Corporate Email:</span> <strong class="text-slate-800 ml-1"><?php echo esc_html($current_user->user_email); ?></strong></div>
+                        <div><span class="text-slate-500">Facility / Plant:</span> <strong class="text-slate-800 ml-1"><?php echo esc_html($plant_name); ?></strong></div>
+                        <div><span class="text-slate-500">Phone Number:</span> <strong class="text-slate-800 ml-1"><?php echo esc_html($phone ?: 'Not provided'); ?></strong></div>
+                    </div>
+                </div>
+
+                <!-- Help & Actions Footer -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200">
+                    <div class="text-xs text-slate-500 text-center sm:text-left">
+                        Need urgent approval for a critical plant emergency? 
+                        <a href="tel:+919876543210" class="text-[#0077c8] font-bold block sm:inline sm:ml-1">Call Admin (+91 98765 43210)</a>
+                    </div>
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
+                        <button onclick="location.reload()" class="px-4 py-2.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                            <span>Check Status</span>
+                        </button>
+                        <a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="px-4 py-2.5 bg-slate-900 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-colors">
+                            Log Out
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <?php
+            return ob_get_clean();
+        }
+
+        // 3. APPROVED USER / ADMIN FULL DASHBOARD VIEW
         $queries = get_user_meta($user_id, 'facilitypro_query_history', true);
         if (!is_array($queries) || empty($queries)) {
             $queries = [
@@ -1243,6 +1359,127 @@ function facilitypro_dashboard_shortcode($atts) {
         }
         
         $initials = strtoupper(substr($display_name, 0, 2));
+
+        // Load users list for Administrator User Approvals tab
+        $facility_users = [];
+        $pending_count = 0;
+        $approved_count = 0;
+        $rejected_count = 0;
+
+        if ($is_admin) {
+            $facility_users = get_users([
+                'role__not_in' => ['administrator'],
+                'orderby'      => 'registered',
+                'order'        => 'DESC',
+                'number'       => 100
+            ]);
+            foreach ($facility_users as $fu) {
+                $st = get_user_meta($fu->ID, 'facilitypro_account_status', true);
+                if ($st === 'approved') {
+                    $approved_count++;
+                } elseif ($st === 'rejected') {
+                    $rejected_count++;
+                } else {
+                    $pending_count++;
+                }
+            }
+        }
+
+        // Load Premium Files for Vault Tab
+        $premium_files_query = get_posts([
+            'post_type'      => 'mep_premium_file',
+            'posts_per_page' => 50,
+            'post_status'    => 'publish',
+            'orderby'        => 'date',
+            'order'          => 'DESC'
+        ]);
+
+        // Default seeds if empty
+        $default_vault_files = [
+            [
+                'id'         => 9001,
+                'title'      => 'Centrifugal Chilled Water Sizing & Friction Head Derivation Matrix',
+                'desc'       => 'Full Excel calculator conforming to ASHRAE 90.1 with Hazen-Williams friction loss, pump TDH, and valve authority curves.',
+                'discipline' => 'hvac',
+                'format'     => 'XLSX',
+                'size'       => '3.4 MB',
+                'access'     => 'pro',
+                'price'      => '₹499 / Included in Pro'
+            ],
+            [
+                'id'         => 9002,
+                'title'      => '11kV Substation Single Line Diagram (SLD) & Protection Coordination',
+                'desc'       => 'Complete AutoCAD DWG + PDF schematics for 2x2000kVA transformers, VCB panels, APFC relays, and IS 732 earthing grid.',
+                'discipline' => 'electrical',
+                'format'     => 'DWG',
+                'size'       => '8.9 MB',
+                'access'     => 'pro',
+                'price'      => '₹799 / Included in Pro'
+            ],
+            [
+                'id'         => 9003,
+                'title'      => 'NFPA 13 & 20 Sprinkler Demand & Fire Pump Hydraulic Head Calculator',
+                'desc'       => 'Automatic hydraulic calculation sheet for Ordinary Hazard Group 2 warehouses, churn pressure curves, and relief valves.',
+                'discipline' => 'firefighting',
+                'format'     => 'XLSX',
+                'size'       => '2.7 MB',
+                'access'     => 'pro',
+                'price'      => '₹499 / Included in Pro'
+            ],
+            [
+                'id'         => 9004,
+                'title'      => 'High-Rise Hydro-Pneumatic Water Supply & Booster Sizing Worksheet',
+                'desc'       => 'Hunter fixture units (WSFU) diversity calculations, membrane expansion tank sizing, and pressure reducing valve (PRV) schedule.',
+                'discipline' => 'plumbing',
+                'format'     => 'XLSX',
+                'size'       => '2.1 MB',
+                'access'     => 'pro',
+                'price'      => '₹399 / Included in Pro'
+            ],
+            [
+                'id'         => 9005,
+                'title'      => 'Solar Rooftop Grid-Tied PV Array Sizing & Shadow Analysis Matrix',
+                'desc'       => 'MNRE & CEA compliant sizing template with inverter MPPT string matching, PR ratio, and 25-year degradation forecast.',
+                'discipline' => 'solar',
+                'format'     => 'XLSX',
+                'size'       => '4.2 MB',
+                'access'     => 'pro',
+                'price'      => '₹499 / Included in Pro'
+            ],
+            [
+                'id'         => 9006,
+                'title'      => 'BMS BACnet & Modbus I/O Point Schedule with Sequence of Operations',
+                'desc'       => 'Master point list for AHUs, Chillers, VAVs, VFDs, and Energy Meters with standard BACnet object types and polling intervals.',
+                'discipline' => 'bms',
+                'format'     => 'XLSX',
+                'size'       => '2.6 MB',
+                'access'     => 'pro',
+                'price'      => '₹399 / Included in Pro'
+            ],
+            [
+                'id'         => 9007,
+                'title'      => 'Sewage Treatment Plant (STP) MBBR / MBR Bioreactor Design Worksheet',
+                'desc'       => 'CPCB norms compliant sizing sheet for MLSS, aeration blower CFM, media filling ratio, and sludge generation rates.',
+                'discipline' => 'stp',
+                'format'     => 'XLSX',
+                'size'       => '3.8 MB',
+                'access'     => 'pro',
+                'price'      => '₹499 / Included in Pro'
+            ],
+            [
+                'id'         => 9008,
+                'title'      => 'Diesel Generator (DG Set) Fuel Day-Tank, Exhaust Backpressure & AMF Sheet',
+                'desc'       => 'ISO 8528 sizing calculations for generator step loading, alternator thermal derating, and acoustic louvre free area sizing.',
+                'discipline' => 'dg',
+                'format'     => 'XLSX',
+                'size'       => '2.3 MB',
+                'access'     => 'pro',
+                'price'      => '₹399 / Included in Pro'
+            ],
+        ];
+
+        // Is user approved or admin
+        $is_pro_user = $is_admin || ($account_status === 'approved' && ($plan_status === 'Active' || $plan_status === 'Active Member' || empty($plan_status)));
         ?>
         <div class="facilitypro-dashboard-root max-w-7xl mx-auto space-y-6">
             
@@ -1252,28 +1489,42 @@ function facilitypro_dashboard_shortcode($atts) {
                     <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
                     <span>Overview</span>
                 </button>
-                <button onclick="switchDashboardTab('queries')" data-dashtab="queries" class="dash-mobile-tab px-3.5 py-2 rounded-xl font-semibold text-xs whitespace-nowrap transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer flex items-center gap-1.5">
-                    <i data-lucide="messages-square" class="w-3.5 h-3.5"></i>
-                    <span>Consultations (<?php echo count($queries); ?>)</span>
+                <?php if ($is_admin): ?>
+                <button onclick="switchDashboardTab('approvals')" data-dashtab="approvals" class="dash-mobile-tab px-3.5 py-2 rounded-xl font-semibold text-xs whitespace-nowrap transition-all bg-amber-50 text-amber-900 hover:bg-amber-100 border border-amber-300 cursor-pointer flex items-center gap-1.5">
+                    <i data-lucide="user-check" class="w-3.5 h-3.5 text-amber-700"></i>
+                    <span>Approvals (<?php echo $pending_count; ?>)</span>
+                </button>
+                <?php endif; ?>
+                <button onclick="switchDashboardTab('knowledge')" data-dashtab="knowledge" class="dash-mobile-tab px-3.5 py-2 rounded-xl font-semibold text-xs whitespace-nowrap transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer flex items-center gap-1.5">
+                    <i data-lucide="book-open" class="w-3.5 h-3.5 text-sky-500"></i>
+                    <span>MEP Knowledge</span>
+                </button>
+                <button onclick="switchDashboardTab('vault')" data-dashtab="vault" class="dash-mobile-tab px-3.5 py-2 rounded-xl font-semibold text-xs whitespace-nowrap transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer flex items-center gap-1.5">
+                    <i data-lucide="folder-down" class="w-3.5 h-3.5 text-purple-500"></i>
+                    <span>Premium Files</span>
                 </button>
                 <button onclick="switchDashboardTab('calculations')" data-dashtab="calculations" class="dash-mobile-tab px-3.5 py-2 rounded-xl font-semibold text-xs whitespace-nowrap transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer flex items-center gap-1.5">
-                    <i data-lucide="calculator" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="calculator" class="w-3.5 h-3.5 text-teal-500"></i>
                     <span>Calculators</span>
                 </button>
                 <button onclick="switchDashboardTab('sops')" data-dashtab="sops" class="dash-mobile-tab px-3.5 py-2 rounded-xl font-semibold text-xs whitespace-nowrap transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer flex items-center gap-1.5">
-                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-500"></i>
                     <span>SOPs</span>
                 </button>
                 <button onclick="switchDashboardTab('checklists')" data-dashtab="checklists" class="dash-mobile-tab px-3.5 py-2 rounded-xl font-semibold text-xs whitespace-nowrap transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer flex items-center gap-1.5">
-                    <i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="clipboard-check" class="w-3.5 h-3.5 text-emerald-500"></i>
                     <span>Checklists</span>
                 </button>
+                <button onclick="switchDashboardTab('queries')" data-dashtab="queries" class="dash-mobile-tab px-3.5 py-2 rounded-xl font-semibold text-xs whitespace-nowrap transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer flex items-center gap-1.5">
+                    <i data-lucide="messages-square" class="w-3.5 h-3.5 text-blue-500"></i>
+                    <span>AI Consultations</span>
+                </button>
                 <button onclick="switchDashboardTab('subscription')" data-dashtab="subscription" class="dash-mobile-tab px-3.5 py-2 rounded-xl font-semibold text-xs whitespace-nowrap transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer flex items-center gap-1.5">
-                    <i data-lucide="credit-card" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="credit-card" class="w-3.5 h-3.5 text-indigo-500"></i>
                     <span>Billing</span>
                 </button>
                 <button onclick="switchDashboardTab('settings')" data-dashtab="settings" class="dash-mobile-tab px-3.5 py-2 rounded-xl font-semibold text-xs whitespace-nowrap transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer flex items-center gap-1.5">
-                    <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="settings" class="w-3.5 h-3.5 text-slate-500"></i>
                     <span>Settings</span>
                 </button>
             </div>
@@ -1293,9 +1544,9 @@ function facilitypro_dashboard_shortcode($atts) {
                             <div class="min-w-0">
                                 <h2 class="text-sm font-black text-slate-900 truncate"><?php echo esc_html($display_name); ?></h2>
                                 <p class="text-[11px] text-slate-500 truncate"><?php echo esc_html($plant_name); ?></p>
-                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    <span><?php echo esc_html($plan_status); ?></span>
+                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold <?php echo $is_admin ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'; ?>">
+                                    <span class="w-1.5 h-1.5 rounded-full <?php echo $is_admin ? 'bg-purple-500' : 'bg-emerald-500 animate-pulse'; ?>"></span>
+                                    <span><?php echo esc_html($is_admin ? 'Platform Admin' : $plan_status); ?></span>
                                 </span>
                             </div>
                         </div>
@@ -1322,22 +1573,33 @@ function facilitypro_dashboard_shortcode($atts) {
                             <i data-lucide="chevron-right" class="w-3.5 h-3.5 opacity-60"></i>
                         </button>
 
-                        <!-- Tab 2: AI Consultations -->
-                        <button onclick="switchDashboardTab('queries')" data-dashtab="queries" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 cursor-pointer group">
+                        <?php if ($is_admin): ?>
+                        <!-- Admin Tab: User Approvals -->
+                        <button onclick="switchDashboardTab('approvals')" data-dashtab="approvals" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-200 cursor-pointer group">
                             <div class="flex items-center gap-2.5">
-                                <i data-lucide="messages-square" class="w-4 h-4 text-sky-500"></i>
-                                <span>AI Consultations</span>
+                                <i data-lucide="user-check" class="w-4 h-4 text-amber-700"></i>
+                                <span class="font-bold">User Approvals</span>
                             </div>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-[#0077c8]">
-                                <?php echo count($queries); ?>
+                            <span id="sidebar-pending-counter" class="px-2 py-0.5 rounded-full text-[10px] font-black <?php echo $pending_count > 0 ? 'bg-amber-500 text-white animate-pulse' : 'bg-slate-200 text-slate-600'; ?>">
+                                <?php echo $pending_count; ?> Pending
                             </span>
+                        </button>
+                        <?php endif; ?>
+
+                        <!-- Tab 2: MEP Knowledge Hub -->
+                        <button onclick="switchDashboardTab('knowledge')" data-dashtab="knowledge" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 cursor-pointer group">
+                            <div class="flex items-center gap-2.5">
+                                <i data-lucide="book-open" class="w-4 h-4 text-sky-500"></i>
+                                <span>MEP Knowledge</span>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-400">9 Disciplines</span>
                         </button>
 
                         <!-- Tab 3: Calculations & Tools -->
                         <button onclick="switchDashboardTab('calculations')" data-dashtab="calculations" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 cursor-pointer group">
                             <div class="flex items-center gap-2.5">
                                 <i data-lucide="calculator" class="w-4 h-4 text-teal-500"></i>
-                                <span>Engineering Calculators</span>
+                                <span>Calculation Tools</span>
                             </div>
                             <span class="text-[10px] font-bold text-slate-400">6 Tools</span>
                         </button>
@@ -1346,7 +1608,7 @@ function facilitypro_dashboard_shortcode($atts) {
                         <button onclick="switchDashboardTab('sops')" data-dashtab="sops" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 cursor-pointer group">
                             <div class="flex items-center gap-2.5">
                                 <i data-lucide="shield-check" class="w-4 h-4 text-amber-500"></i>
-                                <span>Plant SOPs &amp; Audits</span>
+                                <span>Plant SOP Library</span>
                             </div>
                             <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
                         </button>
@@ -1360,11 +1622,31 @@ function facilitypro_dashboard_shortcode($atts) {
                             <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
                         </button>
 
+                        <!-- Tab 6: Premium Engineering Vault -->
+                        <button onclick="switchDashboardTab('vault')" data-dashtab="vault" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-gradient-to-r from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 text-purple-950 border border-purple-200 cursor-pointer group">
+                            <div class="flex items-center gap-2.5">
+                                <i data-lucide="folder-down" class="w-4 h-4 text-purple-600"></i>
+                                <span class="font-bold">Premium Vault &amp; Files</span>
+                            </div>
+                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-purple-600 text-white uppercase">Pro</span>
+                        </button>
+
+                        <!-- Tab 7: AI Consultations -->
+                        <button onclick="switchDashboardTab('queries')" data-dashtab="queries" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 cursor-pointer group">
+                            <div class="flex items-center gap-2.5">
+                                <i data-lucide="messages-square" class="w-4 h-4 text-blue-500"></i>
+                                <span>AI Consultations</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-[#0077c8]">
+                                <?php echo count($queries); ?>
+                            </span>
+                        </button>
+
                         <div class="pt-3 pb-1 px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-t border-slate-100 mt-2">
                             Account &amp; Support
                         </div>
 
-                        <!-- Tab 6: Plan & Billing -->
+                        <!-- Tab 8: Plan & Billing -->
                         <button onclick="switchDashboardTab('subscription')" data-dashtab="subscription" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 cursor-pointer group">
                             <div class="flex items-center gap-2.5">
                                 <i data-lucide="credit-card" class="w-4 h-4 text-indigo-500"></i>
@@ -1373,7 +1655,7 @@ function facilitypro_dashboard_shortcode($atts) {
                             <span class="text-[10px] font-bold text-emerald-600 font-mono">₹399/m</span>
                         </button>
 
-                        <!-- Tab 7: Settings -->
+                        <!-- Tab 9: Settings -->
                         <button onclick="switchDashboardTab('settings')" data-dashtab="settings" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 cursor-pointer group">
                             <div class="flex items-center gap-2.5">
                                 <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i>
@@ -1407,7 +1689,7 @@ function facilitypro_dashboard_shortcode($atts) {
                 <!-- ================= RIGHT MAIN WORKSPACE (lg:col-span-9) ================= -->
                 <main class="lg:col-span-9 space-y-6 min-w-0">
                     
-                    <!-- TAB 1: OVERVIEW -->
+                    <!-- TAB 1: OVERVIEW (Exact Layout from User Reference Image) -->
                     <div id="dashtab-overview" class="dash-panel space-y-6">
                         
                         <!-- Top Welcome Banner -->
@@ -1425,7 +1707,7 @@ function facilitypro_dashboard_shortcode($atts) {
                             </div>
                         </div>
 
-                        <!-- 4 Stats Cards -->
+                        <!-- 4 Stats Cards (Exact Match to Reference Screenshot) -->
                         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
                             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
                                 <div class="flex items-center justify-between">
@@ -1459,15 +1741,15 @@ function facilitypro_dashboard_shortcode($atts) {
                                     <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Plan Status</span>
                                     <div class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600"><i data-lucide="zap" class="w-4 h-4"></i></div>
                                 </div>
-                                <div class="text-2xl font-black text-slate-900 mt-2">Pro</div>
-                                <div class="text-[10px] text-emerald-600 font-semibold mt-1">Unlimited GPT-4o Access</div>
+                                <div class="text-2xl font-black text-slate-900 mt-2"><?php echo $is_pro_user ? 'Pro Member' : 'Standard'; ?></div>
+                                <div class="text-[10px] text-emerald-600 font-semibold mt-1">Unlimited AI &amp; Files</div>
                             </div>
                         </div>
 
-                        <!-- Recent Activity & Quick Tools Grid -->
+                        <!-- 2-Column Section (Exact Match to User Screenshot) -->
                         <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
                             
-                            <!-- Recent Consultations (2 cols) -->
+                            <!-- Left: Recent AI Diagnostic Sessions (2 cols) -->
                             <div class="xl:col-span-2 bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm">
                                 <div class="flex items-center justify-between mb-4">
                                     <h2 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
@@ -1486,17 +1768,11 @@ function facilitypro_dashboard_shortcode($atts) {
                                                     <span class="inline-block text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-blue-50 text-[#0077c8] mb-1">
                                                         <?php echo esc_html($q['discipline']); ?>
                                                     </span>
-                                                    <h3 class="text-xs sm:text-sm font-bold text-slate-900 hover:text-[#0077c8] transition-colors line-clamp-2">
-                                                        <?php echo esc_html($q['question']); ?>
-                                                    </h3>
-                                                    <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-2">
-                                                        <span>👨‍💼 <?php echo esc_html($q['expert']); ?></span>
-                                                        <span>&bull;</span>
-                                                        <span><?php echo esc_html($q['date']); ?></span>
-                                                    </div>
+                                                    <h3 class="text-xs sm:text-sm font-bold text-slate-900 truncate"><?php echo esc_html($q['question']); ?></h3>
+                                                    <p class="text-[11px] text-slate-500 mt-1">Assigned: <strong class="text-slate-700"><?php echo esc_html($q['expert']); ?></strong> &bull; <?php echo esc_html($q['date']); ?></p>
                                                 </div>
-                                                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold shrink-0">
-                                                    <?php echo esc_html($q['status']); ?>
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                                                    Resolved
                                                 </span>
                                             </div>
                                         </div>
@@ -1504,7 +1780,7 @@ function facilitypro_dashboard_shortcode($atts) {
                                 </div>
                             </div>
 
-                            <!-- Quick Shortcuts (1 col) -->
+                            <!-- Right: Quick Sizing Tools & Shortcuts (1 col) -->
                             <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-3">
                                 <h2 class="text-sm sm:text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
                                     <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
@@ -1527,6 +1803,14 @@ function facilitypro_dashboard_shortcode($atts) {
                                     <div class="text-[10px] text-slate-500 mt-0.5">Equal Friction 0.08-0.1 in.wg</div>
                                 </button>
 
+                                <button onclick="switchDashboardTab('vault')" class="w-full text-left p-3 rounded-xl border border-slate-200 hover:border-purple-500 hover:bg-purple-50/30 transition-all cursor-pointer">
+                                    <div class="text-xs font-bold text-purple-950 flex items-center justify-between">
+                                        <span>11kV Substation SLD Template</span>
+                                        <i data-lucide="folder-down" class="w-3.5 h-3.5 text-purple-600"></i>
+                                    </div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5">CAD DWG + Protection Coordination</div>
+                                </button>
+
                                 <button onclick="switchDashboardTab('sops')" class="w-full text-left p-3 rounded-xl border border-slate-200 hover:border-[#0077c8] hover:bg-blue-50/30 transition-all cursor-pointer">
                                     <div class="text-xs font-bold text-slate-900 flex items-center justify-between">
                                         <span>Chiller Annual Overhaul SOP</span>
@@ -1538,38 +1822,244 @@ function facilitypro_dashboard_shortcode($atts) {
 
                         </div>
 
-                    </div>
-
-                    <!-- TAB 2: CONSULTATIONS -->
-                    <div id="dashtab-queries" class="dash-panel hidden space-y-4">
-                        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-sm">
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
+                        <!-- All Menu Hub Quick Navigation Grid -->
+                        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4">
+                            <div class="flex items-center justify-between">
                                 <div>
-                                    <h2 class="text-lg sm:text-xl font-black text-slate-900">Your AI Consultation History</h2>
-                                    <p class="text-xs text-slate-500 mt-0.5">Complete archive of MEP calculations and licensed engineer responses.</p>
+                                    <h3 class="text-sm font-black text-slate-900">Platform Features &amp; Menu Navigation</h3>
+                                    <p class="text-xs text-slate-500">Access all sections of FacilityPro directly from your command center.</p>
                                 </div>
-                                <button onclick="facilityProOpenConsultationModal()" class="px-4 py-2 bg-[#f05423] text-white text-xs font-bold rounded-xl hover:bg-[#d94416] transition-colors flex items-center gap-1.5 cursor-pointer">
-                                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                                    <span>+ New Consultation</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                                <button onclick="switchDashboardTab('knowledge')" class="p-3.5 rounded-xl border border-slate-200 hover:border-sky-500 hover:bg-sky-50/40 transition-all text-left group cursor-pointer">
+                                    <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                                    </div>
+                                    <div class="text-xs font-bold text-slate-900">MEP Knowledge</div>
+                                    <div class="text-[10px] text-slate-500">9 Disciplines</div>
+                                </button>
+
+                                <button onclick="switchDashboardTab('calculations')" class="p-3.5 rounded-xl border border-slate-200 hover:border-teal-500 hover:bg-teal-50/40 transition-all text-left group cursor-pointer">
+                                    <div class="w-8 h-8 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                                        <i data-lucide="calculator" class="w-4 h-4"></i>
+                                    </div>
+                                    <div class="text-xs font-bold text-slate-900">Calculators</div>
+                                    <div class="text-[10px] text-slate-500">6 Sizing Tools</div>
+                                </button>
+
+                                <button onclick="switchDashboardTab('sops')" class="p-3.5 rounded-xl border border-slate-200 hover:border-amber-500 hover:bg-amber-50/40 transition-all text-left group cursor-pointer">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                                    </div>
+                                    <div class="text-xs font-bold text-slate-900">SOP Library</div>
+                                    <div class="text-[10px] text-slate-500">Plant LOTO &amp; Audits</div>
+                                </button>
+
+                                <button onclick="switchDashboardTab('checklists')" class="p-3.5 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/40 transition-all text-left group cursor-pointer">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                                        <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+                                    </div>
+                                    <div class="text-xs font-bold text-slate-900">PM Checklists</div>
+                                    <div class="text-[10px] text-slate-500">Routine Maintenance</div>
+                                </button>
+
+                                <button onclick="switchDashboardTab('vault')" class="p-3.5 rounded-xl border border-purple-200 hover:border-purple-500 bg-purple-50/30 hover:bg-purple-50/60 transition-all text-left group cursor-pointer">
+                                    <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                                        <i data-lucide="folder-down" class="w-4 h-4"></i>
+                                    </div>
+                                    <div class="text-xs font-bold text-purple-950">Premium Vault</div>
+                                    <div class="text-[10px] text-purple-700 font-semibold">CAD DWG &amp; Excel</div>
+                                </button>
+
+                                <button onclick="facilityProOpenConsultationModal()" class="p-3.5 rounded-xl border border-orange-200 hover:border-orange-500 bg-orange-50/30 hover:bg-orange-50/60 transition-all text-left group cursor-pointer">
+                                    <div class="w-8 h-8 rounded-lg bg-orange-100 text-orange-700 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                                    </div>
+                                    <div class="text-xs font-bold text-orange-950">Ask AI Specialist</div>
+                                    <div class="text-[10px] text-orange-700 font-semibold">24/7 Q&amp;A</div>
                                 </button>
                             </div>
-                            
-                            <div class="space-y-3.5">
-                                <?php foreach ($queries as $q) : ?>
-                                    <div class="p-4 sm:p-5 rounded-2xl border border-slate-200 hover:border-blue-400 bg-slate-50/60 transition-all">
-                                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 pb-3 mb-3">
-                                            <span class="text-xs font-extrabold uppercase px-2.5 py-1 rounded-lg bg-blue-100 text-[#0077c8] w-fit">
-                                                <?php echo esc_html($q['discipline']); ?>
-                                            </span>
-                                            <span class="text-[11px] text-slate-400 font-medium">Session Logged: <?php echo esc_html($q['date']); ?></span>
+                        </div>
+
+                    </div>
+
+                    <!-- TAB 2: MEP KNOWLEDGE HUB (All 9 Disciplines with Filters) -->
+                    <div id="dashtab-knowledge" class="dash-panel hidden space-y-6">
+                        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                                <div>
+                                    <h2 class="text-xl sm:text-2xl font-black text-slate-900">MEP Knowledge Hub &amp; Technical Guides</h2>
+                                    <p class="text-xs text-slate-500 mt-0.5">Explore 28+ in-depth engineering breakdowns, formulas, and real plant case studies across 9 disciplines.</p>
+                                </div>
+                                <a href="<?php echo esc_url(home_url('/knowledge-hub/')); ?>" target="_blank" class="px-4 py-2 bg-slate-900 hover:bg-[#0077c8] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs">
+                                    <span>Open Full Hub</span>
+                                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </div>
+
+                            <!-- Embedded Knowledge Hub Shortcode -->
+                            <?php echo do_shortcode('[facilitypro_knowledge_hub]'); ?>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: PREMIUM ENGINEERING VAULT & FILES -->
+                    <div id="dashtab-vault" class="dash-panel hidden space-y-6">
+                        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-100 text-purple-800 uppercase tracking-wider">Engineering Asset Vault</span>
+                                        <span class="text-xs text-emerald-600 font-bold">&bull; Verified Sizing Matrices</span>
+                                    </div>
+                                    <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-1">Premium Files, CAD Blueprints &amp; Excel Sheets</h2>
+                                    <p class="text-xs text-slate-500">Downloadable calculation tools, single line diagrams (DWG), and sizing spreadsheets for facility engineers.</p>
+                                </div>
+                                
+                                <?php if ($is_admin): ?>
+                                <div>
+                                    <button onclick="facilityProOpenAddFileModal()" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-1.5 cursor-pointer">
+                                        <i data-lucide="plus" class="w-4 h-4"></i>
+                                        <span>+ Add New Premium File</span>
+                                    </button>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Pro Access Notice Banner -->
+                            <?php if (!$is_pro_user): ?>
+                                <div class="p-4 bg-gradient-to-r from-purple-900 to-slate-900 text-white rounded-2xl shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/40 text-purple-300 flex items-center justify-center shrink-0">
+                                            <i data-lucide="lock" class="w-5 h-5"></i>
                                         </div>
-                                        <h3 class="text-sm sm:text-base font-bold text-slate-900"><?php echo esc_html($q['question']); ?></h3>
-                                        <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
-                                            <span class="text-xs text-slate-600 font-medium">Assigned AI Specialist: <strong><?php echo esc_html($q['expert']); ?></strong></span>
-                                            <button onclick="facilityProOpenConsultationModal('<?php echo esc_js($q['question']); ?>')" class="text-xs font-bold text-[#0077c8] hover:underline flex items-center gap-1 cursor-pointer">
-                                                <span>Reopen Consultation Session</span>
-                                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                                            </button>
+                                        <div>
+                                            <div class="text-sm font-bold text-white">Unlock All Premium Engineering Files</div>
+                                            <div class="text-xs text-purple-200 mt-0.5">Activate FacilityPro Pro for ₹399/mo to download all Excel calculators, CAD drawings, and design spreadsheets.</div>
+                                        </div>
+                                    </div>
+                                    <button onclick="switchDashboardTab('subscription')" class="px-4 py-2 bg-[#f05423] hover:bg-[#d94416] text-white rounded-xl text-xs font-bold whitespace-nowrap transition-colors shadow-xs cursor-pointer">
+                                        Upgrade to Pro (₹399/m)
+                                    </button>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Discipline Filter Pills -->
+                            <div class="flex items-center gap-2 mb-6 overflow-x-auto pb-1 no-scrollbar">
+                                <button onclick="facilityProFilterVaultFiles('all')" data-vault-disc="all" class="vault-filter-btn active px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm border border-slate-900 cursor-pointer">
+                                    All Files
+                                </button>
+                                <button onclick="facilityProFilterVaultFiles('hvac')" data-vault-disc="hvac" class="vault-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                                    HVAC
+                                </button>
+                                <button onclick="facilityProFilterVaultFiles('electrical')" data-vault-disc="electrical" class="vault-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                                    Electrical
+                                </button>
+                                <button onclick="facilityProFilterVaultFiles('firefighting')" data-vault-disc="firefighting" class="vault-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                                    Fire Fighting
+                                </button>
+                                <button onclick="facilityProFilterVaultFiles('plumbing')" data-vault-disc="plumbing" class="vault-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                                    Plumbing
+                                </button>
+                                <button onclick="facilityProFilterVaultFiles('solar')" data-vault-disc="solar" class="vault-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                                    Solar
+                                </button>
+                                <button onclick="facilityProFilterVaultFiles('bms')" data-vault-disc="bms" class="vault-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                                    BMS
+                                </button>
+                                <button onclick="facilityProFilterVaultFiles('stp')" data-vault-disc="stp" class="vault-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                                    STP
+                                </button>
+                                <button onclick="facilityProFilterVaultFiles('dg')" data-vault-disc="dg" class="vault-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                                    DG Set
+                                </button>
+                            </div>
+
+                            <!-- Vault Files Grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="vaultFilesGrid">
+                                <?php 
+                                // Render DB files if any, else default seeds
+                                $render_files = [];
+                                if (!empty($premium_files_query)) {
+                                    foreach ($premium_files_query as $pf) {
+                                        $f_disc   = get_post_meta($pf->ID, '_mep_discipline', true) ?: 'hvac';
+                                        $f_format = get_post_meta($pf->ID, '_mep_file_format', true) ?: 'XLSX';
+                                        $f_size   = get_post_meta($pf->ID, '_mep_file_size', true) ?: '2.5 MB';
+                                        $f_access = get_post_meta($pf->ID, '_mep_access_level', true) ?: 'pro';
+                                        $f_price  = get_post_meta($pf->ID, '_mep_file_price', true) ?: '₹399 / Included in Pro';
+                                        $render_files[] = [
+                                            'id'         => $pf->ID,
+                                            'title'      => $pf->post_title,
+                                            'desc'       => $pf->post_content ?: 'Complete engineering calculation template with formulas and code references.',
+                                            'discipline' => $f_disc,
+                                            'format'     => $f_format,
+                                            'size'       => $f_size,
+                                            'access'     => $f_access,
+                                            'price'      => $f_price,
+                                            'is_db'      => true
+                                        ];
+                                    }
+                                } else {
+                                    $render_files = $default_vault_files;
+                                }
+
+                                foreach ($render_files as $vf): 
+                                    $disc_badge_color = 'bg-blue-50 text-blue-700 border-blue-200';
+                                    if ($vf['discipline'] === 'electrical') $disc_badge_color = 'bg-amber-50 text-amber-800 border-amber-200';
+                                    if ($vf['discipline'] === 'firefighting') $disc_badge_color = 'bg-rose-50 text-rose-700 border-rose-200';
+                                    if ($vf['discipline'] === 'plumbing') $disc_badge_color = 'bg-cyan-50 text-cyan-700 border-cyan-200';
+                                    if ($vf['discipline'] === 'solar') $disc_badge_color = 'bg-orange-50 text-orange-700 border-orange-200';
+                                    if ($vf['discipline'] === 'bms') $disc_badge_color = 'bg-teal-50 text-teal-700 border-teal-200';
+                                    if ($vf['discipline'] === 'stp') $disc_badge_color = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                                    if ($vf['discipline'] === 'dg') $disc_badge_color = 'bg-slate-100 text-slate-800 border-slate-300';
+
+                                    $fmt_color = 'bg-emerald-100 text-emerald-800';
+                                    if ($vf['format'] === 'DWG') $fmt_color = 'bg-blue-100 text-blue-800';
+                                    if ($vf['format'] === 'PDF') $fmt_color = 'bg-rose-100 text-rose-800';
+                                    if ($vf['format'] === 'ZIP') $fmt_color = 'bg-purple-100 text-purple-800';
+                                ?>
+                                    <div id="vault-card-<?php echo $vf['id']; ?>" data-discipline="<?php echo esc_attr($vf['discipline']); ?>" class="vault-file-card bg-slate-50/70 hover:bg-white p-5 rounded-2xl border border-slate-200 hover:border-purple-300 hover:shadow-md transition-all flex flex-col justify-between">
+                                        <div>
+                                            <div class="flex items-start justify-between gap-3 mb-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase <?php echo $fmt_color; ?>">
+                                                        <?php echo esc_html($vf['format']); ?>
+                                                    </span>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border <?php echo $disc_badge_color; ?>">
+                                                        <?php echo esc_html($vf['discipline']); ?>
+                                                    </span>
+                                                </div>
+                                                <span class="text-[11px] font-mono text-slate-400"><?php echo esc_html($vf['size']); ?></span>
+                                            </div>
+
+                                            <h3 class="text-sm font-bold text-slate-900 leading-snug mb-1.5"><?php echo esc_html($vf['title']); ?></h3>
+                                            <p class="text-xs text-slate-500 leading-relaxed line-clamp-2"><?php echo esc_html($vf['desc']); ?></p>
+                                        </div>
+
+                                        <div class="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between gap-2">
+                                            <div class="text-[11px] font-semibold text-purple-900">
+                                                <?php echo esc_html($vf['price']); ?>
+                                            </div>
+
+                                            <div class="flex items-center gap-2">
+                                                <?php if ($is_admin && !empty($vf['is_db'])): ?>
+                                                    <button onclick="facilityProHandleDeletePremiumFile(<?php echo $vf['id']; ?>, this)" class="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg text-xs" title="Delete File">
+                                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                                    </button>
+                                                <?php endif; ?>
+
+                                                <?php if ($is_pro_user): ?>
+                                                    <button onclick="facilityProDownloadFile(<?php echo $vf['id']; ?>, this)" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+                                                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                                                        <span>Download File</span>
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button onclick="facilityProDownloadFile(<?php echo $vf['id']; ?>, this)" class="px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+                                                        <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                                                        <span>Get Access</span>
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -1577,29 +2067,29 @@ function facilitypro_dashboard_shortcode($atts) {
                         </div>
                     </div>
 
-                    <!-- TAB 3: CALCULATORS EMBEDDED -->
+                    <!-- TAB 4: CALCULATORS EMBEDDED -->
                     <div id="dashtab-calculations" class="dash-panel hidden space-y-6">
                         <div class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-sm">
                             <div class="mb-6">
-                                <h2 class="text-lg sm:text-xl font-black text-slate-900">Embedded Plant Engineering Calculators</h2>
-                                <p class="text-xs text-slate-500 mt-0.5">Run instant formulas conforming to ASHRAE 90.1, IS 732, and NFPA 13.</p>
+                                <h2 class="text-lg sm:text-xl font-black text-slate-900">FacilityPro MEP Engineering Calculators</h2>
+                                <p class="text-xs text-slate-500 mt-0.5">Interactive sizing equations compliant with IS, NBC 2016, ASHRAE &amp; IEEE.</p>
                             </div>
                             <?php echo do_shortcode('[facilitypro_calculators]'); ?>
                         </div>
                     </div>
 
-                    <!-- TAB 4: SOPS EMBEDDED -->
+                    <!-- TAB 5: SOP LIBRARY EMBEDDED -->
                     <div id="dashtab-sops" class="dash-panel hidden space-y-6">
                         <div class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-sm">
                             <div class="mb-6">
-                                <h2 class="text-lg sm:text-xl font-black text-slate-900">Standard Operating Procedures &amp; LOTO Audits</h2>
-                                <p class="text-xs text-slate-500 mt-0.5">OSHA &amp; NBC 2016 compliant procedures for plant equipment commissioning.</p>
+                                <h2 class="text-lg sm:text-xl font-black text-slate-900">Standard Operating Procedures (SOPs)</h2>
+                                <p class="text-xs text-slate-500 mt-0.5">Audited plant maintenance processes with step-by-step safety controls.</p>
                             </div>
                             <?php echo do_shortcode('[facilitypro_sop_library]'); ?>
                         </div>
                     </div>
 
-                    <!-- TAB 5: CHECKLISTS EMBEDDED -->
+                    <!-- TAB 6: CHECKLISTS EMBEDDED -->
                     <div id="dashtab-checklists" class="dash-panel hidden space-y-6">
                         <div class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-sm">
                             <div class="mb-6">
@@ -1610,7 +2100,43 @@ function facilitypro_dashboard_shortcode($atts) {
                         </div>
                     </div>
 
-                    <!-- TAB 6: PLAN & BILLING -->
+                    <!-- TAB 7: AI CONSULTATIONS HISTORY -->
+                    <div id="dashtab-queries" class="dash-panel hidden space-y-6">
+                        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                                <div>
+                                    <h2 class="text-lg sm:text-xl font-black text-slate-900">AI Consultation Log</h2>
+                                    <p class="text-xs text-slate-500 mt-0.5">Archive of point-to-point derivations formulated by FacilityPro Specialists.</p>
+                                </div>
+                                <button onclick="facilityProOpenConsultationModal()" class="px-4 py-2 bg-gradient-to-r from-[#f05423] to-[#d94416] text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all cursor-pointer">
+                                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                                    <span>New Query</span>
+                                </button>
+                            </div>
+
+                            <div class="space-y-4">
+                                <?php foreach ($queries as $idx => $q): ?>
+                                    <div class="p-4 sm:p-5 rounded-2xl bg-slate-50/70 border border-slate-200 hover:border-slate-300 transition-colors">
+                                        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-[#0077c8] uppercase tracking-wider">
+                                                    <?php echo esc_html($q['discipline']); ?>
+                                                </span>
+                                                <span class="text-xs text-slate-400">&bull; <?php echo esc_html($q['date']); ?></span>
+                                            </div>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                ✓ Verified Derivation
+                                            </span>
+                                        </div>
+                                        <h4 class="text-sm font-bold text-slate-900 mb-1"><?php echo esc_html($q['question']); ?></h4>
+                                        <p class="text-xs text-slate-500 font-medium">Assigned Specialist: <span class="text-slate-800 font-bold"><?php echo esc_html($q['expert']); ?></span></p>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 8: PLAN & BILLING -->
                     <div id="dashtab-subscription" class="dash-panel hidden space-y-6">
                         <div class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-sm">
                             <div class="max-w-4xl mx-auto space-y-6">
@@ -1620,10 +2146,10 @@ function facilitypro_dashboard_shortcode($atts) {
                                 <div class="p-6 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-[#0b2545] text-white shadow-md">
                                     <div class="flex items-center justify-between mb-4">
                                         <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Current Membership</span>
-                                        <span class="px-3 py-1 rounded-full text-xs font-black bg-emerald-500 text-white">Active</span>
+                                        <span class="px-3 py-1 rounded-full text-xs font-black bg-emerald-500 text-white"><?php echo $is_pro_user ? 'Active' : 'Pending Upgrade'; ?></span>
                                     </div>
                                     <div class="text-2xl sm:text-3xl font-black text-white"><?php echo esc_html($plan); ?></div>
-                                    <p class="text-xs text-slate-300 mt-2">Unlimited Point-to-Point AI Q&amp;A &bull; All 6 MEP Calculators &bull; Full SOP &amp; Checklist Library &bull; 24/7 Priority Support</p>
+                                    <p class="text-xs text-slate-300 mt-2">Unlimited Point-to-Point AI Q&amp;A &bull; All 6 MEP Calculators &bull; Full SOP &amp; Checklist Library &bull; Premium File Vault Downloads &bull; 24/7 Priority Support</p>
                                 </div>
 
                                 <div class="pt-4 border-t border-slate-100">
@@ -1634,7 +2160,7 @@ function facilitypro_dashboard_shortcode($atts) {
                         </div>
                     </div>
 
-                    <!-- TAB 7: SETTINGS -->
+                    <!-- TAB 9: SETTINGS -->
                     <div id="dashtab-settings" class="dash-panel hidden space-y-6">
                         <div class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-sm max-w-2xl mx-auto">
                             <h2 class="text-xl font-black text-slate-900 mb-1">Plant &amp; Profile Settings</h2>
@@ -1672,11 +2198,251 @@ function facilitypro_dashboard_shortcode($atts) {
                         </div>
                     </div>
 
+                    <?php if ($is_admin): ?>
+                    <!-- TAB 10: ADMIN USER APPROVALS -->
+                    <div id="dashtab-approvals" class="dash-panel hidden space-y-6">
+                        <div class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-100 text-purple-800 uppercase tracking-wider">Admin Control</span>
+                                        <span class="text-xs text-slate-400">&bull; Live Access Management</span>
+                                    </div>
+                                    <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-1">Plant Engineer Registrations &amp; Approvals</h2>
+                                    <p class="text-xs text-slate-500">Approve or reject registered plant engineers to grant or restrict access to FacilityPro calculators, SOPs, and AI tools.</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="location.reload()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5">
+                                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                        <span>Refresh List</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Toast Notification Container -->
+                            <div id="admin-approvals-toast" class="hidden"></div>
+
+                            <!-- Summary Cards -->
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                                    <div class="text-[11px] font-bold text-slate-500 uppercase">Total Users</div>
+                                    <div class="text-2xl font-black text-slate-900 mt-1"><?php echo count($facility_users); ?></div>
+                                </div>
+                                <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
+                                    <div class="text-[11px] font-bold text-amber-700 uppercase">Pending Review</div>
+                                    <div class="text-2xl font-black text-amber-900 mt-1" id="stat-pending-count"><?php echo $pending_count; ?></div>
+                                </div>
+                                <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200">
+                                    <div class="text-[11px] font-bold text-emerald-700 uppercase">Approved</div>
+                                    <div class="text-2xl font-black text-emerald-900 mt-1" id="stat-approved-count"><?php echo $approved_count; ?></div>
+                                </div>
+                                <div class="p-4 rounded-xl bg-rose-50 border border-rose-200">
+                                    <div class="text-[11px] font-bold text-rose-700 uppercase">Rejected</div>
+                                    <div class="text-2xl font-black text-rose-900 mt-1" id="stat-rejected-count"><?php echo $rejected_count; ?></div>
+                                </div>
+                            </div>
+
+                            <!-- Filter Buttons -->
+                            <div class="flex items-center gap-2 mb-4 overflow-x-auto pb-1">
+                                <button onclick="facilityProFilterUsers('all')" data-status-filter="all" class="user-filter-btn active px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm border border-slate-900 cursor-pointer">
+                                    All Users (<?php echo count($facility_users); ?>)
+                                </button>
+                                <button onclick="facilityProFilterUsers('pending')" data-status-filter="pending" class="user-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                                    Pending (<?php echo $pending_count; ?>)
+                                </button>
+                                <button onclick="facilityProFilterUsers('approved')" data-status-filter="approved" class="user-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                                    Approved (<?php echo $approved_count; ?>)
+                                </button>
+                                <button onclick="facilityProFilterUsers('rejected')" data-status-filter="rejected" class="user-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                                    Rejected (<?php echo $rejected_count; ?>)
+                                </button>
+                            </div>
+
+                            <!-- Users Table -->
+                            <div class="overflow-x-auto rounded-xl border border-slate-200">
+                                <table class="w-full text-left border-collapse text-xs">
+                                    <thead>
+                                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                                            <th class="p-3.5">Engineer / User</th>
+                                            <th class="p-3.5">Facility / Plant</th>
+                                            <th class="p-3.5">Phone</th>
+                                            <th class="p-3.5">Registered</th>
+                                            <th class="p-3.5">Status</th>
+                                            <th class="p-3.5 text-right">Admin Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        <?php if (empty($facility_users)): ?>
+                                            <tr>
+                                                <td colspan="6" class="p-8 text-center text-slate-400">
+                                                    No registered users found yet.
+                                                </td>
+                                            </tr>
+                                        <?php else: ?>
+                                            <?php foreach ($facility_users as $fu): 
+                                                $u_status = get_user_meta($fu->ID, 'facilitypro_account_status', true);
+                                                if (empty($u_status)) $u_status = 'pending';
+                                                $u_plant  = get_user_meta($fu->ID, 'facilitypro_plant_name', true);
+                                                if (empty($u_plant)) $u_plant = '—';
+                                                $u_phone  = get_user_meta($fu->ID, 'facilitypro_phone', true);
+                                                if (empty($u_phone)) $u_phone = '—';
+                                                $reg_date = date('M d, Y', strtotime($fu->user_registered));
+                                            ?>
+                                                <tr id="user-row-<?php echo $fu->ID; ?>" data-user-status="<?php echo esc_attr($u_status); ?>" class="user-approval-row hover:bg-slate-50/80 transition-colors">
+                                                    <td class="p-3.5">
+                                                        <div class="font-bold text-slate-900"><?php echo esc_html($fu->display_name ?: $fu->user_login); ?></div>
+                                                        <div class="text-[11px] text-slate-500 font-mono"><?php echo esc_html($fu->user_email); ?></div>
+                                                    </td>
+                                                    <td class="p-3.5 font-semibold text-slate-800">
+                                                        <?php echo esc_html($u_plant); ?>
+                                                    </td>
+                                                    <td class="p-3.5 text-slate-600 font-mono">
+                                                        <?php echo esc_html($u_phone); ?>
+                                                    </td>
+                                                    <td class="p-3.5 text-slate-500">
+                                                        <?php echo esc_html($reg_date); ?>
+                                                    </td>
+                                                    <td class="p-3.5">
+                                                        <span id="user-status-badge-<?php echo $fu->ID; ?>">
+                                                            <?php if ($u_status === 'approved'): ?>
+                                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Approved
+                                                                </span>
+                                                            <?php elseif ($u_status === 'rejected'): ?>
+                                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                                                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Rejected
+                                                                </span>
+                                                            <?php else: ?>
+                                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pending
+                                                                </span>
+                                                            <?php endif; ?>
+                                                        </span>
+                                                    </td>
+                                                    <td class="p-3.5 text-right">
+                                                        <div id="user-actions-<?php echo $fu->ID; ?>" class="inline-flex items-center gap-1.5 justify-end">
+                                                            <?php if ($u_status === 'approved'): ?>
+                                                                <button onclick="facilityProUpdateUserStatus(<?php echo $fu->ID; ?>, 'rejected', this)" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition-colors cursor-pointer">
+                                                                    Revoke / Reject
+                                                                </button>
+                                                            <?php elseif ($u_status === 'rejected'): ?>
+                                                                <button onclick="facilityProUpdateUserStatus(<?php echo $fu->ID; ?>, 'approved', this)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors shadow-xs cursor-pointer flex items-center gap-1">
+                                                                    <span>✓</span> Approve
+                                                                </button>
+                                                            <?php else: ?>
+                                                                <button onclick="facilityProUpdateUserStatus(<?php echo $fu->ID; ?>, 'approved', this)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors shadow-xs cursor-pointer flex items-center gap-1">
+                                                                    <span>✓</span> Approve
+                                                                </button>
+                                                                <button onclick="facilityProUpdateUserStatus(<?php echo $fu->ID; ?>, 'rejected', this)" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition-colors cursor-pointer">
+                                                                    Reject
+                                                                </button>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
                 </main>
 
             </div>
 
         </div>
+
+        <?php if ($is_admin): ?>
+        <!-- ADMIN ADD PREMIUM FILE MODAL POPUP -->
+        <div id="adminAddFileModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center">
+                            <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                        </div>
+                        <h3 class="text-base font-black text-slate-900">Add Premium Engineering File</h3>
+                    </div>
+                    <button onclick="facilityProCloseAddFileModal()" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <div id="admin-file-save-msg" class="hidden"></div>
+
+                <form onsubmit="facilityProHandleSavePremiumFile(event)" class="space-y-3.5 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">File Title / Asset Name</label>
+                        <input type="text" name="file_title" placeholder="e.g. 11kV HT Substation Sizing & SLD Matrix" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 outline-none focus:border-purple-600" required>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">MEP Discipline</label>
+                            <select name="file_discipline" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 outline-none focus:border-purple-600">
+                                <option value="hvac">HVAC</option>
+                                <option value="electrical">Electrical</option>
+                                <option value="firefighting">Fire Fighting</option>
+                                <option value="plumbing">Plumbing</option>
+                                <option value="painting">Painting &amp; Polishing</option>
+                                <option value="solar">Solar System</option>
+                                <option value="bms">BMS &amp; Automation</option>
+                                <option value="stp">STP &amp; Water Treatment</option>
+                                <option value="dg">DG Set (Generators)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">File Format</label>
+                            <select name="file_format" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 outline-none focus:border-purple-600">
+                                <option value="XLSX">Excel (.XLSX / .XLS)</option>
+                                <option value="DWG">AutoCAD (.DWG / .DXF)</option>
+                                <option value="PDF">PDF Document (.PDF)</option>
+                                <option value="DOCX">Word Document (.DOCX)</option>
+                                <option value="ZIP">Archive Package (.ZIP)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">File Size</label>
+                            <input type="text" name="file_size" placeholder="e.g. 3.4 MB" value="2.5 MB" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 outline-none focus:border-purple-600">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Access Level</label>
+                            <select name="file_access" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 outline-none focus:border-purple-600">
+                                <option value="pro">Pro Members Only (Paid/Approved)</option>
+                                <option value="free">Free for All Logged-in Users</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Direct Download File URL / Media Link</label>
+                        <input type="text" name="file_url" placeholder="https://... or leave blank for default theme path" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 outline-none focus:border-purple-600">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Brief Description / Contents</label>
+                        <textarea name="file_description" rows="2" placeholder="Summary of what calculations, sizing formulas, or drawing layers are inside..." class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl font-medium text-slate-800 outline-none focus:border-purple-600"></textarea>
+                    </div>
+
+                    <div class="pt-2 flex items-center justify-end gap-2">
+                        <button type="button" onclick="facilityProCloseAddFileModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold transition-colors shadow-md">
+                            Save to Vault
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <?php
     } else {
         // Logged-out state: Professional Engineering Login & Register Portal
@@ -1748,12 +2514,22 @@ function facilitypro_dashboard_shortcode($atts) {
                 </div>
 
                 <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Contact Number</label>
+                    <input type="text" name="phone" placeholder="e.g. +91 98765 43210" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]">
+                </div>
+
+                <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Create Password (min 6 chars)</label>
                     <input type="password" name="password" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required minlength="6">
                 </div>
 
+                <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900 leading-snug flex items-start gap-2">
+                    <i data-lucide="info" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+                    <span>Registrations require Admin approval before accessing engineering tools. You will be notified once reviewed.</span>
+                </div>
+
                 <button type="submit" class="w-full py-3.5 px-4 bg-[#f05423] hover:bg-[#d94416] text-white rounded-xl text-xs font-black transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
-                    <span>Create Account &amp; Access (₹399/mo)</span>
+                    <span>Submit Registration for Admin Approval</span>
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </form>
@@ -1868,9 +2644,9 @@ function facilitypro_hero_shortcode($atts) {
                             </button>
                         </div>
 
-                        <!-- Disclaimer text -->
-                        <p class="text-[11px] text-slate-400 mt-2.5 text-center sm:text-left">
-                            By querying, you agree to our <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="text-sky-400 hover:underline">Terms of Service</a> &amp; verified engineering calculation standards.
+                        <!-- Legal & Code Engineering Guidance Disclaimer -->
+                        <p class="text-[11px] text-slate-300/80 mt-2.5 text-center sm:text-left leading-relaxed">
+                            By submitting an engineering query, you understand derivations are AI-assisted for guidance based on IS, NBC &amp; ASHRAE standards and agree to our <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="text-sky-400 hover:underline">Terms of Service</a> &amp; <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="text-sky-400 hover:underline">Privacy Policy</a>.
                         </p>
                     </form>
 
@@ -1905,15 +2681,15 @@ add_shortcode('facilitypro_hero', 'facilitypro_hero_shortcode');
 
 
 
-// 8. Category Grid Shortcode (9 Disciplines with Direct Blog Links) [facilitypro_category_pills] and [facilitypro_category_grid]
+// 8. Category Grid Shortcode (9 Disciplines with Direct Blog Links - 6 Featured on Homepage) [facilitypro_category_pills] and [facilitypro_category_grid]
 function facilitypro_category_grid_shortcode($atts) {
     ob_start();
     
-    // Query published articles from database
+    // Query published articles from database (LIMITED TO 6 ON HOMEPAGE)
     $articles_query = new WP_Query(array(
         'post_type'      => array('mep_knowledge', 'post'),
         'post_status'    => 'publish',
-        'posts_per_page' => 24,
+        'posts_per_page' => 6,
         'orderby'        => 'date',
         'order'          => 'DESC'
     ));
@@ -2074,12 +2850,12 @@ function facilitypro_category_grid_shortcode($atts) {
 
             </div>
 
-            <!-- DYNAMIC FEATURED BLOGS & SOLUTIONS GRID (WITH FEATURED IMAGES) -->
+            <!-- DYNAMIC FEATURED BLOGS & SOLUTIONS GRID (LIMITED TO 6 CARDS) -->
             <div class="mt-12 pt-8 border-t border-slate-200" id="featured-blogs-section">
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                     <div>
                         <span class="text-[10px] font-bold uppercase tracking-wider text-[#0077c8] bg-sky-50 px-2.5 py-1 rounded-md border border-sky-100" id="currentFilterLabel">
-                            Showing All Engineering Articles
+                            Featured Engineering Articles
                         </span>
                         <h3 class="text-xl sm:text-2xl font-black text-slate-900 mt-1">
                             Technical Blogs &amp; Plant Diagnostic Guides
@@ -2191,6 +2967,14 @@ function facilitypro_category_grid_shortcode($atts) {
                         wp_reset_postdata();
                     endif;
                     ?>
+                </div>
+
+                <!-- Centered View All Blogs Button -->
+                <div class="mt-10 text-center">
+                    <a href="<?php echo esc_url(home_url('/knowledge-hub/')); ?>" class="inline-flex items-center gap-2.5 px-6 py-3.5 bg-slate-900 hover:bg-[#0077c8] text-white text-xs sm:text-sm font-black rounded-2xl shadow-md transition-all transform hover:-translate-y-0.5">
+                        <span>View All MEP Knowledge Articles (28+)</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
                 </div>
             </div>
 
@@ -2341,48 +3125,134 @@ function facilitypro_popular_questions_shortcode($atts) {
 add_shortcode('facilitypro_popular_questions', 'facilitypro_popular_questions_shortcode');
 
 
-// 10. How It Works Shortcode [facilitypro_how_it_works]
+// 10. How It Works Shortcode [facilitypro_how_it_works] (Exact Clean 2-Column Match)
 function facilitypro_how_it_works_shortcode($atts) {
     ob_start();
     ?>
-    <!-- HOW IT WORKS SECTION -->
-    <section id="how-it-works" class="py-16 sm:py-24 bg-white border-b border-slate-200/70">
+    <!-- HOW IT WORKS (CLEAN 2-COLUMN DESIGN MATCHING REFERENCE) -->
+    <section id="how-it-works" class="py-16 sm:py-24 bg-white border-b border-slate-200/80">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <span class="text-xs font-bold uppercase tracking-widest text-[#0077c8] bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
-                    Point-to-Point Process
-                </span>
-                <h2 class="text-3xl sm:text-5xl font-extrabold text-[#0b2545] tracking-tight mt-3">
-                    How FacilityPro Solves Your Problem
-                </h2>
-                <p class="text-slate-600 text-sm sm:text-base mt-3">
-                    Zero wait times, zero hourly retainers. Instant code-verified derivations with exact formulas.
-                </p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+                
+                <!-- Left Column: 3 Clean Steps -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div>
+                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0b2545] tracking-tight">
+                            How it works
+                        </h2>
+                    </div>
+
+                    <div class="space-y-4 pt-2">
+                        <!-- Step 1 -->
+                        <div class="p-4 sm:p-5 rounded-2xl">
+                            <h3 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                                <span>1. Ask your question</span>
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed max-w-xl">
+                                Tell us your situation. Ask any question in any category, anytime you want.
+                            </p>
+                        </div>
+
+                        <!-- Step 2: Highlighted Active Box (Exact match to reference) -->
+                        <div class="bg-[#edf5fb] border border-[#cbe3f5] rounded-2xl p-5 sm:p-6 shadow-xs">
+                            <h3 class="text-lg sm:text-xl font-bold text-[#0b2545] tracking-tight flex items-center gap-2">
+                                <span>2. Let us match you</span>
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-700 mt-2 leading-relaxed max-w-xl">
+                                We'll connect you in minutes with the best Expert for your question.
+                            </p>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="p-4 sm:p-5 rounded-2xl">
+                            <h3 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                                <span>3. Chat with an Expert</span>
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed max-w-xl">
+                                Talk, text, or chat until you have your answer. Members get free follow-up chats 24/7, so there's always an Expert ready when you need one.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Visual Clean Mockup matching reference image -->
+                <div class="lg:col-span-5 flex justify-center">
+                    <div class="w-full max-w-md bg-white rounded-3xl p-6 border-2 border-slate-200/90 shadow-xl relative space-y-4">
+                        
+                        <!-- Dummy Expert Row 1 -->
+                        <div class="flex items-center gap-3.5 opacity-35 p-2 rounded-xl">
+                            <img src="<?php echo esc_url(FACILITYPRO_URI . '/assets/images/avatar_vikram_malhotra.jpg'); ?>" alt="Expert" class="w-10 h-10 rounded-full object-cover grayscale">
+                            <div class="space-y-1.5 flex-1">
+                                <div class="h-3 w-28 bg-slate-300 rounded-full"></div>
+                                <div class="h-2 w-40 bg-slate-200 rounded-full"></div>
+                            </div>
+                        </div>
+
+                        <!-- Dummy Expert Row 2 -->
+                        <div class="flex items-center gap-3.5 opacity-45 p-2 rounded-xl">
+                            <img src="<?php echo esc_url(FACILITYPRO_URI . '/assets/images/avatar_amit_patel.jpg'); ?>" alt="Expert" class="w-10 h-10 rounded-full object-cover grayscale">
+                            <div class="space-y-1.5 flex-1">
+                                <div class="h-3 w-32 bg-slate-300 rounded-full"></div>
+                                <div class="h-2 w-36 bg-slate-200 rounded-full"></div>
+                            </div>
+                        </div>
+
+                        <!-- MATCHED POP-OUT HIGHLIGHT CARD -->
+                        <div class="bg-white rounded-2xl p-4 shadow-xl border-2 border-[#0077c8] relative z-20 transform scale-[1.04] transition-transform flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-3.5">
+                                <div class="relative shrink-0">
+                                    <img src="<?php echo esc_url(FACILITYPRO_URI . '/assets/images/avatar_rajesh_sharma.jpg'); ?>" alt="Er. Rajesh Sharma" class="w-12 h-12 rounded-full object-cover ring-2 ring-[#0077c8]">
+                                    <span class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-xs">
+                                        ✓
+                                    </span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-1.5">
+                                        <h4 class="font-extrabold text-sm text-slate-900">Er. Rajesh Sharma, PE</h4>
+                                    </div>
+                                    <div class="flex items-center gap-1 text-amber-500 text-xs mt-0.5">
+                                        <span>★★★★★</span>
+                                    </div>
+                                    <span class="text-[10px] font-semibold text-[#0077c8] block mt-0.5">HVAC &amp; Central Plant Specialist</span>
+                                </div>
+                            </div>
+                            <span class="px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200 whitespace-nowrap">
+                                Matched
+                            </span>
+                        </div>
+
+                        <!-- Dummy Expert Row 3 -->
+                        <div class="flex items-center gap-3.5 opacity-45 p-2 rounded-xl">
+                            <img src="<?php echo esc_url(FACILITYPRO_URI . '/assets/images/avatar_ananya_verma.jpg'); ?>" alt="Expert" class="w-10 h-10 rounded-full object-cover grayscale">
+                            <div class="space-y-1.5 flex-1">
+                                <div class="h-3 w-30 bg-slate-300 rounded-full"></div>
+                                <div class="h-2 w-44 bg-slate-200 rounded-full"></div>
+                            </div>
+                        </div>
+
+                        <!-- Dummy Expert Row 4 -->
+                        <div class="flex items-center gap-3.5 opacity-30 p-2 rounded-xl">
+                            <div class="w-10 h-10 rounded-full bg-slate-200"></div>
+                            <div class="space-y-1.5 flex-1">
+                                <div class="h-3 w-24 bg-slate-300 rounded-full"></div>
+                                <div class="h-2 w-32 bg-slate-200 rounded-full"></div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Blue Action Button -->
+                        <div class="pt-2">
+                            <button type="button" onclick="facilityProOpenConsultationModal('What can we help with today?')" class="w-full py-3.5 px-4 bg-[#0077c8] hover:bg-[#0062a4] text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                                <span>What can we help with today?</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-slate-50 p-8 rounded-3xl border border-slate-200/80 space-y-4">
-                    <div class="w-12 h-12 rounded-2xl bg-[#0077c8] text-white flex items-center justify-center font-black text-lg shadow-md">1</div>
-                    <h3 class="text-xl font-bold text-slate-900">Type Your Plant Problem</h3>
-                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                        Input your chiller parameters, pump trip symptoms, transformer single-line diagram details, or sprinkler sizing criteria.
-                    </p>
-                </div>
-                <div class="bg-slate-50 p-8 rounded-3xl border border-slate-200/80 space-y-4">
-                    <div class="w-12 h-12 rounded-2xl bg-[#f05423] text-white flex items-center justify-center font-black text-lg shadow-md">2</div>
-                    <h3 class="text-xl font-bold text-slate-900">AI Code &amp; Math Derivation</h3>
-                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                        Our specialized AI models cross-reference IS/NBC, ASHRAE, NFPA, and IEEE standards to calculate exact friction losses, inrush harmonic blocking, and sizing formulas.
-                    </p>
-                </div>
-                <div class="bg-slate-50 p-8 rounded-3xl border border-slate-200/80 space-y-4">
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black text-lg shadow-md">3</div>
-                    <h3 class="text-xl font-bold text-slate-900">Point-to-Point Resolution</h3>
-                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                        Receive a crisp 4-point solution: Direct Summary, Step-by-Step Actions, Mathematical Formulas, and Official Code References. Export to PDF in 1-click.
-                    </p>
-                </div>
-            </div>
         </div>
     </section>
     <?php
@@ -2662,6 +3532,15 @@ function facilitypro_why_choose_us_shortcode($atts) {
 }
 add_shortcode('facilitypro_why_choose_us', 'facilitypro_why_choose_us_shortcode');
 
-add_shortcode('facilitypro_knowledge_hub', 'facilitypro_knowledge_hub_shortcode');
+add_shortcode('facilitypro_hero', 'facilitypro_hero_shortcode');
 add_shortcode('facilitypro_category_grid', 'facilitypro_category_grid_shortcode');
 add_shortcode('facilitypro_category_pills', 'facilitypro_category_grid_shortcode');
+add_shortcode('facilitypro_popular_questions', 'facilitypro_popular_questions_shortcode');
+add_shortcode('facilitypro_how_it_works', 'facilitypro_how_it_works_shortcode');
+add_shortcode('facilitypro_experts', 'facilitypro_experts_shortcode');
+add_shortcode('facilitypro_why_choose_us', 'facilitypro_why_choose_us_shortcode');
+add_shortcode('facilitypro_pricing', 'facilitypro_pricing_shortcode');
+add_shortcode('facilitypro_knowledge_hub', 'facilitypro_knowledge_hub_shortcode');
+add_shortcode('facilitypro_sop_library', 'facilitypro_sop_library_shortcode');
+add_shortcode('facilitypro_calculators', 'facilitypro_calculators_shortcode');
+add_shortcode('facilitypro_checklists', 'facilitypro_checklists_shortcode');

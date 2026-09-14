@@ -323,14 +323,22 @@ function facilityProCloseMobileMenu() {
     }, 300);
 }
 
-function facilityProToggleMobileMechanical() {
-    const sub = document.getElementById('mobileMechanicalSubmenu');
-    const chev = document.getElementById('mobileMechChevron');
+function facilityProToggleMobileAccordion(submenuId, chevronId) {
+    const sub = document.getElementById(submenuId);
+    const chev = chevronId ? document.getElementById(chevronId) : null;
     if (!sub) return;
-    sub.classList.toggle('hidden');
-    if (chev) {
-        chev.classList.toggle('rotate-180');
+    const isHidden = sub.classList.contains('hidden');
+    if (isHidden) {
+        sub.classList.remove('hidden');
+        if (chev) chev.classList.add('rotate-180');
+    } else {
+        sub.classList.add('hidden');
+        if (chev) chev.classList.remove('rotate-180');
     }
+}
+
+function facilityProToggleMobileMechanical() {
+    facilityProToggleMobileAccordion('mobileMechanicalSubmenu', 'mobileMechChevron');
 }
 
 function facilityProFilterCategory(catId) {
@@ -469,4 +477,273 @@ function facilityProToggleMobileAccordion(submenuId, chevronId) {
 
 document.addEventListener('DOMContentLoaded', () => {
     initCyclingDisciplines();
+
+    // Auto switch dashboard tab based on URL hash (e.g. #vault or #approvals)
+    try {
+        const hash = window.location.hash.replace('#', '');
+        if (hash && document.getElementById('dashtab-' + hash)) {
+            switchDashboardTab(hash);
+        }
+    } catch(e) {}
 });
+
+// Admin User Status Handler (Approve / Reject / Pending)
+async function facilityProUpdateUserStatus(userId, newStatus, btnEl) {
+    if (!userId || !newStatus) return;
+    
+    const rowEl = document.getElementById(`user-row-${userId}`);
+    const originalText = btnEl ? btnEl.innerHTML : '';
+    if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.innerHTML = '<span class="inline-block animate-spin">⏳</span> Updating...';
+    }
+
+    const formData = new FormData();
+    formData.append('action', 'facilitypro_admin_update_user_status');
+    formData.append('target_user_id', userId);
+    formData.append('target_status', newStatus);
+    formData.append('nonce', window.facilityProData?.nonce || '');
+
+    try {
+        const res = await fetch(window.facilityProData?.ajaxUrl || '/wp-admin/admin-ajax.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            const statusBadge = document.getElementById(`user-status-badge-${userId}`);
+            const actionsCell = document.getElementById(`user-actions-${userId}`);
+            
+            if (rowEl) {
+                rowEl.dataset.userStatus = newStatus;
+            }
+
+            if (statusBadge) {
+                if (newStatus === 'approved') {
+                    statusBadge.className = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300';
+                    statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Approved';
+                } else if (newStatus === 'rejected') {
+                    statusBadge.className = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300';
+                    statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Rejected';
+                } else {
+                    statusBadge.className = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300';
+                    statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pending';
+                }
+            }
+
+            if (actionsCell) {
+                let html = '';
+                if (newStatus === 'approved') {
+                    html = `<button onclick="facilityProUpdateUserStatus(${userId}, 'rejected', this)" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition-colors cursor-pointer">Revoke / Reject</button>`;
+                } else if (newStatus === 'rejected') {
+                    html = `<button onclick="facilityProUpdateUserStatus(${userId}, 'approved', this)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors shadow-xs cursor-pointer flex items-center gap-1"><span>✓</span> Approve</button>`;
+                } else {
+                    html = `<button onclick="facilityProUpdateUserStatus(${userId}, 'approved', this)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors shadow-xs cursor-pointer flex items-center gap-1"><span>✓</span> Approve</button> <button onclick="facilityProUpdateUserStatus(${userId}, 'rejected', this)" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition-colors cursor-pointer">Reject</button>`;
+                }
+                actionsCell.innerHTML = html;
+            }
+
+            const pendingCounter = document.getElementById('sidebar-pending-counter');
+            if (pendingCounter && data.data.pending_count !== undefined) {
+                pendingCounter.textContent = `${data.data.pending_count} Pending`;
+                pendingCounter.className = data.data.pending_count > 0 ? 'px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500 text-white animate-pulse' : 'px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-200 text-slate-600';
+            }
+
+            const toast = document.getElementById('admin-approvals-toast');
+            if (toast) {
+                toast.className = 'p-3 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 block mb-4';
+                toast.textContent = data.data.message || 'Status updated.';
+                setTimeout(() => { toast.className = 'hidden'; }, 4000);
+            }
+        } else {
+            alert(data.data || 'Failed to update user status.');
+            if (btnEl) {
+                btnEl.disabled = false;
+                btnEl.innerHTML = originalText;
+            }
+        }
+    } catch (err) {
+        alert('Network error while updating status.');
+        if (btnEl) {
+            btnEl.disabled = false;
+            btnEl.innerHTML = originalText;
+        }
+    }
+}
+
+// Filter Users in Approvals Tab
+function facilityProFilterUsers(filterStatus) {
+    document.querySelectorAll('.user-filter-btn').forEach(btn => {
+        if (btn.dataset.statusFilter === filterStatus) {
+            btn.className = 'user-filter-btn active px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm border border-slate-900 cursor-pointer';
+        } else {
+            btn.className = 'user-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer';
+        }
+    });
+
+    document.querySelectorAll('.user-approval-row').forEach(row => {
+        const rowStatus = row.dataset.userStatus;
+        row.style.display = (filterStatus === 'all' || rowStatus === filterStatus) ? '' : 'none';
+    });
+}
+
+// Premium Vault File Download Handler
+async function facilityProDownloadFile(fileId, btnEl) {
+    if (!fileId) return;
+    const origText = btnEl ? btnEl.innerHTML : '';
+    if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.innerHTML = '<span class="inline-block animate-spin">⏳</span> Verifying Access...';
+    }
+
+    const formData = new FormData();
+    formData.append('action', 'facilitypro_download_premium_file');
+    formData.append('file_id', fileId);
+    formData.append('nonce', window.facilityProData?.nonce || '');
+
+    try {
+        const res = await fetch(window.facilityProData?.ajaxUrl || '/wp-admin/admin-ajax.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            if (btnEl) {
+                btnEl.innerHTML = '<span>✓ Access Granted!</span>';
+                setTimeout(() => {
+                    btnEl.disabled = false;
+                    btnEl.innerHTML = origText;
+                }, 2500);
+            }
+            if (data.data.download_url) {
+                window.open(data.data.download_url, '_blank');
+            }
+        } else {
+            if (btnEl) {
+                btnEl.disabled = false;
+                btnEl.innerHTML = origText;
+            }
+            if (data.data?.locked) {
+                if (confirm(data.data.message + "\n\nWould you like to view Pro subscription plans?")) {
+                    window.location.href = data.data.plan_url || '/pricing/';
+                }
+            } else {
+                alert(data.data?.message || data.data || 'Could not verify download.');
+            }
+        }
+    } catch (err) {
+        alert('Network error while processing download.');
+        if (btnEl) {
+            btnEl.disabled = false;
+            btnEl.innerHTML = origText;
+        }
+    }
+}
+
+// Filter Vault Files by Discipline
+function facilityProFilterVaultFiles(disc) {
+    document.querySelectorAll('.vault-filter-btn').forEach(btn => {
+        if (btn.dataset.vaultDisc === disc) {
+            btn.className = 'vault-filter-btn active px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm border border-slate-900 cursor-pointer';
+        } else {
+            btn.className = 'vault-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer';
+        }
+    });
+
+    document.querySelectorAll('.vault-file-card').forEach(card => {
+        const cardDisc = card.dataset.discipline;
+        card.style.display = (disc === 'all' || cardDisc === disc) ? '' : 'none';
+    });
+}
+
+// Modal open/close for adding premium file
+function facilityProOpenAddFileModal() {
+    const m = document.getElementById('adminAddFileModal');
+    if (m) m.classList.remove('hidden');
+}
+
+function facilityProCloseAddFileModal() {
+    const m = document.getElementById('adminAddFileModal');
+    if (m) m.classList.add('hidden');
+}
+
+// Handle Admin Save Premium File
+async function facilityProHandleSavePremiumFile(e) {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const msgEl = document.getElementById('admin-file-save-msg');
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Saving File to Vault...</span>';
+    }
+
+    const formData = new FormData(form);
+    formData.append('action', 'facilitypro_admin_save_premium_file');
+    formData.append('nonce', window.facilityProData?.nonce || '');
+
+    try {
+        const res = await fetch(window.facilityProData?.ajaxUrl || '/wp-admin/admin-ajax.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            if (msgEl) {
+                msgEl.className = 'p-3 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 block mb-3';
+                msgEl.textContent = data.data.message || 'File saved!';
+            }
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            if (msgEl) {
+                msgEl.className = 'p-3 rounded-xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 block mb-3';
+                msgEl.textContent = data.data || 'Failed to save file.';
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Save to Vault</span>';
+            }
+        }
+    } catch (err) {
+        if (msgEl) {
+            msgEl.className = 'p-3 rounded-xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 block mb-3';
+            msgEl.textContent = 'Network error.';
+        }
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>Save to Vault</span>';
+        }
+    }
+}
+
+// Handle Admin Delete Premium File
+async function facilityProHandleDeletePremiumFile(fileId, btnEl) {
+    if (!fileId || !confirm('Are you sure you want to remove this premium file from the vault?')) return;
+
+    const formData = new FormData();
+    formData.append('action', 'facilitypro_admin_delete_premium_file');
+    formData.append('file_id', fileId);
+    formData.append('nonce', window.facilityProData?.nonce || '');
+
+    try {
+        const res = await fetch(window.facilityProData?.ajaxUrl || '/wp-admin/admin-ajax.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+            const card = document.getElementById(`vault-card-${fileId}`);
+            if (card) card.remove();
+        } else {
+            alert(data.data || 'Failed to delete file.');
+        }
+    } catch (err) {
+        alert('Network error.');
+    }
+}

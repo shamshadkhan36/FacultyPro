@@ -156,6 +156,9 @@
                     <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
             </form>
+            <p class="text-[10px] sm:text-[11px] text-slate-400 mt-2 text-center">
+                By submitting an engineering query, you understand derivations are AI-assisted for guidance based on IS, NBC &amp; ASHRAE standards and agree to our <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="text-[#0077c8] hover:underline">Terms of Service</a> &amp; <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="text-[#0077c8] hover:underline">Privacy Policy</a>.
+            </p>
         </div>
 
     </div>

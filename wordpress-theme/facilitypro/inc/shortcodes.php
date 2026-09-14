@@ -489,7 +489,7 @@ function facilitypro_calculators_shortcode($atts) {
 }
 add_shortcode('facilitypro_calculators', 'facilitypro_calculators_shortcode');
 
-// 2. Knowledge Hub Shortcode [facilitypro_knowledge_hub] (Dynamic WP_Query with 9 Disciplines & Server Pre-filter)
+// 2. Knowledge Hub Shortcode [facilitypro_knowledge_hub] (Dynamic WP_Query with 9 Disciplines & Featured Images)
 function facilitypro_knowledge_hub_shortcode($atts) {
     ob_start();
     
@@ -532,7 +532,42 @@ function facilitypro_knowledge_hub_shortcode($atts) {
             
             $excerpt = get_the_excerpt();
             if (empty($excerpt)) {
-                $excerpt = wp_trim_words(strip_tags(get_the_content()), 28, '...');
+                $excerpt = wp_trim_words(strip_tags(get_the_content()), 24, '...');
+            }
+
+            // Featured Image Resolution
+            $thumb_url = get_the_post_thumbnail_url($pid, 'large');
+            if (empty($thumb_url)) {
+                $t_lower = strtolower(get_the_title());
+                if ($disc === 'hvac') {
+                    $thumb_url = (strpos($t_lower, 'duct') !== false || strpos($t_lower, 'air') !== false) 
+                        ? FACILITYPRO_URI . '/assets/images/hvac_duct_sizing.jpg' 
+                        : FACILITYPRO_URI . '/assets/images/hvac_chiller_plant.jpg';
+                } elseif ($disc === 'electrical') {
+                    $thumb_url = (strpos($t_lower, 'transformer') !== false || strpos($t_lower, 'power') !== false)
+                        ? FACILITYPRO_URI . '/assets/images/electrical_transformer_yard.jpg'
+                        : FACILITYPRO_URI . '/assets/images/electrical_substation_room.jpg';
+                } elseif ($disc === 'firefighting') {
+                    $thumb_url = (strpos($t_lower, 'hydrant') !== false || strpos($t_lower, 'valve') !== false)
+                        ? FACILITYPRO_URI . '/assets/images/fire_hydrant_sprinkler_system.jpg'
+                        : FACILITYPRO_URI . '/assets/images/fire_sprinkler_pumps.jpg';
+                } elseif ($disc === 'plumbing') {
+                    $thumb_url = (strpos($t_lower, 'drain') !== false || strpos($t_lower, 'grease') !== false || strpos($t_lower, 'pipe') !== false)
+                        ? FACILITYPRO_URI . '/assets/images/plumbing_drainage_pipes.jpg'
+                        : FACILITYPRO_URI . '/assets/images/plumbing_booster_pumps.jpg';
+                } elseif ($disc === 'painting') {
+                    $thumb_url = FACILITYPRO_URI . '/assets/images/painting_epoxy_flooring.jpg';
+                } elseif ($disc === 'solar') {
+                    $thumb_url = FACILITYPRO_URI . '/assets/images/solar_rooftop_photovoltaic.jpg';
+                } elseif ($disc === 'bms') {
+                    $thumb_url = FACILITYPRO_URI . '/assets/images/bms_control_room.jpg';
+                } elseif ($disc === 'stp') {
+                    $thumb_url = FACILITYPRO_URI . '/assets/images/stp_water_treatment_plant.jpg';
+                } elseif ($disc === 'dg') {
+                    $thumb_url = FACILITYPRO_URI . '/assets/images/dg_diesel_generator_room.jpg';
+                } else {
+                    $thumb_url = FACILITYPRO_URI . '/assets/images/hvac_chiller_plant.jpg';
+                }
             }
 
             $all_articles[] = array(
@@ -544,6 +579,7 @@ function facilitypro_knowledge_hub_shortcode($atts) {
                 'codeRef'    => $code_ref,
                 'summary'    => $excerpt,
                 'permalink'  => get_permalink(),
+                'thumbnail'  => $thumb_url,
                 'date'       => get_the_date('M d, Y')
             );
         }
@@ -576,49 +612,56 @@ function facilitypro_knowledge_hub_shortcode($atts) {
             <?php endforeach; ?>
         </div>
 
-        <!-- Articles Grid -->
+        <!-- Articles Grid with Featured Images -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="kbCardsGrid">
             <?php foreach ($all_articles as $art) : 
                 $link = (!empty($art['permalink']) && $art['permalink'] !== '#') ? esc_url($art['permalink']) : 'javascript:void(0)';
                 $art_disc = $art['discipline'];
                 $is_visible = ($selected_disc === 'all' || $selected_disc === $art_disc);
             ?>
-                <div class="kb-card bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:border-[#0077c8] transition-all flex flex-col justify-between group cursor-pointer" style="<?php echo $is_visible ? 'display: flex;' : 'display: none;'; ?>" data-discipline="<?php echo esc_attr($art_disc); ?>" onclick="window.location.href='<?php echo $link; ?>'">
+                <div class="kb-card bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-[#0077c8] transition-all flex flex-col justify-between group cursor-pointer overflow-hidden transform hover:-translate-y-1" style="<?php echo $is_visible ? 'display: flex;' : 'display: none;'; ?>" data-discipline="<?php echo esc_attr($art_disc); ?>" onclick="window.location.href='<?php echo $link; ?>'">
                     <div>
-                        <div class="flex items-center justify-between gap-2 mb-3">
-                            <span class="px-2.5 py-1 rounded-lg bg-sky-50 text-[#0077c8] text-[11px] font-bold uppercase tracking-wider">
+                        <!-- Featured Image Banner -->
+                        <div class="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-100">
+                            <img src="<?php echo esc_url($art['thumbnail']); ?>" alt="<?php echo esc_attr($art['title']); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent opacity-70"></div>
+                            <span class="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-white/95 backdrop-blur-xs text-[#0077c8] text-[10px] sm:text-[11px] font-black uppercase tracking-wider shadow-sm">
                                 <?php echo esc_html($art['category']); ?>
                             </span>
-                            <span class="text-[11px] font-medium text-slate-400">
-                                <?php echo esc_html($art['readTime']); ?>
+                            <span class="absolute bottom-3 right-3 text-[10px] sm:text-[11px] font-bold text-white bg-slate-900/80 backdrop-blur-xs px-2 py-0.5 rounded-md flex items-center gap-1">
+                                <i data-lucide="clock" class="w-3 h-3 text-slate-300"></i>
+                                <span><?php echo esc_html($art['readTime']); ?></span>
                             </span>
                         </div>
 
-                        <h3 class="text-base font-black text-slate-900 group-hover:text-[#0077c8] transition-colors line-clamp-2 leading-snug">
-                            <a href="<?php echo $link; ?>" class="hover:underline">
-                                <?php echo esc_html($art['title']); ?>
-                            </a>
-                        </h3>
+                        <!-- Card Body -->
+                        <div class="p-5 sm:p-6">
+                            <div class="flex items-center justify-between gap-2 mb-2 text-slate-400 text-[11px]">
+                                <span><?php echo esc_html($art['date']); ?></span>
+                                <span class="font-semibold text-slate-500 truncate max-w-[150px]">📖 <?php echo esc_html($art['codeRef']); ?></span>
+                            </div>
 
-                        <p class="text-xs text-slate-600 mt-2.5 line-clamp-3 leading-relaxed">
-                            <?php echo esc_html($art['summary']); ?>
-                        </p>
+                            <h3 class="text-base sm:text-lg font-black text-slate-900 group-hover:text-[#0077c8] transition-colors line-clamp-2 leading-snug">
+                                <a href="<?php echo $link; ?>" class="hover:underline">
+                                    <?php echo esc_html($art['title']); ?>
+                                </a>
+                            </h3>
+
+                            <p class="text-xs sm:text-sm text-slate-600 mt-2.5 line-clamp-2 leading-relaxed">
+                                <?php echo esc_html($art['summary']); ?>
+                            </p>
+                        </div>
                     </div>
 
-                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
-                        <span class="text-[10px] font-semibold text-slate-400 truncate">
-                            📖 <?php echo esc_html($art['codeRef']); ?>
-                        </span>
-
-                        <div class="flex items-center gap-1.5 shrink-0">
-                            <a href="<?php echo $link; ?>" class="px-3.5 py-1.5 bg-slate-900 hover:bg-[#0077c8] text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-1 shadow-xs">
-                                <span>Read Full Blog</span>
-                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                            </a>
-                            <button type="button" onclick="event.stopPropagation(); facilityProOpenConsultationModal('Technical query regarding: <?php echo esc_js($art['title']); ?>')" class="p-2 text-slate-500 hover:text-[#f05423] hover:bg-orange-50 rounded-xl transition-colors cursor-pointer" title="Ask AI Specialist">
-                                <i data-lucide="sparkles" class="w-4 h-4 text-[#f05423]"></i>
-                            </button>
-                        </div>
+                    <!-- Card Footer Actions -->
+                    <div class="px-5 sm:px-6 pb-5 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <a href="<?php echo $link; ?>" class="flex-1 py-2 px-3 bg-slate-900 hover:bg-[#0077c8] text-white text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-xs">
+                            <span>Read Full Blog</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        </a>
+                        <button type="button" onclick="event.stopPropagation(); facilityProOpenConsultationModal('Technical query regarding: <?php echo esc_js($art['title']); ?>')" class="p-2 text-slate-500 hover:text-[#f05423] hover:bg-orange-50 rounded-xl transition-colors cursor-pointer shrink-0 border border-slate-200 hover:border-orange-200" title="Ask AI Specialist">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-[#f05423]"></i>
+                        </button>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -2031,7 +2074,7 @@ function facilitypro_category_grid_shortcode($atts) {
 
             </div>
 
-            <!-- DYNAMIC FEATURED BLOGS & SOLUTIONS GRID -->
+            <!-- DYNAMIC FEATURED BLOGS & SOLUTIONS GRID (WITH FEATURED IMAGES) -->
             <div class="mt-12 pt-8 border-t border-slate-200" id="featured-blogs-section">
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                     <div>
@@ -2069,31 +2112,71 @@ function facilitypro_category_grid_shortcode($atts) {
                             }
                             $code_ref = get_post_meta($p_id, 'kb_code_ref', true);
                             if (empty($code_ref)) $code_ref = 'ASHRAE / NBC 2016';
+                            
+                            $thumb_url = get_the_post_thumbnail_url($p_id, 'large');
+                            if (empty($thumb_url)) {
+                                $t_lower = strtolower(get_the_title());
+                                if ($disc === 'hvac') {
+                                    $thumb_url = (strpos($t_lower, 'duct') !== false || strpos($t_lower, 'air') !== false) 
+                                        ? FACILITYPRO_URI . '/assets/images/hvac_duct_sizing.jpg' 
+                                        : FACILITYPRO_URI . '/assets/images/hvac_chiller_plant.jpg';
+                                } elseif ($disc === 'electrical') {
+                                    $thumb_url = (strpos($t_lower, 'transformer') !== false || strpos($t_lower, 'power') !== false)
+                                        ? FACILITYPRO_URI . '/assets/images/electrical_transformer_yard.jpg'
+                                        : FACILITYPRO_URI . '/assets/images/electrical_substation_room.jpg';
+                                } elseif ($disc === 'firefighting') {
+                                    $thumb_url = (strpos($t_lower, 'hydrant') !== false || strpos($t_lower, 'valve') !== false)
+                                        ? FACILITYPRO_URI . '/assets/images/fire_hydrant_sprinkler_system.jpg'
+                                        : FACILITYPRO_URI . '/assets/images/fire_sprinkler_pumps.jpg';
+                                } elseif ($disc === 'plumbing') {
+                                    $thumb_url = (strpos($t_lower, 'drain') !== false || strpos($t_lower, 'grease') !== false || strpos($t_lower, 'pipe') !== false)
+                                        ? FACILITYPRO_URI . '/assets/images/plumbing_drainage_pipes.jpg'
+                                        : FACILITYPRO_URI . '/assets/images/plumbing_booster_pumps.jpg';
+                                } elseif ($disc === 'painting') {
+                                    $thumb_url = FACILITYPRO_URI . '/assets/images/painting_epoxy_flooring.jpg';
+                                } elseif ($disc === 'solar') {
+                                    $thumb_url = FACILITYPRO_URI . '/assets/images/solar_rooftop_photovoltaic.jpg';
+                                } elseif ($disc === 'bms') {
+                                    $thumb_url = FACILITYPRO_URI . '/assets/images/bms_control_room.jpg';
+                                } elseif ($disc === 'stp') {
+                                    $thumb_url = FACILITYPRO_URI . '/assets/images/stp_water_treatment_plant.jpg';
+                                } elseif ($disc === 'dg') {
+                                    $thumb_url = FACILITYPRO_URI . '/assets/images/dg_diesel_generator_room.jpg';
+                                } else {
+                                    $thumb_url = FACILITYPRO_URI . '/assets/images/hvac_chiller_plant.jpg';
+                                }
+                            }
                             ?>
-                            <div class="blog-card bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:border-[#0077c8] transition-all flex flex-col justify-between group transform hover:-translate-y-1 cursor-pointer" data-discipline="<?php echo esc_attr($disc); ?>" onclick="window.location.href='<?php the_permalink(); ?>'">
+                            <div class="blog-card bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-[#0077c8] transition-all flex flex-col justify-between group transform hover:-translate-y-1 cursor-pointer overflow-hidden" data-discipline="<?php echo esc_attr($disc); ?>" onclick="window.location.href='<?php the_permalink(); ?>'">
                                 <div>
-                                    <div class="flex items-center justify-between gap-2 mb-3">
-                                        <span class="px-2.5 py-1 rounded-lg bg-sky-50 text-[#0077c8] text-[11px] font-bold uppercase tracking-wider">
+                                    <!-- Featured Image Thumbnail -->
+                                    <div class="relative h-44 sm:h-48 w-full overflow-hidden bg-slate-100">
+                                        <img src="<?php echo esc_url($thumb_url); ?>" alt="<?php the_title_attribute(); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-65"></div>
+                                        <span class="absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-white/95 backdrop-blur-xs text-[#0077c8] text-[10px] sm:text-[11px] font-black uppercase tracking-wider shadow-sm">
                                             <?php echo esc_html(strtoupper($disc)); ?>
                                         </span>
-                                        <span class="text-[11px] font-medium text-slate-400">
+                                        <span class="absolute bottom-2.5 right-2.5 text-[10px] font-bold text-white bg-slate-900/80 backdrop-blur-xs px-2 py-0.5 rounded-md">
                                             <?php echo get_the_date('M d, Y'); ?>
                                         </span>
                                     </div>
 
-                                    <h4 class="text-base font-black text-slate-900 group-hover:text-[#0077c8] transition-colors line-clamp-2 leading-snug">
-                                        <a href="<?php the_permalink(); ?>" class="hover:underline">
-                                            <?php the_title(); ?>
-                                        </a>
-                                    </h4>
+                                    <!-- Content -->
+                                    <div class="p-5">
+                                        <h4 class="text-base font-black text-slate-900 group-hover:text-[#0077c8] transition-colors line-clamp-2 leading-snug">
+                                            <a href="<?php the_permalink(); ?>" class="hover:underline">
+                                                <?php the_title(); ?>
+                                            </a>
+                                        </h4>
 
-                                    <p class="text-xs text-slate-600 mt-2.5 line-clamp-3 leading-relaxed">
-                                        <?php echo wp_trim_words(get_the_excerpt(), 24, '...'); ?>
-                                    </p>
+                                        <p class="text-xs text-slate-600 mt-2 line-clamp-2 leading-relaxed">
+                                            <?php echo wp_trim_words(get_the_excerpt(), 20, '...'); ?>
+                                        </p>
+                                    </div>
                                 </div>
 
-                                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
-                                    <span class="text-[10px] font-semibold text-slate-400 truncate">
+                                <div class="px-5 pb-5 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                                    <span class="text-[10px] font-semibold text-slate-400 truncate max-w-[140px]">
                                         📖 <?php echo esc_html($code_ref); ?>
                                     </span>
 

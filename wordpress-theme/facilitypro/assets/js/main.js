@@ -284,117 +284,85 @@ async function facilityProHandleProfileUpdate(e) {
     }
 }
 
+
+// Robust Mobile Navigation Sidebar Drawer Controller
 function facilityProToggleMobileMenu() {
-    const menu = document.getElementById('mobileMenuDrawer');
-    if (!menu) return;
-    menu.classList.toggle('hidden');
-}
-
-function facilityProFilterCategory(categorySlug) {
-    // 1. Toggle or Select Category Card
-    document.querySelectorAll('.category-card').forEach(card => {
-        const iconBox = card.querySelector('.category-icon-box');
-        if (card.dataset.category === categorySlug) {
-            // Check if already active -> if so, reset to all
-            if (card.classList.contains('active') && categorySlug !== 'all') {
-                card.classList.remove('active', 'border-[#0077c8]', 'ring-2', 'ring-[#0077c8]/30', 'bg-blue-50/40');
-                card.classList.add('border-slate-200/90');
-                if (iconBox) {
-                    iconBox.className = 'category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white';
-                }
-                categorySlug = 'all';
-            } else {
-                card.classList.add('active', 'border-[#0077c8]', 'ring-2', 'ring-[#0077c8]/30', 'bg-blue-50/40');
-                card.classList.remove('border-slate-200/90');
-                if (iconBox) {
-                    iconBox.className = 'category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-[#0077c8] text-white border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-sm';
-                }
-            }
-        } else {
-            card.classList.remove('active', 'border-[#0077c8]', 'ring-2', 'ring-[#0077c8]/30', 'bg-blue-50/40');
-            card.classList.add('border-slate-200/90');
-            if (iconBox) {
-                iconBox.className = 'category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white';
-            }
-        }
-    });
-
-    // 2. Filter Questions
-    const cards = document.querySelectorAll('.question-card');
-    cards.forEach(card => {
-        if (categorySlug === 'all' || card.dataset.category === categorySlug) {
-            card.style.display = 'flex';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-
-    if (window.lucide) {
-        lucide.createIcons();
+    const drawer = document.getElementById('mobileSidebarDrawer');
+    if (!drawer) return;
+    if (drawer.style.display === 'none' || drawer.classList.contains('hidden')) {
+        facilityProOpenMobileMenu();
+    } else {
+        facilityProCloseMobileMenu();
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (window.lucide) {
-        lucide.createIcons();
-    }
-
-    const consultForm = document.getElementById('consultationForm');
-    if (consultForm) {
-        consultForm.addEventListener('submit', handleConsultationSubmit);
-    }
-
-    const floatingForm = document.getElementById('floatingChatForm');
-    if (floatingForm) {
-        floatingForm.addEventListener('submit', handleFloatingChatSubmit);
-    }
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            facilityProCloseConsultationModal();
-            facilityProCloseAuthModal();
-        }
-    });
-});
-
-
-
-// Filter SOP Library Cards
-function facilityProFilterSop(discipline) {
-    document.querySelectorAll('.sop-filter-btn').forEach(btn => {
-        if (btn.dataset.sopfilter === discipline) {
-            btn.className = 'sop-filter-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-900 text-white shadow-sm border border-slate-900 cursor-pointer';
-        } else {
-            btn.className = 'sop-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer';
-        }
-    });
-
-    document.querySelectorAll('.sop-card').forEach(card => {
-        if (discipline === 'all' || card.dataset.discipline === discipline) {
-            card.classList.remove('hidden');
-        } else {
-            card.classList.add('hidden');
-        }
-    });
+function facilityProOpenMobileMenu() {
+    const drawer = document.getElementById('mobileSidebarDrawer');
+    const content = document.getElementById('mobileDrawerContent');
+    if (!drawer || !content) return;
+    drawer.style.display = 'block';
+    drawer.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+    setTimeout(() => {
+        content.classList.remove('-translate-x-full');
+        content.classList.add('translate-x-0');
+    }, 20);
     if (window.lucide) lucide.createIcons();
 }
 
-// Filter Knowledge Hub Articles
-function facilityProFilterKb(discipline) {
-    document.querySelectorAll('.kb-filter-btn').forEach(btn => {
-        if (btn.dataset.kbfilter === discipline) {
-            btn.className = 'kb-filter-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-900 text-white shadow-sm border border-slate-900 cursor-pointer';
+function facilityProCloseMobileMenu() {
+    const drawer = document.getElementById('mobileSidebarDrawer');
+    const content = document.getElementById('mobileDrawerContent');
+    if (!drawer || !content) return;
+    content.classList.remove('translate-x-0');
+    content.classList.add('-translate-x-full');
+    document.body.classList.remove('overflow-hidden');
+    setTimeout(() => {
+        drawer.classList.add('hidden');
+        drawer.style.display = 'none';
+    }, 300);
+}
+
+function facilityProToggleMobileMechanical() {
+    const sub = document.getElementById('mobileMechanicalSubmenu');
+    const chev = document.getElementById('mobileMechChevron');
+    if (!sub) return;
+    sub.classList.toggle('hidden');
+    if (chev) {
+        chev.classList.toggle('rotate-180');
+    }
+}
+
+function facilityProFilterCategory(catId) {
+    // 1. Highlight Grid Cards
+    document.querySelectorAll('.category-card').forEach(card => {
+        if (catId === 'all' || card.dataset.category === catId) {
+            card.classList.remove('opacity-30', 'grayscale');
+            card.classList.add('opacity-100');
+            if (card.dataset.category === catId) {
+                card.classList.add('border-[#0077c8]', 'bg-sky-50/50', 'ring-2', 'ring-[#0077c8]/20');
+            } else {
+                card.classList.remove('border-[#0077c8]', 'bg-sky-50/50', 'ring-2', 'ring-[#0077c8]/20');
+            }
         } else {
-            btn.className = 'kb-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer';
+            card.classList.remove('border-[#0077c8]', 'bg-sky-50/50', 'ring-2', 'ring-[#0077c8]/20');
+            card.classList.add('opacity-30', 'grayscale');
         }
     });
 
-    document.querySelectorAll('.kb-card').forEach(card => {
-        if (discipline === 'all' || card.dataset.discipline === discipline) {
-            card.classList.remove('hidden');
-        } else {
-            card.classList.add('hidden');
-        }
-    });
+    // 2. Trigger SOP & KB filtering if present
+    if (typeof facilityProFilterKb === 'function') {
+        facilityProFilterKb(catId);
+    }
+    if (typeof facilityProFilterSop === 'function') {
+        facilityProFilterSop(catId);
+    }
+
+    // 3. Scroll to disciplines section
+    const disciplinesEl = document.getElementById('disciplines');
+    if (disciplinesEl) {
+        disciplinesEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     if (window.lucide) lucide.createIcons();
 }

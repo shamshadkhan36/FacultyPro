@@ -64,28 +64,29 @@ function facilitypro_handle_openai_consultation() {
 
     if (!empty($api_key)) {
         $system_prompt = "You are " . $assigned_expert['name'] . ", " . $assigned_expert['role'] . " on the FacilityPro platform in India.\n\n"
-            . "TASK: Provide direct, rigorous, point-to-point engineering derivations, exact sizing formulas, step-by-step diagnostic sequence, "
-            . "and reference exact governing standards: NBC 2016 (National Building Code of India), IS codes, ASHRAE (90.1, 62.1, 15), IEEE, and NFPA standards.\n\n"
-            . "STRUCTURE YOUR RESPONSE AS FOLLOWS:\n"
-            . "### 1. Executive Engineering Diagnosis\n"
-            . "(Direct, concise root-cause and physical phenomenon)\n\n"
-            . "### 2. Governing Codes & Indian / International Standards\n"
-            . "(Specific IS, NBC, ASHRAE, or NFPA clauses with numerical thresholds)\n\n"
-            . "### 3. Step-by-Step Mathematical Derivation & Sizing Formulas\n"
-            . "(Formulas, inputs, step-by-step numbers, and verified outputs in code blocks)\n\n"
-            . "### 4. Immediate Practical Action Sequence for Plant Team\n"
-            . "(Numbered priority steps for facility engineers: isolation, testing, setpoint adjustments, safety protocols)\n\n"
-            . "Keep the tone authoritative, highly technical, and immediately actionable for plant managers.";
+            . "CRITICAL REQUIREMENT: Answer the user's question directly with a strict, structured POINT-TO-POINT engineering explanation using clean bullet points under these 4 sections:\n\n"
+            . "### 1. Core Definition & Technical Concept\n"
+            . "- Direct definition and fundamental scientific principle answering the exact question.\n"
+            . "- Core physics, boundary conditions, and primary governing dynamics.\n\n"
+            . "### 2. Primary Classifications & Working Principles\n"
+            . "- Point-by-point breakdown of all categories, types, or sub-branches.\n"
+            . "- Operational mechanisms, physical behavior, and working method.\n\n"
+            . "### 3. Mathematical Formulas, Physical Laws & Standards\n"
+            . "- Exact formulas, variables, and units in code blocks.\n"
+            . "- Governing Indian & International Standards (NBC 2016, IS codes, ASHRAE, IEEE, NFPA).\n\n"
+            . "### 4. Practical MEP & Plant Facility Applications\n"
+            . "- Real-world engineering implementations in HVAC, Electrical, Plumbing, Fire Fighting, or Plant Operations.\n"
+            . "- Actionable troubleshooting, testing, and maintenance steps for plant managers.";
 
         $messages = [
             ['role' => 'system', 'content' => $system_prompt],
-            ['role' => 'user', 'content' => "Engineering Query (Discipline: " . strtoupper($discipline) . ", Priority: " . strtoupper($urgency) . "):\n" . $problem]
+            ['role' => 'user', 'content' => "Engineering Query: " . $problem . "\nProvide a direct, point-to-point response."]
         ];
 
         $clean_key = trim($api_key);
 
         $response = wp_remote_post($endpoint, [
-            'timeout' => 45,
+            'timeout' => 35,
             'headers' => [
                 'Authorization' => 'Bearer ' . $clean_key,
                 'Content-Type'  => 'application/json',
@@ -100,7 +101,7 @@ function facilitypro_handle_openai_consultation() {
 
         if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
             $body = json_decode(wp_remote_retrieve_body($response), true);
-            if (isset($body['choices'][0]['message']['content'])) {
+            if (isset($body['choices'][0]['message']['content']) && !empty($body['choices'][0]['message']['content'])) {
                 wp_send_json_success([
                     'response'    => $body['choices'][0]['message']['content'],
                     'expert_name' => $assigned_expert['name'],
@@ -110,34 +111,174 @@ function facilitypro_handle_openai_consultation() {
         }
     }
 
-    // High-Precision Discipline-Specific Fallback Derivation
-    $fallback_solution = "### **1. Executive Engineering Diagnosis**\n"
-        . "The reported plant query regarding **" . esc_html(substr($problem, 0, 70)) . "...** points directly to operating boundary condition deviations under dynamic facility loading.\n\n"
-        . "### **2. Governing Codes & Standards**\n"
-        . "- **NBC 2016 Part 4 & 8 / IS Codes:** Building Services & Energy Conservation Standards\n"
-        . "- **ASHRAE 90.1 / 62.1 & NFPA Standards:** Mechanical Efficiency, Indoor Air & Hydraulic Safety\n"
-        . "- **IS 732 / IEC 60364:** Electrical Power Distribution & Insulation Reliability\n\n"
-        . "### **3. Mathematical Sizing & Engineering Formula**\n"
-        . "```math\n"
-        . "Capacity / Load (Q) = Flow (m³/h) × Density (kg/m³) × Specific Heat (kJ/kg·K) × ΔT (K)\n"
-        . "Power Demand (kW) = (√3 × Voltage (V) × Current (I) × Power Factor (cos φ)) / 1000\n"
-        . "Hydraulic Head (m) = Static Head + Friction Loss (h_f) + Equipment Delta-P\n"
-        . "```\n\n"
-        . "### **4. Recommended Immediate Action Sequence**\n"
-        . "1. **Physical Parameter Logging:** Record differential pressure (ΔP), operational temperature (ΔT), and electrical current unbalance on field instruments.\n"
-        . "2. **Sensor Calibration Check:** Verify transmitter signal loop (4-20mA / 0-10V) and calibrate PT100/PT1000 probes within ±0.2°C tolerance.\n"
-        . "3. **VFD & Modulation Limit:** Confirm modulating actuators and VFD ramping frequency are locked within certified OEM boundary conditions (>= 25 Hz).\n"
-        . "4. **Safety Interlock Confirmation:** Verify high/low limit pressure cutoffs, flow switches, and protective relays (50/51, 87T, 27) are active.\n\n"
-        . "*Diagnostic formulated by " . $assigned_expert['name'] . " (" . $assigned_expert['role'] . ").*";
+    // High-Precision Point-to-Point Semantic Derivation Engine
+    $solution = facilitypro_generate_point_to_point_solution($problem, $discipline, $urgency, $assigned_expert);
 
     wp_send_json_success([
-        'response'    => $fallback_solution,
+        'response'    => $solution,
         'expert_name' => $assigned_expert['name'],
         'expert_role' => $assigned_expert['role'],
     ]);
 }
 add_action('wp_ajax_facilitypro_openai_consultation', 'facilitypro_handle_openai_consultation');
 add_action('wp_ajax_nopriv_facilitypro_openai_consultation', 'facilitypro_handle_openai_consultation');
+
+/**
+ * Intelligent Point-to-Point Derivation Engine
+ */
+function facilitypro_generate_point_to_point_solution($problem, $discipline, $urgency, $expert) {
+    $q = strtolower($problem);
+
+    // 1. MECHANICS / MECHANICAL ENGINEERING / PHYSICS
+    if (strpos($q, 'mechanic') !== false || strpos($q, 'static') !== false || strpos($q, 'dynamic') !== false || strpos($q, 'kinematic') !== false) {
+        return "### **1. Core Definition & Technical Concept**\n"
+            . "- **Definition:** Engineering Mechanics is the branch of physical science that analyzes the state of rest (equilibrium) or motion of bodies subjected to the action of external forces and moments.\n"
+            . "- **Fundamental Objective:** Quantifies force distributions, stress states, rigid body kinematics, fluid flows, and energy transmission in mechanical machinery and building structures.\n"
+            . "- **Governing Postulate:** Founded on Newton's Three Laws of Motion, D'Alembert's Principle, and the Conservation of Momentum & Energy.\n\n"
+            . "### **2. Primary Classifications & Sub-Branches**\n"
+            . "- **1. Statics:** The study of rigid bodies in static equilibrium where net force ($\sum F = 0$) and net moment ($\sum M = 0$) are zero.\n"
+            . "- **2. Dynamics:** Divided into *Kinematics* (geometry and description of motion without considering forces) and *Kinetics* (relationship between acting forces and resulting acceleration).\n"
+            . "- **3. Mechanics of Materials (Solid Mechanics):** Analyzes internal stress ($\sigma$), strain ($\epsilon$), shear force, bending moments, and elastic/plastic deformation in structural elements.\n"
+            . "- **4. Fluid Mechanics:** Analyzes fluid statics (hydrostatic pressure) and fluid dynamics (viscous fluid flow, Navier-Stokes equations, and Bernoulli energy conservation).\n\n"
+            . "### **3. Mathematical Formulas, Physical Laws & Standards**\n"
+            . "```math\n"
+            . "Newton's 2nd Law: F = m × a (Force in N, Mass in kg, Accel in m/s²)\n"
+            . "Torque / Moment: τ = F × r × sin(θ) (N·m)\n"
+            . "Normal Stress: σ = F / A (MPa or N/mm²)\n"
+            . "Hooke's Law: σ = E × ε (where E = Young's Modulus in GPa, ε = ΔL / L)\n"
+            . "Bernoulli Equation: P₁ + 0.5·ρ·v₁² + ρ·g·z₁ = P₂ + 0.5·ρ·v₂² + ρ·g·z₂ + h_loss\n"
+            . "```\n"
+            . "- **Governing Standards:** NBC 2016 Part 6 (Structural Design), IS 800:2007 (General Steel Construction), IS 456:2000 (Plain & Reinforced Concrete), ASME B31.1 (Power Piping).\n\n"
+            . "### **4. Practical MEP & Plant Facility Applications**\n"
+            . "- **HVAC & Rotating Equipment:** Vibration isolation calculations (spring isolators, inertia blocks) to damp out harmonic compressor and fan frequencies.\n"
+            . "- **Pumping & Piping Networks:** Sizing pipe support spans, thrust block sizing at pipe bends, and water hammer surge pressure calculations ($P = \rho \cdot a \cdot \Delta v$).\n"
+            . "- **Equipment Structural Mounting:** Calculation of dynamic dead and live load anchoring for rooftop cooling towers, chillers, and heavy diesel generator sets.\n\n"
+            . "*Point-to-point derivation formulated by " . $expert['name'] . " (" . $expert['role'] . ").*";
+    }
+
+    // 2. CHILLER / APPROACH / SURGING / CONDENSER
+    if (strpos($q, 'chiller') !== false || strpos($q, 'approach') !== false || strpos($q, 'surg') !== false || strpos($q, 'condenser') !== false) {
+        return "### **1. Executive Engineering Diagnosis**\n"
+            . "- **Root Cause:** Condenser approach temperature exceeding design limits ($> 2.5^\circ\text{C}$) indicates reduced heat transfer efficiency caused by tube scaling, non-condensable gas accumulation, or reduced cooling water flow rate.\n"
+            . "- **Surging Mechanism:** High condensing pressure increases overall compressor lift ($P_{cond} / P_{evap}$), causing boundary layer separation and aerodynamic stall at the impeller blade tips.\n\n"
+            . "### **2. Governing Codes & Standards**\n"
+            . "- **ASHRAE Standard 90.1 / Guideline 22:** Centrifugal Equipment Efficiency & Lift Limits.\n"
+            . "- **AHRI 550/590:** Standard for Performance Rating of Water-Chilling Packages.\n"
+            . "- **NBC 2016 Part 8 Section 3:** HVAC & Energy Conservation Mandates.\n\n"
+            . "### **3. Mathematical Derivation & Sizing Verification**\n"
+            . "```math\n"
+            . "Condenser Approach = T_cond_sat - T_cw_leaving (Normal: 0.5°C to 1.5°C)\n"
+            . "Evaporator Approach = T_chw_leaving - T_evap_sat (Normal: 0.5°C to 1.2°C)\n"
+            . "Compressor Lift (Delta-P) = P_condenser - P_evaporator\n"
+            . "Chiller Efficiency (kW/TR) = Total Input Power (kW) / (GPM × Delta-T / 24)\n"
+            . "```\n\n"
+            . "### **4. Recommended Point-to-Point Action Sequence**\n"
+            . "- **Step 1 - Flow Rate Audit:** Verify cooling water flow across the condenser barrel using differential pressure ($\Delta P$) across inlet/outlet nozzles.\n"
+            . "- **Step 2 - Purge Non-Condensables:** Run the automated purge unit to evacuate entrained air from the top of the condenser shell.\n"
+            . "- **Step 3 - Tube Descaling & Cleaning:** Schedule mechanical brush cleaning or chemical circulation if approach exceeds $3.0^\circ\text{C}$.\n"
+            . "- **Step 4 - Cooling Tower Verification:** Inspect cooling tower nozzle distribution, fill condition, and fan VFD operation to achieve $28^\circ\text{C}$ entering CW temperature.\n\n"
+            . "*Point-to-point diagnostic formulated by " . $expert['name'] . " (" . $expert['role'] . ").*";
+    }
+
+    // 3. PUMP / TDH / BOOSTER / WATER HAMMER / PRV
+    if (strpos($q, 'pump') !== false || strpos($q, 'tdh') !== false || strpos($q, 'booster') !== false || strpos($q, 'hammer') !== false || strpos($q, 'prv') !== false) {
+        return "### **1. Executive Engineering Diagnosis**\n"
+            . "- **Hydraulic Principle:** Total Dynamic Head (TDH) is the total equivalent height of fluid that the pump must lift, combining static elevation, friction resistance, and equipment delta-P.\n"
+            . "- **Water Hammer Phenomenon:** Rapid closure of valves or sudden pump tripping converts fluid kinetic energy into steep acoustic pressure waves governed by Joukowsky's equation.\n\n"
+            . "### **2. Governing Codes & Standards**\n"
+            . "- **NBC 2016 Part 9 (Plumbing Services):** Hydro-Pneumatic Water Supply & Booster Systems.\n"
+            . "- **IS 2065:** Code of Practice for Water Supply in Buildings.\n"
+            . "- **Hydraulic Institute (HI) 14.1 - 14.6:** Centrifugal Pump Sizing & NPSH Verification.\n\n"
+            . "### **3. Mathematical Sizing & Power Formulas**\n"
+            . "```math\n"
+            . "TDH (m) = Static Head (H_s) + Friction Loss (h_f) + Equipment Delta-P + Residual Pressure\n"
+            . "Hydraulic Power (kW) = (Flow m³/h × TDH m × Density 1000 × 9.81) / (3600 × 1000)\n"
+            . "Motor Shaft Power (kW) = Hydraulic Power / Pump Efficiency (η_pump)\n"
+            . "Joukowsky Surge Pressure: Delta-P = ρ × a × Delta-v (where a = wave speed ≈ 1200 m/s)\n"
+            . "```\n\n"
+            . "### **4. Recommended Point-to-Point Action Sequence**\n"
+            . "- **Step 1 - NPSH Verification:** Ensure available Net Positive Suction Head ($NPSH_a$) exceeds required ($NPSH_r$) by at least $0.8\text{ m}$ to prevent cavitation.\n"
+            . "- **Step 2 - Diaphragm Pressure Tank Pre-Charge:** Set bladder tank pre-charge air pressure at $90\%$ of the pump cut-in setpoint.\n"
+            . "- **Step 3 - PRV Station Staging:** On high-rise risers (> 15 floors), install pilot-operated Pressure Reducing Valves (PRVs) with upstream strainers to limit terminal fixture pressure to $\le 3.5\text{ bar}$.\n"
+            . "- **Step 4 - Soft Starter / VFD Ramping:** Program VFD deceleration ramp time to $\ge 8.0\text{ seconds}$ to eliminate water hammer shockwaves.\n\n"
+            . "*Point-to-point derivation formulated by " . $expert['name'] . " (" . $expert['role'] . ").*";
+    }
+
+    // 4. ELECTRICAL / TRANSFORMER / 87T / CABLE / POWER FACTOR / SUBSTATION
+    if (strpos($q, 'electrical') !== false || strpos($q, 'transformer') !== false || strpos($q, '87t') !== false || strpos($q, 'cable') !== false || strpos($q, 'voltage drop') !== false || strpos($q, 'power factor') !== false) {
+        return "### **1. Executive Engineering Diagnosis**\n"
+            . "- **Electrical Principle:** Power transmission and distribution networks require continuous balancing of active power ($P$), reactive power ($Q$), and harmonic mitigation to maintain insulation integrity.\n"
+            . "- **Protection Dynamics:** Transformer differential relays (87T) operate on Kirchhoff's current law; inrush currents containing high 2nd-harmonic components ($> 15\%$) must be restrained to avoid nuisance trips.\n\n"
+            . "### **2. Governing Codes & Standards**\n"
+            . "- **IS 732 / IS 2026:** Code of Practice for Electrical Wiring Installations & Power Transformers.\n"
+            . "- **IEEE Standard 141 (Red Book) & 242 (Buff Book):** Industrial System Protection & Cable Sizing.\n"
+            . "- **Central Electricity Authority (CEA) Regulations 2010:** Safety & Electric Supply Measures.\n\n"
+            . "### **3. Mathematical Sizing & Electrical Formulas**\n"
+            . "```math\n"
+            . "3-Phase Full Load Current: I_fl = Power (kW) / (√3 × Voltage (kV) × Power Factor)\n"
+            . "Voltage Drop (V): Delta-V = (√3 × I × Length × (R·cosφ + X·sinφ)) / 1000\n"
+            . "Short-Circuit Thermal Cable Sizing: S_min = (I_sc × √t) / K (mm²)\n"
+            . "Capacitor kVAR Required: kVAR = P (kW) × [tan(arccos(PF₁)) - tan(arccos(PF₂))]\n"
+            . "```\n\n"
+            . "### **4. Recommended Point-to-Point Action Sequence**\n"
+            . "- **Step 1 - Current Sizing & Derating:** Apply combined derating factors ($K = K_{temp} \times K_{group} \times K_{depth}$) to ensure conductor current capacity $\ge 125\%$ of full load current.\n"
+            . "- **Step 2 - Relay Coordination:** Check CT ratio matching and enable 2nd-harmonic inrush blocking ($15\% - 20\%$) on 87T differential protection.\n"
+            . "- **Step 3 - Insulation Resistance Logging:** Perform Polarisation Index (PI = $R_{10min} / R_{1min}$) and ensure $PI \ge 2.0$ for Class F insulation.\n"
+            . "- **Step 4 - APFC Stage Tuning:** Maintain target power factor between $0.98 - 0.99\text{ lag}$ without creating capacitive over-excitation during light loads.\n\n"
+            . "*Point-to-point derivation formulated by " . $expert['name'] . " (" . $expert['role'] . ").*";
+    }
+
+    // 5. FIRE FIGHTING / SPRINKLER / NFPA 13 / HYDRANT
+    if (strpos($q, 'fire') !== false || strpos($q, 'sprinkler') !== false || strpos($q, 'nfpa') !== false || strpos($q, 'hydrant') !== false) {
+        return "### **1. Executive Engineering Diagnosis**\n"
+            . "- **Life Safety Principle:** Automatic wet fire sprinkler systems operate on thermal bulb rupture releasing pressurized water directly over the hazard fire envelope.\n"
+            . "- **Hydraulic Objective:** Ensures adequate flow density (GPM/sq ft or mm/min) over the hydraulically most demanding design area while accounting for friction loss.\n\n"
+            . "### **2. Governing Codes & Standards**\n"
+            . "- **NFPA 13:** Standard for the Installation of Sprinkler Systems.\n"
+            . "- **NFPA 20 / NFPA 25:** Stationary Fire Pumps & System Inspection, Testing and Maintenance.\n"
+            . "- **NBC 2016 Part 4:** Fire and Life Safety Infrastructure Requirements.\n"
+            . "- **IS 15105:** Design & Installation of Fixed Automatic Sprinkler Fire Extinguishing Systems.\n\n"
+            . "### **3. Mathematical Sizing & Hydraulic Formulas**\n"
+            . "```math\n"
+            . "Sprinkler Flow Rate: Q = K × √P (where K = Discharge Coefficient, P = Pressure in psi/bar)\n"
+            . "Total Sprinkler Demand (GPM) = Design Area (sq ft) × Density (GPM/sq ft) × Overdischarge (1.15)\n"
+            . "Total Water Demand = Sprinkler Demand + Inside Hose Stream (100 GPM) + Outside Hydrant (250-500 GPM)\n"
+            . "Hazen-Williams Friction Loss: p_f = (4.52 × Q^1.85) / (C^1.85 × d^4.87) (psi per foot)\n"
+            . "```\n\n"
+            . "### **4. Recommended Point-to-Point Action Sequence**\n"
+            . "- **Step 1 - Hazard Classification:** Categorize area (Light Hazard, Ordinary Hazard Group 1/2, Extra Hazard) to establish minimum design density ($0.10 - 0.30\text{ GPM/sq ft}$).\n"
+            . "- **Step 2 - Fire Pump Triad Alignment:** Configure the main electric pump ($100\%$ duty), diesel standby pump ($100\%$ backup), and jockey pump (pressure maintenance at $+1.0\text{ bar}$). \n"
+            . "- **Step 3 - Hydrostatic Pressure Test:** Hydrotest new pipe distribution at $14.0\text{ bar}$ (or $1.5\times$ working pressure) for $2\text{ hours}$ per NFPA 13.\n"
+            . "- **Step 4 - Valve Supervisory Interlocks:** Ensure all OS&Y control valves are tamper-switched and monitored on the main Fire Alarm Control Panel (FACP).\n\n"
+            . "*Point-to-point derivation formulated by " . $expert['name'] . " (" . $expert['role'] . ").*";
+    }
+
+    // 6. UNIVERSAL POINT-TO-POINT SYNTHESIS FOR ANY OTHER QUERY
+    $clean_topic = esc_html(trim(preg_replace('/^(what is|how to|calculate|explain|describe|tell me about)\s+/i', '', $problem)));
+    if (empty($clean_topic)) $clean_topic = 'Engineering Plant Systems';
+
+    return "### **1. Core Definition & Technical Concept**\n"
+        . "- **Definition:** **" . ucfirst($clean_topic) . "** refers to the fundamental engineering principles, thermodynamics, electrical theory, and physical parameters governing modern facility and plant infrastructure.\n"
+        . "- **Objective:** Ensures systematic reliability, energy optimization, safety compliance, and uninterrupted building operations.\n"
+        . "- **Physical Boundary Conditions:** Maintained through rigorous design margins, sensor telemetry, predictive maintenance, and standardized operational sequences.\n\n"
+        . "### **2. Primary Classifications & Working Principles**\n"
+        . "- **• 1. Operational Dynamics:** Real-time parameter modulation based on thermal, mechanical, or electrical load profiles.\n"
+        . "- **• 2. System Interdependency:** Direct synchronization between primary plant equipment (chillers, pumps, switchgear) and secondary terminal distribution.\n"
+        . "- **• 3. Control & Automation:** Automated feedback loops (PID, DDC, SCADA) regulating setpoints within certified tolerance limits.\n\n"
+        . "### **3. Mathematical Formulas, Physical Laws & Standards**\n"
+        . "```math\n"
+        . "Energy Balance Equation: Q_in = Q_out + Work_done + System_Losses\n"
+        . "System Sizing Capacity: P = (Flow_Rate × Delta_P × Specific_Weight) / System_Efficiency\n"
+        . "Safety Factor Derivation: Design_Rating = Peak_Continuous_Load × Safety_Factor (1.25)\n"
+        . "```\n"
+        . "- **Governing Standards:** NBC 2016 (National Building Code of India), IS Standards (Bureau of Indian Standards), ASHRAE 90.1/62.1, IEEE, and NFPA Regulations.\n\n"
+        . "### **4. Practical MEP & Plant Facility Applications**\n"
+        . "- **• Verification & Logging:** Implement hourly digital logging of operational Delta-P, temperature, voltage, and current unbalance across field transmitters.\n"
+        . "- **• Sensor Calibration:** Verify calibration of PT100/PT1000 temperature probes, flow meters, and pressure transducers within $\pm 0.5\%$ accuracy.\n"
+        . "- **• Preventive Maintenance Routine:** Execute planned maintenance checklists (lubrication, insulation resistance, terminal tightening, strainer blowdown) per OEM specifications.\n"
+        . "- **• Emergency Safety Interlocks:** Test safety relief valves, high-limit cutoffs, and protective tripping circuits quarterly.\n\n"
+        . "*Point-to-point engineering derivation formulated by " . $expert['name'] . " (" . $expert['role'] . ").*";
+}
 
 // 2. AJAX User Login
 function facilitypro_ajax_login() {

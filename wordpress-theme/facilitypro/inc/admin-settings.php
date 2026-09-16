@@ -25,6 +25,7 @@ add_action('admin_menu', 'facilitypro_add_admin_menu');
 function facilitypro_register_settings() {
     register_setting('facilitypro_settings_group', 'facilitypro_openai_api_key');
     register_setting('facilitypro_settings_group', 'facilitypro_openai_model');
+    register_setting('facilitypro_settings_group', 'facilitypro_openai_endpoint');
     register_setting('facilitypro_settings_group', 'facilitypro_emergency_phone');
     register_setting('facilitypro_settings_group', 'facilitypro_contact_email');
 }
@@ -37,7 +38,7 @@ function facilitypro_render_admin_settings_page() {
             <span style="background: #f05423; color: white; padding: 4px 10px; border-radius: 8px; font-size: 16px;">FP</span>
             FacilityPro AI & Engineering Settings
         </h1>
-        <p style="color: #64748b; font-size: 14px;">Configure OpenAI GPT-4o integration, engineering models, and customer support channels.</p>
+        <p style="color: #64748b; font-size: 14px;">Configure OpenAI GPT-4o integration, engineering models, custom API endpoints, and customer support channels.</p>
         
         <div style="background: #ffffff; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-top: 20px;">
             <form method="post" action="options.php">
@@ -52,6 +53,14 @@ function facilitypro_render_admin_settings_page() {
                         <td>
                             <input type="password" name="facilitypro_openai_api_key" value="<?php echo esc_attr(get_option('facilitypro_openai_api_key')); ?>" class="regular-text" style="width: 100%; max-width: 450px; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1;" placeholder="sk-..." />
                             <p class="description" style="color: #64748b; margin-top: 6px;">Enter your OpenAI API secret key. If left blank, FacilityPro will automatically use its built-in mathematical reasoning engine.</p>
+                        </td>
+                    </tr>
+
+                    <tr valign="top">
+                        <th scope="row" style="font-weight: 700; color: #1e293b;">API Endpoint (Chat URL)</th>
+                        <td>
+                            <input type="text" name="facilitypro_openai_endpoint" value="<?php echo esc_attr(get_option('facilitypro_openai_endpoint', 'https://api.openai.com/v1/chat/completions')); ?>" class="regular-text" style="width: 100%; max-width: 450px; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1;" placeholder="https://api.openai.com/v1/chat/completions" />
+                            <p class="description" style="color: #64748b; margin-top: 6px;">Default: <code>https://api.openai.com/v1/chat/completions</code>. Supports any OpenAI-compatible proxy gateway.</p>
                         </td>
                     </tr>
 

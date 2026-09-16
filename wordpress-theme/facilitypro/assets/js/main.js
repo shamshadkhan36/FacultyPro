@@ -2,31 +2,133 @@
  * FacilityPro Main Theme Controller & User Authentication
  */
 
-function facilityProOpenConsultationModal(prefillQuery = '', discipline = 'hvac') {
-    const modal = document.getElementById('consultationModal');
+// AI Consultation Modal & Point-to-Point Reasoning
+function facilityProOpenConsultationModal(prefillQuery = '', expertName = '', discipline = 'hvac') {
+    const modal = document.getElementById('facilitypro-consultation-modal') || document.getElementById('consultationModal');
     if (!modal) return;
     
     modal.classList.remove('hidden');
     modal.classList.add('flex');
 
     if (prefillQuery) {
-        const textarea = modal.querySelector('textarea[name="problem_details"]');
-        if (textarea) textarea.value = prefillQuery;
-    }
-
-    if (discipline) {
-        const select = modal.querySelector('select[name="discipline"]');
-        if (select) select.value = discipline;
+        const queryInput = document.getElementById('modal-query-input');
+        if (queryInput) queryInput.value = prefillQuery;
+        
+        facilityProFetchConsultationSolution(prefillQuery, discipline, expertName);
+    } else {
+        const userQueryText = document.getElementById('modal-user-query-text');
+        if (userQueryText) userQueryText.textContent = 'Enter your facility engineering question below...';
+        const answerEl = document.getElementById('modal-ai-answer-content');
+        if (answerEl) {
+            answerEl.innerHTML = '<p class="text-xs text-slate-600">Type any complex HVAC, Electrical, Fire, Plumbing, STP, DG, BMS, or Solar query to receive instant derivations and IS/NBC code clauses.</p>';
+        }
     }
 
     if (window.lucide) lucide.createIcons();
 }
 
 function facilityProCloseConsultationModal() {
-    const modal = document.getElementById('consultationModal');
+    const modal = document.getElementById('facilitypro-consultation-modal') || document.getElementById('consultationModal');
     if (!modal) return;
     modal.classList.add('hidden');
     modal.classList.remove('flex');
+}
+
+function facilityProHandleHeroSearch(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const input = document.getElementById('hero-search-input');
+    const query = input ? input.value.trim() : '';
+    if (query) {
+        facilityProOpenConsultationModal(query, 'Er. Rajesh Sharma', 'general');
+    } else {
+        facilityProOpenConsultationModal('Calculate plant equipment efficiency and sizing derivation.', 'Er. Rajesh Sharma', 'hvac');
+    }
+}
+
+async function facilityProFetchConsultationSolution(query, discipline = 'general', expertName = '') {
+    const answerEl = document.getElementById('modal-ai-answer-content');
+    const userQueryEl = document.getElementById('modal-user-query-text');
+    const expertNameEl = document.getElementById('modal-expert-name');
+    const expertTitleEl = document.getElementById('modal-expert-title');
+    const expertAvatarEl = document.getElementById('modal-expert-avatar');
+
+    if (userQueryEl) userQueryEl.textContent = query;
+    if (answerEl) {
+        answerEl.innerHTML = `
+            <div class="flex items-center gap-3 py-6 justify-center text-slate-500 text-xs">
+                <i data-lucide="loader-2" class="w-5 h-5 animate-spin text-[#0077c8]"></i>
+                <span>Formulating thermodynamic derivations and IS/NBC code clauses...</span>
+            </div>`;
+        if (window.lucide) lucide.createIcons();
+    }
+
+    const expertProfiles = {
+        'Er. Rajesh Sharma': { title: 'Senior HVAC & Central Chilled Water AI Specialist', avatar: 'avatar_rajesh_sharma.jpg' },
+        'Dr. Vikram Malhotra': { title: 'Chief Electrical & Substation Engineer (PhD, PE)', avatar: 'avatar_vikram_malhotra.jpg' },
+        'Er. Amit Patel': { title: 'Lead Plumbing & Hydro-Pneumatics Specialist (M.Tech)', avatar: 'avatar_amit_patel.jpg' },
+        'Er. Ananya Verma': { title: 'Senior Fire Protection & Life Safety Consultant (NFPA Cert.)', avatar: 'avatar_ananya_verma.jpg' }
+    };
+
+    if (expertName && expertProfiles[expertName]) {
+        if (expertNameEl) expertNameEl.textContent = expertName;
+        if (expertTitleEl) expertTitleEl.textContent = expertProfiles[expertName].title;
+        if (expertAvatarEl && window.facilityProData?.themeUri) {
+            expertAvatarEl.src = window.facilityProData.themeUri + '/assets/images/' + expertProfiles[expertName].avatar;
+        }
+    }
+
+    const formData = new FormData();
+    formData.append('action', 'facilitypro_openai_consultation');
+    formData.append('nonce', window.facilityProData?.nonce || '');
+    formData.append('discipline', discipline || 'general');
+    formData.append('urgency', 'high');
+    formData.append('problem_details', query);
+
+    try {
+        const res = await fetch(window.facilityProData?.ajaxUrl || '/wp-admin/admin-ajax.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+
+        if (data.success && data.data) {
+            if (answerEl) {
+                answerEl.innerHTML = typeof formatMarkdownToHtml === 'function' 
+                    ? formatMarkdownToHtml(data.data.response) 
+                    : data.data.response.replace(/\n/g, '<br>');
+            }
+            if (data.data.expert_name && expertNameEl) {
+                expertNameEl.textContent = data.data.expert_name;
+            }
+            if (data.data.expert_role && expertTitleEl) {
+                expertTitleEl.textContent = data.data.expert_role;
+            }
+        } else {
+            if (answerEl) {
+                answerEl.innerHTML = `<div class="p-4 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 font-semibold">${data.data || 'Failed to generate solution.'}</div>`;
+            }
+        }
+    } catch (err) {
+        if (answerEl) {
+            answerEl.innerHTML = `<div class="p-4 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 font-semibold">Network error connecting to AI engine.</div>`;
+        }
+    } finally {
+        if (window.lucide) lucide.createIcons();
+    }
+}
+
+function facilityProHandleModalSubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const input = document.getElementById('modal-query-input');
+    const query = input ? input.value.trim() : '';
+    if (query) {
+        facilityProFetchConsultationSolution(query);
+        input.value = '';
+    }
+}
+
+function facilityProExportModalAnswer() {
+    window.print();
 }
 
 function facilityProToggleFloatingChat() {

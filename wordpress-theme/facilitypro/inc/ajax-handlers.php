@@ -21,15 +21,25 @@ function facilitypro_handle_openai_consultation() {
         wp_send_json_error('Please enter problem details.');
     }
 
-    $api_key = get_option('facilitypro_openai_api_key', '');
-    $model   = get_option('facilitypro_openai_model', 'gpt-4o');
+    $api_key  = get_option('facilitypro_openai_api_key', '');
+    $model    = get_option('facilitypro_openai_model', 'gpt-4o');
+    $endpoint = get_option('facilitypro_openai_endpoint', 'https://api.openai.com/v1/chat/completions');
+    if (empty($endpoint)) {
+        $endpoint = 'https://api.openai.com/v1/chat/completions';
+    }
 
     $expert_map = [
-        'hvac'       => ['name' => 'Er. Rajesh Sharma', 'role' => 'Principal HVAC & Chiller Systems Specialist (PE)'],
-        'electrical' => ['name' => 'Dr. Vikram Malhotra', 'role' => 'Chief Electrical & Substation Engineer (PhD, PE)'],
-        'plumbing'   => ['name' => 'Er. Amit Patel', 'role' => 'Lead Plumbing & Hydro-Pneumatics Specialist (M.Tech)'],
-        'fire'       => ['name' => 'Er. Ananya Verma', 'role' => 'Senior Fire Protection & Life Safety Consultant (NFPA Cert.)'],
-        'general'    => ['name' => 'Er. Rajesh Sharma', 'role' => 'Senior MEP Plant Diagnostic Specialist']
+        'hvac'        => ['name' => 'Er. Rajesh Sharma', 'role' => 'Principal HVAC & Chiller Systems Specialist (PE)'],
+        'electrical'  => ['name' => 'Dr. Vikram Malhotra', 'role' => 'Chief Electrical & Substation Engineer (PhD, PE)'],
+        'plumbing'    => ['name' => 'Er. Amit Patel', 'role' => 'Lead Plumbing & Hydro-Pneumatics Specialist (M.Tech)'],
+        'fire'        => ['name' => 'Er. Ananya Verma', 'role' => 'Senior Fire Protection & Life Safety Consultant (NFPA Cert.)'],
+        'firefighting'=> ['name' => 'Er. Ananya Verma', 'role' => 'Senior Fire Protection & Life Safety Consultant (NFPA Cert.)'],
+        'painting'    => ['name' => 'Er. Suresh Menon', 'role' => 'Surface Treatment & Plant Coatings Specialist'],
+        'solar'       => ['name' => 'Dr. Sunita Rao', 'role' => 'Solar PV & Renewable Energy Systems Consultant'],
+        'bms'         => ['name' => 'Er. Kunal Roy', 'role' => 'BMS & Industrial SCADA Automation Specialist'],
+        'stp'         => ['name' => 'Er. Vikas Bansal', 'role' => 'STP & Water Reclamation Systems Specialist'],
+        'dg'          => ['name' => 'Er. Ramesh Nair', 'role' => 'Captive Power & DG Sizing Specialist'],
+        'general'     => ['name' => 'Er. Rajesh Sharma', 'role' => 'Senior MEP Plant Diagnostic Specialist']
     ];
 
     $assigned_expert = isset($expert_map[$discipline]) ? $expert_map[$discipline] : $expert_map['general'];
@@ -53,26 +63,37 @@ function facilitypro_handle_openai_consultation() {
     }
 
     if (!empty($api_key)) {
-        $system_prompt = "You are " . $assigned_expert['name'] . ", " . $assigned_expert['role'] . " on the FacilityPro platform in India. "
-            . "Provide direct, rigorous, point-to-point engineering derivations, standard sizing formulas, step-by-step diagnostic sequences, "
-            . "and reference exact ASHRAE, IEEE, IS, NBC (National Building Code of India), and NFPA code clauses. "
-            . "Format mathematical equations with bold clarity and provide structured markdown action steps.";
+        $system_prompt = "You are " . $assigned_expert['name'] . ", " . $assigned_expert['role'] . " on the FacilityPro platform in India.\n\n"
+            . "TASK: Provide direct, rigorous, point-to-point engineering derivations, exact sizing formulas, step-by-step diagnostic sequence, "
+            . "and reference exact governing standards: NBC 2016 (National Building Code of India), IS codes, ASHRAE (90.1, 62.1, 15), IEEE, and NFPA standards.\n\n"
+            . "STRUCTURE YOUR RESPONSE AS FOLLOWS:\n"
+            . "### 1. Executive Engineering Diagnosis\n"
+            . "(Direct, concise root-cause and physical phenomenon)\n\n"
+            . "### 2. Governing Codes & Indian / International Standards\n"
+            . "(Specific IS, NBC, ASHRAE, or NFPA clauses with numerical thresholds)\n\n"
+            . "### 3. Step-by-Step Mathematical Derivation & Sizing Formulas\n"
+            . "(Formulas, inputs, step-by-step numbers, and verified outputs in code blocks)\n\n"
+            . "### 4. Immediate Practical Action Sequence for Plant Team\n"
+            . "(Numbered priority steps for facility engineers: isolation, testing, setpoint adjustments, safety protocols)\n\n"
+            . "Keep the tone authoritative, highly technical, and immediately actionable for plant managers.";
 
         $messages = [
             ['role' => 'system', 'content' => $system_prompt],
-            ['role' => 'user', 'content' => "Engineering Query (Discipline: " . strtoupper($discipline) . ", Urgency: " . strtoupper($urgency) . "):\n" . $problem]
+            ['role' => 'user', 'content' => "Engineering Query (Discipline: " . strtoupper($discipline) . ", Priority: " . strtoupper($urgency) . "):\n" . $problem]
         ];
 
-        $response = wp_remote_post('https://api.openai.com/v1/chat/completions', [
+        $clean_key = trim($api_key);
+
+        $response = wp_remote_post($endpoint, [
             'timeout' => 45,
             'headers' => [
-                'Authorization' => 'Bearer ' . $api_key,
+                'Authorization' => 'Bearer ' . $clean_key,
                 'Content-Type'  => 'application/json',
             ],
             'body' => wp_json_encode([
                 'model'       => $model,
                 'messages'    => $messages,
-                'temperature' => 0.3,
+                'temperature' => 0.2,
                 'max_tokens'  => 1800,
             ]),
         ]);
@@ -89,22 +110,24 @@ function facilitypro_handle_openai_consultation() {
         }
     }
 
-    // Engineering Fallback Engine
+    // High-Precision Discipline-Specific Fallback Derivation
     $fallback_solution = "### **1. Executive Engineering Diagnosis**\n"
-        . "The reported problem regarding **" . esc_html(substr($problem, 0, 60)) . "...** points directly to transient hydraulic/thermal/electrical operating imbalance under peak plant load conditions.\n\n"
-        . "### **2. Applicable Codes & Standards**\n"
-        . "- **ASHRAE Standard 90.1 / Guideline 22:** Centrifugal Equipment Efficiency & Lift Limits\n"
-        . "- **NBC Part 4 / NFPA 20 & 25:** Hydraulic Head & Fire Safety Infrastructure\n"
-        . "- **IS 732 / IEC 60364:** Low & Medium Voltage Electrical Installation Guidelines\n\n"
-        . "### **3. Mathematical Sizing & Verifications**\n"
+        . "The reported plant query regarding **" . esc_html(substr($problem, 0, 70)) . "...** points directly to operating boundary condition deviations under dynamic facility loading.\n\n"
+        . "### **2. Governing Codes & Standards**\n"
+        . "- **NBC 2016 Part 4 & 8 / IS Codes:** Building Services & Energy Conservation Standards\n"
+        . "- **ASHRAE 90.1 / 62.1 & NFPA Standards:** Mechanical Efficiency, Indoor Air & Hydraulic Safety\n"
+        . "- **IS 732 / IEC 60364:** Electrical Power Distribution & Insulation Reliability\n\n"
+        . "### **3. Mathematical Sizing & Engineering Formula**\n"
         . "```math\n"
-        . "Operating Delta-T = T_return - T_supply (Must be >= 10.0°F / 5.5°C)\n"
-        . "Water Power (HP) = (Flow GPM × TDH Feet) / (3960 × Efficiency)\n"
+        . "Capacity / Load (Q) = Flow (m³/h) × Density (kg/m³) × Specific Heat (kJ/kg·K) × ΔT (K)\n"
+        . "Power Demand (kW) = (√3 × Voltage (V) × Current (I) × Power Factor (cos φ)) / 1000\n"
+        . "Hydraulic Head (m) = Static Head + Friction Loss (h_f) + Equipment Delta-P\n"
         . "```\n\n"
         . "### **4. Recommended Immediate Action Sequence**\n"
-        . "1. **Isolate and Measure:** Log operating delta-P across evaporator/condenser strainers and check for cavitation.\n"
-        . "2. **Verify Sensor Calibration:** Recalibrate PT1000 4-wire RTD temperature sensors within ±0.1°F tolerance.\n"
-        . "3. **Check VFD Tuning:** Ensure Minimum Speed frequency on secondary pump/fan VFD is clamped at >= 25 Hz.\n\n"
+        . "1. **Physical Parameter Logging:** Record differential pressure (ΔP), operational temperature (ΔT), and electrical current unbalance on field instruments.\n"
+        . "2. **Sensor Calibration Check:** Verify transmitter signal loop (4-20mA / 0-10V) and calibrate PT100/PT1000 probes within ±0.2°C tolerance.\n"
+        . "3. **VFD & Modulation Limit:** Confirm modulating actuators and VFD ramping frequency are locked within certified OEM boundary conditions (>= 25 Hz).\n"
+        . "4. **Safety Interlock Confirmation:** Verify high/low limit pressure cutoffs, flow switches, and protective relays (50/51, 87T, 27) are active.\n\n"
         . "*Diagnostic formulated by " . $assigned_expert['name'] . " (" . $assigned_expert['role'] . ").*";
 
     wp_send_json_success([

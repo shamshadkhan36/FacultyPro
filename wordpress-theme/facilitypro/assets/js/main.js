@@ -85,7 +85,8 @@ async function facilityProFetchConsultationSolution(query, discipline = 'general
     formData.append('problem_details', query);
 
     try {
-        const res = await fetch(window.facilityProData?.ajaxUrl || '/wp-admin/admin-ajax.php', {
+        const ajaxUrl = window.facilityProData?.ajaxUrl || window.facilityProData?.ajax_url || '/wp-admin/admin-ajax.php';
+        const res = await fetch(ajaxUrl, {
             method: 'POST',
             body: formData
         });
@@ -93,9 +94,10 @@ async function facilityProFetchConsultationSolution(query, discipline = 'general
 
         if (data.success && data.data) {
             if (answerEl) {
-                answerEl.innerHTML = typeof formatMarkdownToHtml === 'function' 
+                const responseHtml = typeof formatMarkdownToHtml === 'function' 
                     ? formatMarkdownToHtml(data.data.response) 
                     : data.data.response.replace(/\n/g, '<br>');
+                answerEl.innerHTML = responseHtml;
             }
             if (data.data.expert_name && expertNameEl) {
                 expertNameEl.textContent = data.data.expert_name;
@@ -110,7 +112,7 @@ async function facilityProFetchConsultationSolution(query, discipline = 'general
         }
     } catch (err) {
         if (answerEl) {
-            answerEl.innerHTML = `<div class="p-4 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 font-semibold">Network error connecting to AI engine.</div>`;
+            answerEl.innerHTML = `<div class="p-4 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 font-semibold">Network error connecting to AI engine. Please retry.</div>`;
         }
     } finally {
         if (window.lucide) lucide.createIcons();
@@ -297,7 +299,7 @@ async function facilityProHandleRegister(e, context = 'modal') {
 
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span>Creating Plant Account...</span>';
+        submitBtn.innerHTML = '<span>Creating Facility Account...</span>';
     }
 
     const formData = new FormData(form);

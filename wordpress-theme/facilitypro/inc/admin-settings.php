@@ -132,13 +132,13 @@ function facilitypro_show_custom_user_profile_fields($user) {
                 <select name="facilitypro_plan" id="facilitypro_plan" style="padding: 6px 12px; border-radius: 6px; font-weight: 600;">
                     <option value="Free Plan" <?php selected($plan, 'Free Plan'); ?>>Free Plan (Standard Tier)</option>
                     <option value="Facility Pro Monthly (₹399/mo)" <?php selected($plan, 'Facility Pro Monthly (₹399/mo)'); ?>>Facility Pro Monthly (₹399/mo - Full Access)</option>
-                    <option value="Enterprise Tier" <?php selected($plan, 'Enterprise Tier'); ?>>Enterprise Tier (Multi-Plant / Custom)</option>
+                    <option value="Enterprise Tier" <?php selected($plan, 'Enterprise Tier'); ?>>Enterprise Tier (Multi-Facility / Custom)</option>
                 </select>
                 <p class="description" style="color: #64748b;">Controls access to premium download vault files, advanced diagnostic tools, and SOPs.</p>
             </td>
         </tr>
         <tr>
-            <th><label for="facilitypro_plant_name">Facility / Plant Name</label></th>
+            <th><label for="facilitypro_plant_name">Facility Name</label></th>
             <td>
                 <input type="text" name="facilitypro_plant_name" id="facilitypro_plant_name" value="<?php echo esc_attr($plant_name); ?>" class="regular-text" placeholder="e.g. Acme Pharma Unit 2" />
             </td>
@@ -203,7 +203,7 @@ add_action('edit_user_profile_update', 'facilitypro_save_custom_user_profile_fie
  * Add Custom Columns to WP-Admin Users List
  */
 function facilitypro_add_user_columns($columns) {
-    $columns['facilitypro_plant'] = __('Plant / Facility', 'facilitypro');
+    $columns['facilitypro_plant'] = __('Facility Name', 'facilitypro');
     $columns['facilitypro_plan'] = __('Subscription Plan', 'facilitypro');
     $columns['facilitypro_status'] = __('Account Status', 'facilitypro');
     return $columns;

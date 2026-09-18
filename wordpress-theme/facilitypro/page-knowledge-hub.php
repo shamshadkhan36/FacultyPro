@@ -27,7 +27,7 @@ get_header();
                             <span>Engineering Knowledge Hub</span>
                         </div>
                         <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                            MEP Plant Engineering Guidelines & Troubleshooting
+                            MEP Facility Engineering Guidelines & Troubleshooting
                         </h1>
                         <p class="mt-2 text-base text-slate-600">
                             In-depth technical guides, fault diagnosis matrices, and code-compliant operating procedures created by AI Licensed Professional Engineers.

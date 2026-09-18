@@ -37,13 +37,13 @@
 
             <!-- Col 3: Operations & SOPs -->
             <div class="space-y-3">
-                <h4 class="text-xs font-black uppercase tracking-wider text-slate-300">Plant Operations</h4>
+                <h4 class="text-xs font-black uppercase tracking-wider text-slate-300">Facility Operations</h4>
                 <ul class="space-y-2 text-xs text-slate-400">
-                    <li><a href="<?php echo esc_url(home_url('/sop-library')); ?>" class="hover:text-white transition-colors">Plant SOP Library (50+)</a></li>
+                    <li><a href="<?php echo esc_url(home_url('/sop-library')); ?>" class="hover:text-white transition-colors">Facility SOP Library (50+)</a></li>
                     <li><a href="<?php echo esc_url(home_url('/checklists')); ?>" class="hover:text-white transition-colors">Daily Equipment Checklists</a></li>
                     <li><a href="<?php echo esc_url(home_url('/knowledge-hub')); ?>" class="hover:text-white transition-colors">Technical Knowledge Hub</a></li>
                     <li><a href="<?php echo esc_url(home_url('/pricing')); ?>" class="hover:text-white transition-colors">Facility Pricing (₹199 / ₹399)</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/dashboard')); ?>" class="hover:text-white transition-colors">Client Engineer Portal</a></li>
+                    <li><a href="<?php echo esc_url(home_url('/dashboard')); ?>" class="hover:text-white transition-colors">Facility Engineer Portal</a></li>
                 </ul>
             </div>
 
@@ -66,11 +66,12 @@
             <div>
                 &copy; <?php echo esc_html(date('Y')); ?> FacilityPro Engineering. All rights reserved. IS/NBC & ASHRAE compliant.
             </div>
-            <div class="flex items-center gap-6">
-                <a href="<?php echo esc_url(home_url('/#pricing')); ?>" class="hover:text-white transition-colors">Pricing</a>
-                <a href="<?php echo esc_url(home_url('/#experts')); ?>" class="hover:text-white transition-colors">AI Experts</a>
+            <div class="flex items-center gap-4 sm:gap-6 flex-wrap justify-center">
+                <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="hover:text-white transition-colors">Pricing</a>
+                <a href="<?php echo esc_url(home_url('/terms-of-service')); ?>" class="hover:text-white transition-colors">Terms of Service</a>
+                <a href="<?php echo esc_url(home_url('/privacy-policy')); ?>" class="hover:text-white transition-colors">Privacy Policy</a>
                 <a href="<?php echo esc_url(home_url('/knowledge-hub')); ?>" class="hover:text-white transition-colors">Knowledge Base</a>
-                <a href="mailto:<?php echo esc_attr(get_option('facilitypro_contact_email', 'consult@facilitypro.ai')); ?>" class="hover:text-white transition-colors">Contact Support</a>
+                <a href="mailto:Support@mepdetails.com" class="hover:text-white transition-colors">Support@mepdetails.com</a>
             </div>
         </div>
 
@@ -157,7 +158,7 @@
                 </button>
             </form>
             <p class="text-[10px] sm:text-[11px] text-slate-400 mt-2 text-center">
-                By submitting an engineering query, you understand derivations are AI-assisted for guidance based on IS, NBC &amp; ASHRAE standards and agree to our <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="text-[#0077c8] hover:underline">Terms of Service</a> &amp; <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="text-[#0077c8] hover:underline">Privacy Policy</a>.
+                By submitting an engineering query, you understand derivations are AI-assisted for guidance based on IS, NBC &amp; ASHRAE standards and agree to our <a href="<?php echo esc_url(home_url('/terms-of-service')); ?>" class="text-[#0077c8] hover:underline font-medium">Terms of Service</a> &amp; <a href="<?php echo esc_url(home_url('/privacy-policy')); ?>" class="text-[#0077c8] hover:underline font-medium">Privacy Policy</a>.
             </p>
         </div>
 
@@ -170,7 +171,7 @@
 <div id="facilitypro-auth-modal" class="fixed inset-0 z-50 hidden bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-slate-200 space-y-5">
         <div class="flex items-center justify-between">
-            <h3 class="text-xl font-black text-slate-900">Plant Engineer Portal</h3>
+            <h3 class="text-xl font-black text-slate-900">Facility Engineer Portal</h3>
             <button type="button" onclick="facilityProCloseAuthModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
@@ -182,7 +183,7 @@
                 Sign In
             </button>
             <button type="button" onclick="switchModalAuthTab('signup')" id="authModalTabSignup" class="flex-1 pb-3 text-xs font-bold text-center border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
-                Register New Plant
+                Register New Facility
             </button>
         </div>
 
@@ -217,11 +218,11 @@
 
             <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Corporate Email</label>
-                <input type="email" name="email" placeholder="vikram@plant.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
+                <input type="email" name="email" placeholder="vikram@facility.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Plant Facility Name</label>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Facility Name</label>
                 <input type="text" name="plant_name" placeholder="e.g. Grand Plaza HVAC Operations" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
             </div>
 

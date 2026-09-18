@@ -102,14 +102,17 @@ function facilitypro_enqueue_scripts() {
     );
 
     // Localize Script for Ajax & Configuration
-    wp_localize_script('facilitypro-main', 'facilityProData', array(
+    $fp_data = array(
         'ajaxUrl'    => admin_url('admin-ajax.php'),
+        'ajax_url'   => admin_url('admin-ajax.php'),
         'nonce'      => wp_create_nonce('facilitypro_nonce'),
         'themeUri'   => FACILITYPRO_URI,
         'homeUrl'    => home_url('/'),
         'apiKey'     => get_option('facilitypro_openai_api_key', ''),
         'aiModel'    => get_option('facilitypro_openai_model', 'gpt-4o'),
-    ));
+    );
+    wp_localize_script('facilitypro-main', 'facilityProData', $fp_data);
+    wp_localize_script('facilitypro-openai', 'facilityProData', $fp_data);
 }
 add_action('wp_enqueue_scripts', 'facilitypro_enqueue_scripts');
 

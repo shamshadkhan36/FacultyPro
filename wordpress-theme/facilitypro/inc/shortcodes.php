@@ -1043,7 +1043,7 @@ function facilitypro_pricing_shortcode($atts) {
                     Quick Solver
                 </div>
                 <h2 class="text-xl font-bold text-slate-900">Single Emergency Case</h2>
-                <p class="text-xs text-slate-500 mt-2">Essential MEP point-to-point Q&A and urgent diagnostic troubleshooting for plant engineers.</p>
+                <p class="text-xs text-slate-500 mt-2">Essential MEP point-to-point Q&A and urgent diagnostic troubleshooting for facility engineers.</p>
                 
                 <div class="mt-6 flex items-baseline gap-1">
                     <span class="text-4xl font-black text-slate-900">₹199</span>
@@ -1085,7 +1085,7 @@ function facilitypro_pricing_shortcode($atts) {
         <!-- Plan 2: Facility Pro Monthly -->
         <div class="bg-gradient-to-b from-slate-900 to-slate-800 rounded-2xl shadow-2xl border-2 border-[#f05423] p-8 flex flex-col justify-between relative transform md:-translate-y-2 text-white">
             <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#f05423] text-white text-[11px] font-black uppercase tracking-wider px-4 py-1 rounded-full shadow-md">
-                Most Popular for Plants
+                Most Popular for Facilities
             </div>
 
             <div>
@@ -1093,7 +1093,7 @@ function facilitypro_pricing_shortcode($atts) {
                     Unlimited Access
                 </div>
                 <h2 class="text-2xl font-black text-white">Facility Pro Monthly</h2>
-                <p class="text-xs text-slate-300 mt-2">Unlimited point-to-point Q&A for Facility Managers, MEP Contractors & Plant Engineers.</p>
+                <p class="text-xs text-slate-300 mt-2">Unlimited point-to-point Q&A for Facility Managers, MEP Contractors & Facility Engineers.</p>
                 
                 <div class="mt-6 flex items-baseline gap-1">
                     <span class="text-5xl font-black text-white">₹399</span>
@@ -1141,14 +1141,14 @@ function facilitypro_pricing_shortcode($atts) {
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 flex flex-col justify-between hover:shadow-xl transition-all">
             <div>
                 <div class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 mb-4">
-                    Enterprise Plant Lab
+                    Enterprise Facility Lab
                 </div>
                 <h2 class="text-xl font-bold text-slate-900">Enterprise MEP Lab</h2>
                 <p class="text-xs text-slate-500 mt-2">For MEP Consultancy firms, Hospital facilities, and Data Center operations teams.</p>
                 
                 <div class="mt-6 flex items-baseline gap-1">
                     <span class="text-3xl font-black text-slate-900">Custom</span>
-                    <span class="text-xs font-semibold text-slate-500">/ Plant SLA</span>
+                    <span class="text-xs font-semibold text-slate-500">/ Facility SLA</span>
                 </div>
 
                 <ul class="mt-8 space-y-3.5 text-xs text-slate-700">
@@ -1162,7 +1162,7 @@ function facilitypro_pricing_shortcode($atts) {
                     </li>
                     <li class="flex items-center gap-2.5">
                         <i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
-                        <span>Customized Plant SOPs & LOTO Standards</span>
+                        <span>Customized Facility SOPs & LOTO Standards</span>
                     </li>
                     <li class="flex items-center gap-2.5">
                         <i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
@@ -1177,7 +1177,7 @@ function facilitypro_pricing_shortcode($atts) {
 
             <div class="mt-8">
                 <button onclick="facilityProOpenConsultationModal('Enterprise Custom Plan Inquiry: ')" class="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-slate-100 hover:bg-slate-200 text-slate-800 transition-colors flex items-center justify-center gap-2">
-                    <span>Contact Plant Solutions</span>
+                    <span>Contact Facility Solutions</span>
                 </button>
             </div>
         </div>
@@ -1198,7 +1198,7 @@ function facilitypro_dashboard_shortcode($atts) {
         $is_admin       = current_user_can('manage_options');
         $display_name   = !empty($current_user->display_name) ? $current_user->display_name : $current_user->user_login;
         $plant_name     = get_user_meta($user_id, 'facilitypro_plant_name', true);
-        if (empty($plant_name)) $plant_name = 'Main Facility Plant';
+        if (empty($plant_name)) $plant_name = 'Main Facility';
         $phone          = get_user_meta($user_id, 'facilitypro_phone', true);
         $plan           = get_user_meta($user_id, 'facilitypro_plan', true);
         if (empty($plan)) $plan = 'Facility Pro Monthly (₹399/mo)';
@@ -1224,12 +1224,12 @@ function facilitypro_dashboard_shortcode($atts) {
                 </div>
                 <h1 class="text-2xl font-black text-slate-900">Application Under Review / Declined</h1>
                 <p class="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
-                    Your registration for plant <strong><?php echo esc_html($plant_name); ?></strong> was not approved at this time. If you believe this is an error or need immediate access, please contact our administrator directly.
+                    Your registration for facility <strong><?php echo esc_html($plant_name); ?></strong> was not approved at this time. If you believe this is an error or need immediate access, please contact our administrator directly.
                 </p>
                 <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <a href="tel:+919876543210" class="w-full sm:w-auto px-5 py-2.5 bg-[#0077c8] hover:bg-[#005fa3] text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2">
-                        <i data-lucide="phone" class="w-3.5 h-3.5"></i>
-                        <span>Contact Admin (+91 98765 43210)</span>
+                    <a href="mailto:Support@mepdetails.com" class="w-full sm:w-auto px-5 py-2.5 bg-[#0077c8] hover:bg-[#005fa3] text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2">
+                        <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                        <span>Contact Admin (Support@mepdetails.com)</span>
                     </a>
                     <a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors">
                         Log Out
@@ -1271,8 +1271,9 @@ function facilitypro_dashboard_shortcode($atts) {
                     </a>
                 </div>
                 <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <a href="tel:<?php echo esc_attr($clean_phone); ?>" class="w-full sm:w-auto px-5 py-2.5 bg-[#0077c8] hover:bg-[#005fa3] text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2">
-                        <span>📞 Call Admin (<?php echo esc_html($admin_phone); ?>)</span>
+                    <a href="mailto:Support@mepdetails.com" class="w-full sm:w-auto px-5 py-2.5 bg-[#0077c8] hover:bg-[#005fa3] text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2">
+                        <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                        <span>Email Support (Support@mepdetails.com)</span>
                     </a>
                     <a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors">
                         Log Out
@@ -1356,7 +1357,7 @@ function facilitypro_dashboard_shortcode($atts) {
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
                         <div><span class="text-slate-500">Engineer / User Name:</span> <strong class="text-slate-800 ml-1"><?php echo esc_html($display_name); ?></strong></div>
                         <div><span class="text-slate-500">Corporate Email:</span> <strong class="text-slate-800 ml-1"><?php echo esc_html($current_user->user_email); ?></strong></div>
-                        <div><span class="text-slate-500">Facility / Plant:</span> <strong class="text-slate-800 ml-1"><?php echo esc_html($plant_name); ?></strong></div>
+                        <div><span class="text-slate-500">Facility Name:</span> <strong class="text-slate-800 ml-1"><?php echo esc_html($plant_name); ?></strong></div>
                         <div><span class="text-slate-500">Phone Number:</span> <strong class="text-slate-800 ml-1"><?php echo esc_html($phone ?: 'Not provided'); ?></strong></div>
                     </div>
                 </div>
@@ -1364,8 +1365,8 @@ function facilitypro_dashboard_shortcode($atts) {
                 <!-- Help & Actions Footer -->
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200">
                     <div class="text-xs text-slate-500 text-center sm:text-left">
-                        Need urgent approval for a critical plant emergency? 
-                        <a href="tel:<?php echo esc_attr($clean_phone); ?>" class="text-[#0077c8] font-bold block sm:inline sm:ml-1">Call Admin (<?php echo esc_html($admin_phone); ?>)</a>
+                        Need urgent assistance for a critical facility emergency? 
+                        <a href="mailto:Support@mepdetails.com" class="text-[#0077c8] font-bold block sm:inline sm:ml-1">Email Support (Support@mepdetails.com)</a>
                     </div>
                     <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
                         <button onclick="location.reload()" class="px-4 py-2.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5">
@@ -1684,7 +1685,7 @@ function facilitypro_dashboard_shortcode($atts) {
                         <button onclick="switchDashboardTab('sops')" data-dashtab="sops" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 cursor-pointer group">
                             <div class="flex items-center gap-2.5">
                                 <i data-lucide="shield-check" class="w-4 h-4 text-amber-500"></i>
-                                <span>Plant SOP Library</span>
+                                <span>Facility SOP Library</span>
                             </div>
                             <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
                         </button>
@@ -1735,7 +1736,7 @@ function facilitypro_dashboard_shortcode($atts) {
                         <button onclick="switchDashboardTab('settings')" data-dashtab="settings" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 cursor-pointer group">
                             <div class="flex items-center gap-2.5">
                                 <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i>
-                                <span>Plant Settings</span>
+                                <span>Facility Settings</span>
                             </div>
                             <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
                         </button>
@@ -1744,21 +1745,21 @@ function facilitypro_dashboard_shortcode($atts) {
                     <!-- 3. Sidebar Helpline & Quick Info -->
                     <div class="bg-gradient-to-br from-[#0b2545] to-[#134074] text-white rounded-2xl p-4 border border-blue-900/40 shadow-sm space-y-2.5">
                         <div class="flex items-center gap-2 text-xs font-black text-sky-300">
-                            <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
-                            <span>24/7 Plant Helpline</span>
+                            <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                            <span>24/7 Facility Support</span>
                         </div>
                         <p class="text-[11px] text-slate-300 leading-snug">
-                            Instant escalation to licensed Indian PEs for critical plant breakdown emergencies.
+                            Instant escalation to licensed Indian PEs for critical facility breakdown emergencies.
                         </p>
-                        <a href="tel:+919876543210" class="block w-full text-center py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-bold text-white transition-colors">
-                            📞 +91 98765 43210
+                        <a href="mailto:Support@mepdetails.com" class="block w-full text-center py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-bold text-white transition-colors">
+                            ✉️ Support@mepdetails.com
                         </a>
                     </div>
 
                     <!-- 4. Log Out button -->
                     <a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-slate-100 hover:bg-rose-50 hover:text-rose-700 text-slate-600 rounded-xl text-xs font-bold transition-colors border border-slate-200">
                         <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-                        <span>Log Out from Plant Session</span>
+                        <span>Log Out</span>
                     </a>
                 </aside>
 
@@ -1773,7 +1774,7 @@ function facilitypro_dashboard_shortcode($atts) {
                             <div>
                                 <span class="text-[11px] font-bold text-sky-400 uppercase tracking-wider">Engineering Command Center</span>
                                 <h1 class="text-xl sm:text-2xl font-black tracking-tight mt-0.5">Welcome, <?php echo esc_html($display_name); ?></h1>
-                                <p class="text-xs text-slate-300 mt-1">Plant: <strong><?php echo esc_html($plant_name); ?></strong> &bull; All 4 AI Faculty Specialists are live &amp; calibrated to IS/NBC 2016 standards.</p>
+                                <p class="text-xs text-slate-300 mt-1">Facility: <strong><?php echo esc_html($plant_name); ?></strong> &bull; All 4 AI Faculty Specialists are live &amp; calibrated to IS/NBC 2016 standards.</p>
                             </div>
                             <div class="shrink-0 flex items-center gap-2">
                                 <button onclick="facilityProOpenConsultationModal()" class="px-4 py-2.5 bg-[#f05423] hover:bg-[#d94416] text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all cursor-pointer">
@@ -1809,7 +1810,7 @@ function facilitypro_dashboard_shortcode($atts) {
                                     <div class="p-1.5 rounded-lg bg-amber-50 text-amber-600"><i data-lucide="shield-check" class="w-4 h-4"></i></div>
                                 </div>
                                 <div class="text-2xl font-black text-slate-900 mt-2">12 SOPs</div>
-                                <div class="text-[10px] text-slate-500 font-semibold mt-1">LOTO &amp; Plant Start-Up</div>
+                                <div class="text-[10px] text-slate-500 font-semibold mt-1">LOTO &amp; Facility Start-Up</div>
                             </div>
 
                             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
@@ -1929,10 +1930,10 @@ function facilitypro_dashboard_shortcode($atts) {
                                         <i data-lucide="shield-check" class="w-4 h-4"></i>
                                     </div>
                                     <div class="text-xs font-bold text-slate-900">SOP Library</div>
-                                    <div class="text-[10px] text-slate-500">Plant LOTO &amp; Audits</div>
+                                    <div class="text-[10px] text-slate-500">Facility LOTO &amp; Audits</div>
                                 </button>
 
-                                <button onclick="switchDashboardTab('checklists')" class="p-3.5 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/40 transition-all text-left group cursor-pointer">
+                                <button onclick="switchDashboardTab('checklists')" class="p-3.5 rounded-xl border border-emerald-500 hover:bg-emerald-50/40 transition-all text-left group cursor-pointer">
                                     <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
                                         <i data-lucide="clipboard-check" class="w-4 h-4"></i>
                                     </div>
@@ -1966,7 +1967,7 @@ function facilitypro_dashboard_shortcode($atts) {
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                                 <div>
                                     <h2 class="text-xl sm:text-2xl font-black text-slate-900">MEP Knowledge Hub &amp; Technical Guides</h2>
-                                    <p class="text-xs text-slate-500 mt-0.5">Explore 28+ in-depth engineering breakdowns, formulas, and real plant case studies across 9 disciplines.</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">Explore 28+ in-depth engineering breakdowns, formulas, and real facility case studies across 9 disciplines.</p>
                                 </div>
                                 <a href="<?php echo esc_url(home_url('/knowledge-hub/')); ?>" target="_blank" class="px-4 py-2 bg-slate-900 hover:bg-[#0077c8] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs">
                                     <span>Open Full Hub</span>
@@ -2159,7 +2160,7 @@ function facilitypro_dashboard_shortcode($atts) {
                         <div class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-sm">
                             <div class="mb-6">
                                 <h2 class="text-lg sm:text-xl font-black text-slate-900">Standard Operating Procedures (SOPs)</h2>
-                                <p class="text-xs text-slate-500 mt-0.5">Audited plant maintenance processes with step-by-step safety controls.</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Audited facility maintenance processes with step-by-step safety controls.</p>
                             </div>
                             <?php echo do_shortcode('[facilitypro_sop_library]'); ?>
                         </div>
@@ -2216,7 +2217,7 @@ function facilitypro_dashboard_shortcode($atts) {
                     <div id="dashtab-subscription" class="dash-panel hidden space-y-6">
                         <div class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-sm">
                             <div class="max-w-4xl mx-auto space-y-6">
-                                <h2 class="text-xl sm:text-2xl font-black text-slate-900">Subscription &amp; Plant Access</h2>
+                                <h2 class="text-xl sm:text-2xl font-black text-slate-900">Subscription &amp; Facility Access</h2>
                                 <p class="text-xs text-slate-500">Manage your FacilityPro membership, billing frequency, and seats.</p>
 
                                 <div class="p-6 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-[#0b2545] text-white shadow-md">
@@ -2239,8 +2240,8 @@ function facilitypro_dashboard_shortcode($atts) {
                     <!-- TAB 9: SETTINGS -->
                     <div id="dashtab-settings" class="dash-panel hidden space-y-6">
                         <div class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-sm max-w-2xl mx-auto">
-                            <h2 class="text-xl font-black text-slate-900 mb-1">Plant &amp; Profile Settings</h2>
-                            <p class="text-xs text-slate-500 mb-6">Update your engineer name, plant facility details, and credentials.</p>
+                            <h2 class="text-xl font-black text-slate-900 mb-1">Facility &amp; Profile Settings</h2>
+                            <p class="text-xs text-slate-500 mb-6">Update your engineer name, facility details, and credentials.</p>
 
                             <form id="facilitypro-profile-form" onsubmit="facilityProHandleProfileUpdate(event)" class="space-y-4">
                                 <div id="profile-update-msg" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
@@ -2251,7 +2252,7 @@ function facilitypro_dashboard_shortcode($atts) {
                                 </div>
 
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Facility / Plant Name</label>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Facility Name</label>
                                     <input type="text" name="plant_name" value="<?php echo esc_attr($plant_name); ?>" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
                                 </div>
 
@@ -2558,7 +2559,7 @@ function facilitypro_dashboard_shortcode($atts) {
                 <div class="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-xl font-black mx-auto mb-3 shadow-md">
                     FP
                 </div>
-                <h1 class="text-2xl font-black text-slate-900">Plant Engineer Portal</h1>
+                <h1 class="text-2xl font-black text-slate-900">Facility Engineer Portal</h1>
                 <p class="text-xs text-slate-500 mt-1">Sign in or register to access saved calculations and assigned Indian AI PEs.</p>
             </div>
 
@@ -2568,7 +2569,7 @@ function facilitypro_dashboard_shortcode($atts) {
                     Sign In
                 </button>
                 <button type="button" onclick="switchAuthTab('register')" id="authPortalTabRegister" class="flex-1 pb-3 text-xs font-bold text-center border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
-                    Register New Plant
+                    Register New Facility
                 </button>
             </div>
 
@@ -2610,12 +2611,12 @@ function facilitypro_dashboard_shortcode($atts) {
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Corporate / Plant Email</label>
-                    <input type="email" name="email" placeholder="rahul@plantoperations.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Corporate / Facility Email</label>
+                    <input type="email" name="email" placeholder="rahul@facilityoperations.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Facility / Plant / Hotel Name</label>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Facility / Building / Hotel Name</label>
                     <input type="text" name="plant_name" placeholder="e.g. Apex Central Utilities" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0077c8]" required>
                 </div>
 
@@ -2752,7 +2753,7 @@ function facilitypro_hero_shortcode($atts) {
 
                         <!-- Legal & Code Engineering Guidance Disclaimer -->
                         <p class="text-[11px] text-slate-300/80 mt-2.5 text-center sm:text-left leading-relaxed">
-                            By submitting an engineering query, you understand derivations are AI-assisted for guidance based on IS, NBC &amp; ASHRAE standards and agree to our <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="text-sky-400 hover:underline">Terms of Service</a> &amp; <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="text-sky-400 hover:underline">Privacy Policy</a>.
+                            By submitting an engineering query, you understand derivations are AI-assisted for guidance based on IS, NBC &amp; ASHRAE standards and agree to our <a href="<?php echo esc_url(home_url('/terms-of-service')); ?>" class="text-sky-300 hover:text-white underline font-medium">Terms of Service</a> &amp; <a href="<?php echo esc_url(home_url('/privacy-policy')); ?>" class="text-sky-300 hover:text-white underline font-medium">Privacy Policy</a>.
                         </p>
                     </form>
 
@@ -2806,7 +2807,7 @@ function facilitypro_category_grid_shortcode($atts) {
             
             <div class="text-center max-w-3xl mx-auto mb-6">
                 <span class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#0077c8] bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
-                    Plant Engineering Categories
+                    Facility Engineering Categories
                 </span>
                 <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0b2545] tracking-tight mt-2">
                     Select Your Service Category
@@ -2998,7 +2999,7 @@ function facilitypro_category_grid_shortcode($atts) {
                             Featured Engineering Articles
                         </span>
                         <h3 class="text-xl sm:text-2xl font-black text-slate-900 mt-1">
-                            Technical Blogs &amp; Plant Diagnostic Guides
+                            Technical Blogs &amp; Facility Diagnostic Guides
                         </h3>
                     </div>
                     <a href="<?php echo esc_url(home_url('/knowledge-hub/')); ?>" class="text-xs font-bold text-[#0077c8] hover:underline flex items-center gap-1">
@@ -3137,7 +3138,7 @@ function facilitypro_popular_questions_shortcode($atts) {
                     Popular questions at Facility<span class="text-[#f05423]">Pro</span>
                 </h2>
                 <p class="text-sm sm:text-base text-slate-600 mt-2.5 font-normal">
-                    Real plant challenges solved with point-to-point step-by-step clarity by verified Indian AI Engineering Consultants.
+                    Real facility challenges solved with point-to-point step-by-step clarity by verified Indian AI Engineering Consultants.
                 </p>
             </div>
 
@@ -3607,7 +3608,7 @@ function facilitypro_why_choose_us_shortcode($atts) {
                     <div class="w-16 h-16 mx-auto rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-[#0084d6] group-hover:bg-[#0084d6] group-hover:text-white transition-colors shadow-xs">
                         <i data-lucide="badge-check" class="w-8 h-8 stroke-[1.8]"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-slate-900 tracking-tight">15,000+ Verified Plants</h3>
+                    <h3 class="text-lg font-bold text-slate-900 tracking-tight">15,000+ Verified Facilities</h3>
                     <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
                         Multi-step verification including Indian PE board standards, ISHRAE/ASHRAE credentials, and past project audits.
                     </p>
@@ -3616,7 +3617,7 @@ function facilitypro_why_choose_us_shortcode($atts) {
                     <div class="w-16 h-16 mx-auto rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-[#0084d6] group-hover:bg-[#0084d6] group-hover:text-white transition-colors shadow-xs">
                         <i data-lucide="piggy-bank" class="w-8 h-8 stroke-[1.8]"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-slate-900 tracking-tight">Prevent Costly Plant Downtime</h3>
+                    <h3 class="text-lg font-bold text-slate-900 tracking-tight">Prevent Costly Facility Downtime</h3>
                     <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
                         Avoid thousands of dollars in emergency breakdown costs, consultant site visit fees, and regulatory penalties.
                     </p>
@@ -3625,7 +3626,7 @@ function facilitypro_why_choose_us_shortcode($atts) {
                     <div class="w-16 h-16 mx-auto rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-[#0084d6] group-hover:bg-[#0084d6] group-hover:text-white transition-colors shadow-xs">
                         <i data-lucide="heart-handshake" class="w-8 h-8 stroke-[1.8]"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-slate-900 tracking-tight">Tailored to Your Plant</h3>
+                    <h3 class="text-lg font-bold text-slate-900 tracking-tight">Tailored to Your Facility</h3>
                     <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
                         Discuss your specific chiller model, pump curve, substation single line diagram (SLD), or sprinkler hydraulic calculation directly.
                     </p>

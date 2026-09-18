@@ -27,7 +27,7 @@ get_header();
                             <span>Transparent Engineering Pricing</span>
                         </div>
                         <h1 class="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
-                            Point-to-Point MEP Solutions at Plant Speed
+                            Point-to-Point MEP Solutions at Facility Speed
                         </h1>
                         <p class="mt-4 text-base sm:text-lg text-slate-600">
                             Solve urgent breakdowns for ₹199 or empower your engineering team with unlimited AI consultations for ₹399/month.

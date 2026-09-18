@@ -27,7 +27,7 @@ get_header();
                             <span>Preventive Maintenance</span>
                         </div>
                         <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                            MEP Plant Inspection & Audit Checklists
+                            MEP Facility Inspection & Audit Checklists
                         </h1>
                         <p class="mt-2 text-base text-slate-600">
                             Execute daily, weekly, and monthly statutory audit logs. Live progress tracking with immediate AI troubleshooting for failed check items.

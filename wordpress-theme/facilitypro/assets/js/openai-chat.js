@@ -11,17 +11,29 @@ function formatMarkdownToHtml(markdown) {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
 
-    html = html.replace(/\`\`\`([a-zA-Z0-9_]*)\n([\s\S]*?)\`\`\`/g, function(match, lang, code) {
-        return '<div class="my-3 rounded-xl bg-slate-900 text-slate-100 p-4 font-mono text-xs overflow-x-auto border border-slate-800"><div class="flex items-center justify-between text-[10px] text-slate-400 pb-2 mb-2 border-b border-slate-800"><span>' + (lang || 'ENGINEERING FORMULA') + '</span><span>FACILITYPRO AI</span></div><pre class="m-0 leading-relaxed">' + code.trim() + '</pre></div>';
+    // Code & Math blocks
+    html = html.replace(/```([a-zA-Z0-9_]*)\n([\s\S]*?)```/g, function(match, lang, code) {
+        return '<div class="my-3 rounded-xl bg-slate-900 text-slate-100 p-4 font-mono text-xs overflow-x-auto border border-slate-800 shadow-inner"><div class="flex items-center justify-between text-[10px] text-slate-400 pb-2 mb-2 border-b border-slate-800"><span>' + (lang || 'ENGINEERING FORMULA & STANDARDS') + '</span><span class="text-[#0077c8] font-bold">FACILITYPRO AI</span></div><pre class="m-0 leading-relaxed font-mono">' + code.trim() + '</pre></div>';
     });
 
-    html = html.replace(/\`([^\`]+)\`/g, '<code class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-800 font-mono text-xs border border-slate-200">$1</code>');
-    html = html.replace(/^### (.*$)/gim, '<h3 class="text-base font-bold text-slate-900 mt-4 mb-2 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#0077c8]"></span>$1</h3>');
-    html = html.replace(/^## (.*$)/gim, '<h2 class="text-lg font-black text-slate-900 mt-5 mb-2 pb-1 border-b border-slate-200">$1</h2>');
-    html = html.replace(/^# (.*$)/gim, '<h1 class="text-xl font-black text-slate-900 mt-6 mb-3">$1</h1>');
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-800 font-mono text-xs border border-slate-200">$1</code>');
+    
+    // Headers
+    html = html.replace(/^### (.*$)/gim, '<h3 class="text-sm sm:text-base font-bold text-slate-900 mt-4 mb-2 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#0077c8] shrink-0"></span><span>$1</span></h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2 class="text-base sm:text-lg font-black text-slate-900 mt-5 mb-2 pb-1.5 border-b border-slate-200">$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1 class="text-lg sm:text-xl font-black text-slate-900 mt-6 mb-3 pb-2 border-b-2 border-slate-200">$1</h1>');
+    
+    // Formatting
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>');
     html = html.replace(/\*(.*?)\*/g, '<em class="italic text-slate-700">$1</em>');
-    html = html.replace(/^\s*[-*+] (.*$)/gim, '<li class="text-xs text-slate-700 leading-relaxed mb-1.5 flex items-start gap-2"><span class="text-[#0077c8] font-bold">•</span><span>$1</span></li>');
+    
+    // Unordered & Ordered Lists
+    html = html.replace(/^\s*[-*+] (.*$)/gim, '<li class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-2 flex items-start gap-2.5"><span class="text-[#0077c8] font-bold text-base leading-none">•</span><span>$1</span></li>');
+    html = html.replace(/^\s*(\d+)\.\s+(.*$)/gim, '<li class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-2 flex items-start gap-2.5"><span class="text-[#f05423] font-bold text-xs shrink-0">$1.</span><span>$2</span></li>');
+
+    // Paragraph line breaks
+    html = html.replace(/\n\n+/g, '<div class="h-2"></div>');
 
     return html;
 }
@@ -54,7 +66,8 @@ async function handleConsultationSubmit(e) {
         formData.append('urgency', urgency);
         formData.append('problem_details', details);
 
-        const res = await fetch(window.facilityProData?.ajax_url || '/wp-admin/admin-ajax.php', {
+        const ajaxUrl = window.facilityProData?.ajaxUrl || window.facilityProData?.ajax_url || '/wp-admin/admin-ajax.php';
+        const res = await fetch(ajaxUrl, {
             method: 'POST',
             body: formData
         });
@@ -117,7 +130,8 @@ async function handleFloatingChatSubmit(e) {
         formData.append('urgency', 'normal');
         formData.append('problem_details', msg);
 
-        const res = await fetch(window.facilityProData?.ajax_url || '/wp-admin/admin-ajax.php', {
+        const ajaxUrl = window.facilityProData?.ajaxUrl || window.facilityProData?.ajax_url || '/wp-admin/admin-ajax.php';
+        const res = await fetch(ajaxUrl, {
             method: 'POST',
             body: formData
         });

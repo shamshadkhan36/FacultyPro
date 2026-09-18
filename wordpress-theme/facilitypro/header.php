@@ -20,20 +20,25 @@
 
 <!-- Top Announcement Ribbon -->
 <div class="bg-gradient-to-r from-[#0b2545] via-[#134074] to-[#0b2545] text-white text-xs py-2 px-4 shadow-sm border-b border-blue-900/40 relative z-50">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-        <div class="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-            <span class="inline-flex items-center justify-center bg-[#f05423] text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">Live</span>
-            <span class="font-medium text-slate-200 text-xs truncate">
-                🔥 <strong>15,000+ Verified Facility Managers Connected:</strong> Point-to-Point MEP AI Diagnostics with licensed PEs &amp; ASHRAE/NFPA code derivations.
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-0">
+            <span class="inline-flex items-center justify-center bg-[#f05423] text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 shadow-xs animate-pulse">PRO</span>
+            <span class="font-medium text-slate-100 text-xs sm:text-sm truncate">
+                Upgrade to FacilityPro Pro &mdash; Unlock Advanced AI, MEP Calculations, Tools &amp; SOPs
             </span>
+            <a href="<?php echo esc_url(home_url('/pricing')); ?>" class="inline-flex items-center gap-1 font-bold text-amber-300 hover:text-amber-200 transition-colors ml-1.5 shrink-0 text-xs sm:text-sm underline decoration-amber-300/60 hover:decoration-amber-200">
+                <span>View Plans</span>
+                <span class="text-sm font-black">&rarr;</span>
+            </a>
         </div>
-        <div class="hidden md:flex items-center gap-4 shrink-0 text-slate-300 text-xs">
-            <div class="flex items-center gap-1 text-emerald-400 font-bold">
+        <div class="hidden lg:flex items-center gap-4 shrink-0 text-slate-300 text-xs">
+            <div class="flex items-center gap-1.5 text-emerald-400 font-bold">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                <span>AI Consultants Online (&lt; 5s reply)</span>
+                <span>AI Consultants Online</span>
             </div>
-            <a href="tel:<?php echo esc_attr(get_option('facilitypro_emergency_phone', '+919876543210')); ?>" class="hover:text-white font-semibold transition-colors">
-                📞 Emergency Plant Line
+            <a href="mailto:Support@mepdetails.com" class="hover:text-white font-semibold transition-colors flex items-center gap-1.5 bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-lg">
+                <i data-lucide="mail" class="w-3.5 h-3.5 text-slate-300"></i>
+                <span>Support@mepdetails.com</span>
             </a>
         </div>
     </div>

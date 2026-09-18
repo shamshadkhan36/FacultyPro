@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="profile" href="https://gmpg.org/xfn/11">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                window.lucide.createIcons();
+            }
+        });
+    </script>
     <?php wp_head(); ?>
 </head>
 <body <?php body_class('bg-slate-50 font-sans text-slate-800 antialiased min-h-screen flex flex-col selection:bg-[#0077c8]/20 selection:text-[#0077c8]'); ?>>

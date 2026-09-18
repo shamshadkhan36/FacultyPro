@@ -369,24 +369,45 @@ function facilitypro_ajax_register() {
         ]);
     }
 
-    // Default registration is set to PENDING admin approval
-    update_user_meta($user_id, 'facilitypro_account_status', 'pending');
+    // Default registration is set to FREE PLAN (Immediate Access to Free Tier)
+    update_user_meta($user_id, 'facilitypro_account_status', 'approved');
     update_user_meta($user_id, 'facilitypro_registered_at', current_time('mysql'));
     update_user_meta($user_id, 'facilitypro_plant_name', $plant_name);
     update_user_meta($user_id, 'facilitypro_phone', $phone);
-    update_user_meta($user_id, 'facilitypro_plan', 'Facility Pro Monthly');
-    update_user_meta($user_id, 'facilitypro_plan_status', 'Pending Approval');
+    update_user_meta($user_id, 'facilitypro_plan', 'Free Plan');
+    update_user_meta($user_id, 'facilitypro_plan_status', 'Active Member (Free Tier)');
 
     wp_set_current_user($user_id);
     wp_set_auth_cookie($user_id, true);
 
     wp_send_json_success([
-        'message'      => 'Account registered successfully! Your registration is submitted for Admin review.',
-        'status'       => 'pending',
+        'message'      => 'Account created successfully! Welcome to FacilityPro Free Tier.',
+        'status'       => 'approved',
+        'plan'         => 'Free Plan',
         'redirect_url' => home_url('/dashboard/')
     ]);
 }
 add_action('wp_ajax_nopriv_facilitypro_ajax_register', 'facilitypro_ajax_register');
+
+// Global Session Expiry & Force Logout Interceptor
+function facilitypro_enforce_user_session_expiry() {
+    if (is_user_logged_in() && !current_user_can('manage_options')) {
+        $user_id = get_current_user_id();
+        $account_status = get_user_meta($user_id, 'facilitypro_account_status', true);
+        if ($account_status === 'expired' || $account_status === 'rejected') {
+            $sessions = WP_Session_Tokens::get_instance($user_id);
+            if ($sessions) {
+                $sessions->destroy_all();
+            }
+            wp_logout();
+            if (!wp_doing_ajax()) {
+                wp_safe_redirect(add_query_arg('notice', $account_status, home_url('/dashboard/')));
+                exit;
+            }
+        }
+    }
+}
+add_action('init', 'facilitypro_enforce_user_session_expiry');
 
 // 4. AJAX Update Profile
 function facilitypro_ajax_update_profile() {
@@ -418,19 +439,60 @@ function facilitypro_ajax_update_profile() {
 }
 add_action('wp_ajax_facilitypro_ajax_update_profile', 'facilitypro_ajax_update_profile');
 
-// 5. AJAX Admin User Status Management (Approve / Reject / Pending)
-function facilitypro_ajax_admin_update_user_status() {
+// Helper function to calculate user statistics for admin console
+function facilitypro_get_admin_user_counts() {
+    $all_users = get_users(['role__not_in' => ['administrator']]);
+    $counts = [
+        'total'      => count($all_users),
+        'free'       => 0,
+        'pro'        => 0,
+        'enterprise' => 0,
+        'expired'    => 0,
+        'pending'    => 0,
+        'approved'   => 0
+    ];
+
+    foreach ($all_users as $u) {
+        $st   = get_user_meta($u->ID, 'facilitypro_account_status', true);
+        $plan = get_user_meta($u->ID, 'facilitypro_plan', true);
+        if (empty($st)) $st = 'approved';
+
+        if ($st === 'expired') {
+            $counts['expired']++;
+        } elseif ($st === 'pending') {
+            $counts['pending']++;
+        } elseif ($st === 'rejected') {
+            $counts['expired']++;
+        } else {
+            $counts['approved']++;
+            if (stripos($plan, 'pro') !== false) {
+                $counts['pro']++;
+            } elseif (stripos($plan, 'enterprise') !== false) {
+                $counts['enterprise']++;
+            } else {
+                $counts['free']++;
+            }
+        }
+    }
+
+    return $counts;
+}
+
+// 5. AJAX Admin User Subscription & Status Management (Change Plan / Expire & Force Logout)
+function facilitypro_ajax_admin_update_user_subscription() {
     check_ajax_referer('facilitypro_nonce', 'nonce');
 
     if (!current_user_can('manage_options')) {
-        wp_send_json_error('Unauthorized. Only administrators can approve or reject users.');
+        wp_send_json_error('Unauthorized. Only administrators can manage subscriptions.');
     }
 
     $target_user_id = isset($_POST['target_user_id']) ? absint($_POST['target_user_id']) : 0;
+    $action_type    = isset($_POST['action_type']) ? sanitize_key($_POST['action_type']) : 'change_plan';
+    $target_plan    = isset($_POST['target_plan']) ? sanitize_text_field($_POST['target_plan']) : '';
     $target_status  = isset($_POST['target_status']) ? sanitize_key($_POST['target_status']) : '';
 
-    if (!$target_user_id || !in_array($target_status, ['approved', 'rejected', 'pending'], true)) {
-        wp_send_json_error('Invalid user ID or status.');
+    if (!$target_user_id) {
+        wp_send_json_error('Invalid user ID.');
     }
 
     $target_user = get_userdata($target_user_id);
@@ -438,41 +500,80 @@ function facilitypro_ajax_admin_update_user_status() {
         wp_send_json_error('Target user not found.');
     }
 
-    // Do not allow modifying administrator accounts
     if (user_can($target_user_id, 'manage_options')) {
-        wp_send_json_error('Cannot change status of an Administrator.');
+        wp_send_json_error('Cannot modify Administrator accounts.');
     }
 
-    update_user_meta($target_user_id, 'facilitypro_account_status', $target_status);
-    update_user_meta($target_user_id, 'facilitypro_status_updated_at', current_time('mysql'));
+    $now = current_time('mysql');
+    update_user_meta($target_user_id, 'facilitypro_status_updated_at', $now);
 
-    if ($target_status === 'approved') {
-        update_user_meta($target_user_id, 'facilitypro_plan_status', 'Active Member');
-        $msg = sprintf('User "%s" has been approved and granted full dashboard access.', esc_html($target_user->display_name));
-    } elseif ($target_status === 'rejected') {
-        update_user_meta($target_user_id, 'facilitypro_plan_status', 'Application Declined');
-        $msg = sprintf('User "%s" registration has been rejected.', esc_html($target_user->display_name));
-    } else {
-        update_user_meta($target_user_id, 'facilitypro_plan_status', 'Pending Approval');
-        $msg = sprintf('User "%s" reset to pending approval.', esc_html($target_user->display_name));
-    }
-
-    // Calculate remaining pending users
-    $all_users = get_users(['role__not_in' => ['administrator']]);
-    $pending_count = 0;
-    foreach ($all_users as $u) {
-        $st = get_user_meta($u->ID, 'facilitypro_account_status', true);
-        if ($st === 'pending' || empty($st)) {
-            $pending_count++;
+    // 1. ACTION: EXPIRE & FORCE LOGOUT
+    if ($action_type === 'expire_user' || $target_status === 'expired') {
+        update_user_meta($target_user_id, 'facilitypro_account_status', 'expired');
+        update_user_meta($target_user_id, 'facilitypro_plan_status', 'Expired (Session Terminated by Admin)');
+        
+        // Destroy all active WordPress login sessions across all browsers
+        $sessions = WP_Session_Tokens::get_instance($target_user_id);
+        if ($sessions) {
+            $sessions->destroy_all();
         }
+
+        $msg = sprintf('User "%s" has been Expired. All active login sessions have been terminated immediately.', esc_html($target_user->display_name));
+        $new_status = 'expired';
+        $new_plan = get_user_meta($target_user_id, 'facilitypro_plan', true) ?: 'Free Plan';
     }
+    // 2. ACTION: REJECT / BAN
+    elseif ($action_type === 'reject_user' || $target_status === 'rejected') {
+        update_user_meta($target_user_id, 'facilitypro_account_status', 'rejected');
+        update_user_meta($target_user_id, 'facilitypro_plan_status', 'Application Declined');
+        
+        $sessions = WP_Session_Tokens::get_instance($target_user_id);
+        if ($sessions) {
+            $sessions->destroy_all();
+        }
+
+        $msg = sprintf('User "%s" registration rejected and session ended.', esc_html($target_user->display_name));
+        $new_status = 'rejected';
+        $new_plan = get_user_meta($target_user_id, 'facilitypro_plan', true) ?: 'Free Plan';
+    }
+    // 3. ACTION: CHANGE PLAN (Free / Pro / Enterprise) OR REACTIVATE
+    else {
+        // Determine plan name
+        if ($target_plan === 'pro' || stripos($target_plan, 'pro') !== false) {
+            $plan_name = 'Facility Pro Monthly (₹399/mo)';
+            $plan_stat = 'Active Member (Pro Tier)';
+        } elseif ($target_plan === 'enterprise' || stripos($target_plan, 'enterprise') !== false) {
+            $plan_name = 'Enterprise Tier';
+            $plan_stat = 'Active Member (Enterprise)';
+        } else {
+            $plan_name = 'Free Plan';
+            $plan_stat = 'Active Member (Free Tier)';
+        }
+
+        update_user_meta($target_user_id, 'facilitypro_plan', $plan_name);
+        update_user_meta($target_user_id, 'facilitypro_plan_status', $plan_stat);
+        update_user_meta($target_user_id, 'facilitypro_account_status', 'approved');
+
+        $msg = sprintf('User "%s" subscription updated to "%s" (Active).', esc_html($target_user->display_name), $plan_name);
+        $new_status = 'approved';
+        $new_plan = $plan_name;
+    }
+
+    $counts = facilitypro_get_admin_user_counts();
 
     wp_send_json_success([
-        'message'       => $msg,
-        'user_id'       => $target_user_id,
-        'new_status'    => $target_status,
-        'pending_count' => $pending_count
+        'message'    => $msg,
+        'user_id'    => $target_user_id,
+        'new_status' => $new_status,
+        'new_plan'   => $new_plan,
+        'counts'     => $counts
     ]);
+}
+add_action('wp_ajax_facilitypro_admin_update_user_subscription', 'facilitypro_ajax_admin_update_user_subscription');
+
+// Legacy compatibility for facilitypro_admin_update_user_status
+function facilitypro_ajax_admin_update_user_status() {
+    facilitypro_ajax_admin_update_user_subscription();
 }
 add_action('wp_ajax_facilitypro_admin_update_user_status', 'facilitypro_ajax_admin_update_user_status');
 

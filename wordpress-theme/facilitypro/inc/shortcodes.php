@@ -1240,6 +1240,49 @@ function facilitypro_dashboard_shortcode($atts) {
             return ob_get_clean();
         }
 
+        // 1b. EXPIRED USER VIEW (Manual Expire / Session Terminated)
+        if (!$is_admin && $account_status === 'expired') {
+            $admin_phone = get_option('facilitypro_emergency_phone', '+91 98765 43210');
+            $clean_phone = preg_replace('/[^0-9]/', '', $admin_phone);
+            if (empty($clean_phone)) $clean_phone = '919876543210';
+            $wa_msg = urlencode("Hi FacilityPro Admin, my account access has expired for " . $display_name . " (" . $plant_name . ") with email " . $current_user->user_email . ". I want to renew my Pro subscription (₹399/mo). Please re-activate my access.");
+            $wa_url = "https://wa.me/" . $clean_phone . "?text=" . $wa_msg;
+            ?>
+            <div class="facilitypro-expired-review max-w-2xl mx-auto my-12 bg-white rounded-3xl p-8 sm:p-10 shadow-2xl border border-rose-300 text-center space-y-5">
+                <div class="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto shadow-sm">
+                    <svg class="w-8 h-8 stroke-[2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                </div>
+                <div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black bg-rose-100 text-rose-800 border border-rose-300">
+                    <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                    <span>Account Access Expired / Session Terminated</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-black text-slate-900">Subscription Expired</h1>
+                <p class="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
+                    Your portal access for <strong><?php echo esc_html($plant_name); ?></strong> has expired or was terminated by the Administrator. All active sessions have been safely logged out.
+                </p>
+                <div class="p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200 text-left flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="text-xs font-black text-emerald-900">Renew Subscription (₹399/mo)</div>
+                        <p class="text-xs text-slate-600">Send renewal payment or screenshot to Admin on WhatsApp for instant 1-click re-activation.</p>
+                    </div>
+                    <a href="<?php echo esc_url($wa_url); ?>" target="_blank" rel="noopener noreferrer" class="shrink-0 px-5 py-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl text-xs font-black transition-all shadow-md flex items-center gap-2 cursor-pointer">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span>Renew on WhatsApp</span>
+                    </a>
+                </div>
+                <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <a href="tel:<?php echo esc_attr($clean_phone); ?>" class="w-full sm:w-auto px-5 py-2.5 bg-[#0077c8] hover:bg-[#005fa3] text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2">
+                        <span>📞 Call Admin (<?php echo esc_html($admin_phone); ?>)</span>
+                    </a>
+                    <a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors">
+                        Log Out
+                    </a>
+                </div>
+            </div>
+            <?php
+            return ob_get_clean();
+        }
+
         // 2. PENDING USER VIEW (Waiting for Admin approval / Payment verification)
         if (!$is_admin && $account_status === 'pending') {
             $admin_phone = get_option('facilitypro_emergency_phone', '+91 98765 43210');
@@ -1380,27 +1423,40 @@ function facilitypro_dashboard_shortcode($atts) {
         
         $initials = strtoupper(substr($display_name, 0, 2));
 
-        // Load users list for Administrator User Approvals tab
+        // Load users list for Administrator User & Subscription Management
         $facility_users = [];
+        $free_count = 0;
+        $pro_count = 0;
+        $enterprise_count = 0;
+        $expired_count = 0;
         $pending_count = 0;
         $approved_count = 0;
-        $rejected_count = 0;
 
         if ($is_admin) {
             $facility_users = get_users([
                 'role__not_in' => ['administrator'],
                 'orderby'      => 'registered',
                 'order'        => 'DESC',
-                'number'       => 100
+                'number'       => 200
             ]);
             foreach ($facility_users as $fu) {
-                $st = get_user_meta($fu->ID, 'facilitypro_account_status', true);
-                if ($st === 'approved') {
-                    $approved_count++;
-                } elseif ($st === 'rejected') {
-                    $rejected_count++;
-                } else {
+                $st   = get_user_meta($fu->ID, 'facilitypro_account_status', true);
+                $plan = get_user_meta($fu->ID, 'facilitypro_plan', true);
+                if (empty($st)) $st = 'approved';
+
+                if ($st === 'expired' || $st === 'rejected') {
+                    $expired_count++;
+                } elseif ($st === 'pending') {
                     $pending_count++;
+                } else {
+                    $approved_count++;
+                    if (stripos($plan, 'pro') !== false) {
+                        $pro_count++;
+                    } elseif (stripos($plan, 'enterprise') !== false) {
+                        $enterprise_count++;
+                    } else {
+                        $free_count++;
+                    }
                 }
             }
         }
@@ -2225,11 +2281,11 @@ function facilitypro_dashboard_shortcode($atts) {
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-100 text-purple-800 uppercase tracking-wider">Admin Control</span>
-                                        <span class="text-xs text-slate-400">&bull; Live Access Management</span>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-100 text-purple-800 uppercase tracking-wider">Master Console</span>
+                                        <span class="text-xs text-slate-400">&bull; User Subscriptions &amp; Session Control</span>
                                     </div>
-                                    <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-1">Plant Engineer Registrations &amp; Approvals</h2>
-                                    <p class="text-xs text-slate-500">Approve or reject registered plant engineers to grant or restrict access to FacilityPro calculators, SOPs, and AI tools.</p>
+                                    <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-1">User Subscriptions &amp; Access Control</h2>
+                                    <p class="text-xs text-slate-500">Manage user plans (Free / Pro ₹399 / Enterprise) or manually expire access to instantly force logout across all devices.</p>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <button onclick="location.reload()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5">
@@ -2242,23 +2298,27 @@ function facilitypro_dashboard_shortcode($atts) {
                             <!-- Toast Notification Container -->
                             <div id="admin-approvals-toast" class="hidden"></div>
 
-                            <!-- Summary Cards -->
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                            <!-- Summary KPI Cards -->
+                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
                                 <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
                                     <div class="text-[11px] font-bold text-slate-500 uppercase">Total Users</div>
-                                    <div class="text-2xl font-black text-slate-900 mt-1"><?php echo count($facility_users); ?></div>
+                                    <div class="text-2xl font-black text-slate-900 mt-1" id="stat-total-count"><?php echo count($facility_users); ?></div>
+                                </div>
+                                <div class="p-4 rounded-xl bg-sky-50 border border-sky-200">
+                                    <div class="text-[11px] font-bold text-sky-700 uppercase">Free Plan</div>
+                                    <div class="text-2xl font-black text-sky-900 mt-1" id="stat-free-count"><?php echo $free_count; ?></div>
+                                </div>
+                                <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200">
+                                    <div class="text-[11px] font-bold text-emerald-700 uppercase">Pro Active (₹399)</div>
+                                    <div class="text-2xl font-black text-emerald-900 mt-1" id="stat-pro-count"><?php echo $pro_count; ?></div>
+                                </div>
+                                <div class="p-4 rounded-xl bg-rose-50 border border-rose-200">
+                                    <div class="text-[11px] font-bold text-rose-700 uppercase">Expired / Inactive</div>
+                                    <div class="text-2xl font-black text-rose-900 mt-1" id="stat-expired-count"><?php echo $expired_count; ?></div>
                                 </div>
                                 <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
                                     <div class="text-[11px] font-bold text-amber-700 uppercase">Pending Review</div>
                                     <div class="text-2xl font-black text-amber-900 mt-1" id="stat-pending-count"><?php echo $pending_count; ?></div>
-                                </div>
-                                <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200">
-                                    <div class="text-[11px] font-bold text-emerald-700 uppercase">Approved</div>
-                                    <div class="text-2xl font-black text-emerald-900 mt-1" id="stat-approved-count"><?php echo $approved_count; ?></div>
-                                </div>
-                                <div class="p-4 rounded-xl bg-rose-50 border border-rose-200">
-                                    <div class="text-[11px] font-bold text-rose-700 uppercase">Rejected</div>
-                                    <div class="text-2xl font-black text-rose-900 mt-1" id="stat-rejected-count"><?php echo $rejected_count; ?></div>
                                 </div>
                             </div>
 
@@ -2267,14 +2327,17 @@ function facilitypro_dashboard_shortcode($atts) {
                                 <button onclick="facilityProFilterUsers('all')" data-status-filter="all" class="user-filter-btn active px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white shadow-sm border border-slate-900 cursor-pointer">
                                     All Users (<?php echo count($facility_users); ?>)
                                 </button>
+                                <button onclick="facilityProFilterUsers('free')" data-status-filter="free" class="user-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                                    Free Plan (<?php echo $free_count; ?>)
+                                </button>
+                                <button onclick="facilityProFilterUsers('pro')" data-status-filter="pro" class="user-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                                    Pro (₹399/mo) (<?php echo $pro_count; ?>)
+                                </button>
+                                <button onclick="facilityProFilterUsers('expired')" data-status-filter="expired" class="user-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
+                                    Expired / Logged Out (<?php echo $expired_count; ?>)
+                                </button>
                                 <button onclick="facilityProFilterUsers('pending')" data-status-filter="pending" class="user-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
                                     Pending (<?php echo $pending_count; ?>)
-                                </button>
-                                <button onclick="facilityProFilterUsers('approved')" data-status-filter="approved" class="user-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                                    Approved (<?php echo $approved_count; ?>)
-                                </button>
-                                <button onclick="facilityProFilterUsers('rejected')" data-status-filter="rejected" class="user-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 cursor-pointer">
-                                    Rejected (<?php echo $rejected_count; ?>)
                                 </button>
                             </div>
 
@@ -2284,77 +2347,100 @@ function facilitypro_dashboard_shortcode($atts) {
                                     <thead>
                                         <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
                                             <th class="p-3.5">Engineer / User</th>
-                                            <th class="p-3.5">Facility / Plant</th>
-                                            <th class="p-3.5">Phone</th>
-                                            <th class="p-3.5">Registered</th>
-                                            <th class="p-3.5">Status</th>
+                                            <th class="p-3.5">Facility &amp; Phone</th>
+                                            <th class="p-3.5">Subscription Plan</th>
+                                            <th class="p-3.5">Access Status</th>
                                             <th class="p-3.5 text-right">Admin Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100">
                                         <?php if (empty($facility_users)): ?>
-                                            <tr>
-                                                <td colspan="6" class="p-8 text-center text-slate-400">
+                                             <tr>
+                                                <td colspan="5" class="p-8 text-center text-slate-400">
                                                     No registered users found yet.
                                                 </td>
                                             </tr>
                                         <?php else: ?>
                                             <?php foreach ($facility_users as $fu): 
                                                 $u_status = get_user_meta($fu->ID, 'facilitypro_account_status', true);
-                                                if (empty($u_status)) $u_status = 'pending';
+                                                if (empty($u_status)) $u_status = 'approved';
                                                 $u_plant  = get_user_meta($fu->ID, 'facilitypro_plant_name', true);
                                                 if (empty($u_plant)) $u_plant = '—';
                                                 $u_phone  = get_user_meta($fu->ID, 'facilitypro_phone', true);
                                                 if (empty($u_phone)) $u_phone = '—';
+                                                $u_plan   = get_user_meta($fu->ID, 'facilitypro_plan', true) ?: 'Free Plan';
                                                 $reg_date = date('M d, Y', strtotime($fu->user_registered));
+
+                                                $is_pro = (stripos($u_plan, 'pro') !== false);
+                                                $is_enterprise = (stripos($u_plan, 'enterprise') !== false);
+                                                $plan_code = $is_pro ? 'pro' : ($is_enterprise ? 'enterprise' : 'free');
                                             ?>
-                                                <tr id="user-row-<?php echo $fu->ID; ?>" data-user-status="<?php echo esc_attr($u_status); ?>" class="user-approval-row hover:bg-slate-50/80 transition-colors">
+                                                <tr id="user-row-<?php echo $fu->ID; ?>" data-user-status="<?php echo esc_attr($u_status); ?>" data-user-plan="<?php echo esc_attr($plan_code); ?>" class="user-approval-row hover:bg-slate-50/80 transition-colors">
                                                     <td class="p-3.5">
                                                         <div class="font-bold text-slate-900"><?php echo esc_html($fu->display_name ?: $fu->user_login); ?></div>
                                                         <div class="text-[11px] text-slate-500 font-mono"><?php echo esc_html($fu->user_email); ?></div>
+                                                        <div class="text-[10px] text-slate-400 mt-0.5">Reg: <?php echo esc_html($reg_date); ?></div>
                                                     </td>
-                                                    <td class="p-3.5 font-semibold text-slate-800">
-                                                        <?php echo esc_html($u_plant); ?>
+                                                    <td class="p-3.5">
+                                                        <div class="font-semibold text-slate-800"><?php echo esc_html($u_plant); ?></div>
+                                                        <div class="text-[11px] text-slate-500 font-mono"><?php echo esc_html($u_phone); ?></div>
                                                     </td>
-                                                    <td class="p-3.5 text-slate-600 font-mono">
-                                                        <?php echo esc_html($u_phone); ?>
-                                                    </td>
-                                                    <td class="p-3.5 text-slate-500">
-                                                        <?php echo esc_html($reg_date); ?>
+                                                    <td class="p-3.5">
+                                                        <div class="space-y-1">
+                                                            <select onchange="facilityProAdminChangePlan(<?php echo $fu->ID; ?>, this.value, this)" class="w-full max-w-[170px] px-2.5 py-1.5 bg-slate-50 hover:bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-[#0077c8] cursor-pointer shadow-xs">
+                                                                <option value="free" <?php selected($plan_code, 'free'); ?>>Free Plan (Default)</option>
+                                                                <option value="pro" <?php selected($plan_code, 'pro'); ?>>Pro Plan (₹399/mo)</option>
+                                                                <option value="enterprise" <?php selected($plan_code, 'enterprise'); ?>>Enterprise Tier</option>
+                                                            </select>
+                                                        </div>
                                                     </td>
                                                     <td class="p-3.5">
                                                         <span id="user-status-badge-<?php echo $fu->ID; ?>">
-                                                            <?php if ($u_status === 'approved'): ?>
-                                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Approved
+                                                            <?php if ($u_status === 'expired'): ?>
+                                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                                                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> ⛔ Expired (Logged Out)
                                                                 </span>
                                                             <?php elseif ($u_status === 'rejected'): ?>
                                                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
-                                                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Rejected
+                                                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> ✗ Rejected
+                                                                </span>
+                                                            <?php elseif ($u_status === 'pending'): ?>
+                                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> ⏳ Pending Review
                                                                 </span>
                                                             <?php else: ?>
-                                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                                                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pending
-                                                                </span>
+                                                                <?php if ($is_pro): ?>
+                                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ✓ Active (Pro ₹399)
+                                                                    </span>
+                                                                <?php elseif ($is_enterprise): ?>
+                                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300">
+                                                                        <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> ✓ Active (Enterprise)
+                                                                    </span>
+                                                                <?php else: ?>
+                                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-300">
+                                                                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> ✓ Active (Free Plan)
+                                                                    </span>
+                                                                <?php endif; ?>
                                                             <?php endif; ?>
                                                         </span>
                                                     </td>
                                                     <td class="p-3.5 text-right">
                                                         <div id="user-actions-<?php echo $fu->ID; ?>" class="inline-flex items-center gap-1.5 justify-end">
-                                                            <?php if ($u_status === 'approved'): ?>
-                                                                <button onclick="facilityProUpdateUserStatus(<?php echo $fu->ID; ?>, 'rejected', this)" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition-colors cursor-pointer">
-                                                                    Revoke / Reject
+                                                            <?php if ($u_status === 'expired' || $u_status === 'rejected'): ?>
+                                                                <button onclick="facilityProAdminQuickStatus(<?php echo $fu->ID; ?>, 'approved', this)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1">
+                                                                    <span>✓</span> Re-activate
                                                                 </button>
-                                                            <?php elseif ($u_status === 'rejected'): ?>
-                                                                <button onclick="facilityProUpdateUserStatus(<?php echo $fu->ID; ?>, 'approved', this)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors shadow-xs cursor-pointer flex items-center gap-1">
+                                                            <?php elseif ($u_status === 'pending'): ?>
+                                                                <button onclick="facilityProAdminQuickStatus(<?php echo $fu->ID; ?>, 'approved', this)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1">
                                                                     <span>✓</span> Approve
+                                                                </button>
+                                                                <button onclick="facilityProAdminExpireUser(<?php echo $fu->ID; ?>, this)" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg text-xs font-bold transition-all cursor-pointer">
+                                                                    Reject
                                                                 </button>
                                                             <?php else: ?>
-                                                                <button onclick="facilityProUpdateUserStatus(<?php echo $fu->ID; ?>, 'approved', this)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors shadow-xs cursor-pointer flex items-center gap-1">
-                                                                    <span>✓</span> Approve
-                                                                </button>
-                                                                <button onclick="facilityProUpdateUserStatus(<?php echo $fu->ID; ?>, 'rejected', this)" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition-colors cursor-pointer">
-                                                                    Reject
+                                                                <button onclick="facilityProAdminExpireUser(<?php echo $fu->ID; ?>, this)" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 hover:border-rose-300 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1" title="Instantly force logout and terminate access across all devices">
+                                                                    <span>⛔</span> Expire &amp; Logout
                                                                 </button>
                                                             <?php endif; ?>
                                                         </div>
@@ -2736,7 +2822,11 @@ function facilitypro_category_grid_shortcode($atts) {
                 <!-- 1. HVAC -->
                 <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=hvac')); ?>" data-category="hvac" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="wind" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-[#0077c8] group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/>
+                            <path d="M9.6 4.6A2 2 0 1 1 11 8H2"/>
+                            <path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
+                        </svg>
                     </div>
                     <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         HVAC
@@ -2744,14 +2834,16 @@ function facilitypro_category_grid_shortcode($atts) {
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Chillers &amp; AHUs</span>
                     <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
                         <span>View Blogs</span>
-                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </a>
 
                 <!-- 2. Electrical -->
                 <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=electrical')); ?>" data-category="electrical" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="zap" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-[#0077c8] group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
                     </div>
                     <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Electrical
@@ -2759,14 +2851,16 @@ function facilitypro_category_grid_shortcode($atts) {
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Substations &amp; LT</span>
                     <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
                         <span>View Blogs</span>
-                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </a>
 
                 <!-- 3. Fire Fighting -->
                 <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=firefighting')); ?>" data-category="firefighting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="flame" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-[#0077c8] group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                        </svg>
                     </div>
                     <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Fire fighting
@@ -2774,14 +2868,17 @@ function facilitypro_category_grid_shortcode($atts) {
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">NFPA 13 &amp; Pumps</span>
                     <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
                         <span>View Blogs</span>
-                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </a>
 
                 <!-- 4. Plumbing -->
                 <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=plumbing')); ?>" data-category="plumbing" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="droplets" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-[#0077c8] group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/>
+                            <path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/>
+                        </svg>
                     </div>
                     <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Plumbing
@@ -2789,14 +2886,18 @@ function facilitypro_category_grid_shortcode($atts) {
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Pumps &amp; Risers</span>
                     <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
                         <span>View Blogs</span>
-                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </a>
 
                 <!-- 5. Painting & Polishing -->
                 <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=painting')); ?>" data-category="painting" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="paint-roller" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-[#0077c8] group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="16" height="6" x="2" y="2" rx="2"/>
+                            <path d="M10 16v-2a2 2 0 0 1 2-2h8a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                            <rect width="4" height="6" x="8" y="16" rx="1"/>
+                        </svg>
                     </div>
                     <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Painting &amp; polishing
@@ -2804,14 +2905,20 @@ function facilitypro_category_grid_shortcode($atts) {
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Epoxy &amp; PU Coating</span>
                     <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
                         <span>View Blogs</span>
-                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </a>
 
                 <!-- 6. Solar System -->
                 <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=solar')); ?>" data-category="solar" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="sun" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-[#0077c8] group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="4"/>
+                            <path d="M12 2v2"/><path d="M12 20v2"/>
+                            <path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/>
+                            <path d="M2 12h2"/><path d="M20 12h2"/>
+                            <path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+                        </svg>
                     </div>
                     <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         Solar system
@@ -2819,14 +2926,19 @@ function facilitypro_category_grid_shortcode($atts) {
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Rooftop PV &amp; On-Grid</span>
                     <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
                         <span>View Blogs</span>
-                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </a>
 
                 <!-- 7. BMS & Automation -->
                 <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=bms')); ?>" data-category="bms" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="sliders" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-[#0077c8] group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/>
+                            <line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/>
+                            <line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/>
+                            <line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/>
+                        </svg>
                     </div>
                     <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         BMS &amp; Automation
@@ -2834,14 +2946,16 @@ function facilitypro_category_grid_shortcode($atts) {
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">DDC &amp; SCADA</span>
                     <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
                         <span>View Blogs</span>
-                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </a>
 
                 <!-- 8. STP & Water Treatment -->
                 <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=stp')); ?>" data-category="stp" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="filter" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-[#0077c8] group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                        </svg>
                     </div>
                     <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         STP &amp; water treatment
@@ -2849,14 +2963,19 @@ function facilitypro_category_grid_shortcode($atts) {
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">MBBR, MBR &amp; RO</span>
                     <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
                         <span>View Blogs</span>
-                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </a>
 
                 <!-- 9. DG Set -->
                 <a href="<?php echo esc_url(home_url('/knowledge-hub/?discipline=dg')); ?>" data-category="dg" class="category-card group bg-white hover:bg-gradient-to-b hover:from-sky-50/60 hover:to-white rounded-xl sm:rounded-2xl border-2 border-slate-200/90 hover:border-[#0077c8] p-2.5 sm:p-4 lg:p-5 flex flex-col items-center justify-center text-center cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block">
                     <div class="category-icon-box w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-2xl bg-sky-50 text-[#0077c8] border border-sky-100 flex items-center justify-center transition-all duration-300 mb-1.5 sm:mb-3 shadow-xs group-hover:scale-105 group-hover:bg-[#0077c8] group-hover:text-white">
-                        <i data-lucide="battery-charging" class="w-5 h-5 sm:w-8 sm:h-8 lg:w-10 lg:h-10 stroke-[1.7]"></i>
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-[#0077c8] group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 7h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2"/>
+                            <path d="M6 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h1"/>
+                            <path d="m11 7-3 5h4l-3 5"/>
+                            <line x1="22" x2="22" y1="11" y2="13"/>
+                        </svg>
                     </div>
                     <h3 class="text-[11px] sm:text-xs md:text-sm lg:text-base font-extrabold text-slate-900 group-hover:text-[#0077c8] transition-colors leading-tight">
                         DG set
@@ -2864,11 +2983,12 @@ function facilitypro_category_grid_shortcode($atts) {
                     <span class="text-[9px] sm:text-[11px] font-semibold text-slate-500 mt-0.5 sm:mt-1 hidden sm:block">Sync &amp; AMF Panels</span>
                     <span class="mt-1.5 text-[10px] font-bold text-[#0077c8] flex items-center gap-1 group-hover:underline">
                         <span>View Blogs</span>
-                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </a>
 
             </div>
+
 
             <!-- DYNAMIC FEATURED BLOGS & SOLUTIONS GRID (LIMITED TO 6 CARDS) -->
             <div class="mt-12 pt-8 border-t border-slate-200" id="featured-blogs-section">

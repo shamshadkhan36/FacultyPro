@@ -589,20 +589,156 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch(e) {}
 });
 
-// Admin User Status Handler (Approve / Reject / Pending)
-async function facilityProUpdateUserStatus(userId, newStatus, btnEl) {
-    if (!userId || !newStatus) return;
-    
+// Admin User Subscription & Plan Handler (Change Plan: Free / Pro / Enterprise)
+async function facilityProAdminChangePlan(userId, newPlan, selectEl) {
+    if (!userId || !newPlan) return;
+
     const rowEl = document.getElementById(`user-row-${userId}`);
-    const originalText = btnEl ? btnEl.innerHTML : '';
+    const originalValue = selectEl ? selectEl.value : '';
+    if (selectEl) selectEl.disabled = true;
+
+    const formData = new FormData();
+    formData.append('action', 'facilitypro_admin_update_user_subscription');
+    formData.append('target_user_id', userId);
+    formData.append('action_type', 'change_plan');
+    formData.append('target_plan', newPlan);
+    formData.append('target_status', 'approved');
+    formData.append('nonce', window.facilityProData?.nonce || '');
+
+    try {
+        const res = await fetch(window.facilityProData?.ajaxUrl || '/wp-admin/admin-ajax.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            const statusBadge = document.getElementById(`user-status-badge-${userId}`);
+            const actionsCell = document.getElementById(`user-actions-${userId}`);
+
+            if (rowEl) {
+                rowEl.dataset.userStatus = 'approved';
+                rowEl.dataset.userPlan = newPlan;
+            }
+
+            if (statusBadge) {
+                if (newPlan === 'pro') {
+                    statusBadge.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ✓ Active (Pro ₹399)</span>';
+                } else if (newPlan === 'enterprise') {
+                    statusBadge.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> ✓ Active (Enterprise)</span>';
+                } else {
+                    statusBadge.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-300"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> ✓ Active (Free Plan)</span>';
+                }
+            }
+
+            if (actionsCell) {
+                actionsCell.innerHTML = `<button onclick="facilityProAdminExpireUser(${userId}, this)" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 hover:border-rose-300 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1" title="Instantly force logout and terminate access across all devices"><span>⛔</span> Expire &amp; Logout</button>`;
+            }
+
+            facilityProUpdateAdminCounts(data.data.counts);
+
+            const toast = document.getElementById('admin-approvals-toast');
+            if (toast) {
+                toast.className = 'p-3 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 block mb-4';
+                toast.textContent = data.data.message || 'Plan updated successfully.';
+                setTimeout(() => { toast.className = 'hidden'; }, 4000);
+            }
+        } else {
+            alert(data.data || 'Failed to update plan.');
+        }
+    } catch (err) {
+        alert('Network error while updating subscription.');
+    } finally {
+        if (selectEl) selectEl.disabled = false;
+    }
+}
+
+// Admin Expire & Force Logout Handler (Instantly kills user session)
+async function facilityProAdminExpireUser(userId, btnEl) {
+    if (!userId) return;
+    if (!confirm('Are you sure you want to Expire this account? The user will be immediately logged out across all browsers.')) {
+        return;
+    }
+
+    const rowEl = document.getElementById(`user-row-${userId}`);
+    const origText = btnEl ? btnEl.innerHTML : '';
     if (btnEl) {
         btnEl.disabled = true;
-        btnEl.innerHTML = '<span class="inline-block animate-spin">⏳</span> Updating...';
+        btnEl.innerHTML = '<span class="inline-block animate-spin">⏳</span> Expiring...';
     }
 
     const formData = new FormData();
-    formData.append('action', 'facilitypro_admin_update_user_status');
+    formData.append('action', 'facilitypro_admin_update_user_subscription');
     formData.append('target_user_id', userId);
+    formData.append('action_type', 'expire_user');
+    formData.append('target_status', 'expired');
+    formData.append('nonce', window.facilityProData?.nonce || '');
+
+    try {
+        const res = await fetch(window.facilityProData?.ajaxUrl || '/wp-admin/admin-ajax.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            const statusBadge = document.getElementById(`user-status-badge-${userId}`);
+            const actionsCell = document.getElementById(`user-actions-${userId}`);
+
+            if (rowEl) {
+                rowEl.dataset.userStatus = 'expired';
+            }
+
+            if (statusBadge) {
+                statusBadge.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> ⛔ Expired (Logged Out)</span>';
+            }
+
+            if (actionsCell) {
+                actionsCell.innerHTML = `<button onclick="facilityProAdminQuickStatus(${userId}, 'approved', this)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1"><span>✓</span> Re-activate</button>`;
+            }
+
+            facilityProUpdateAdminCounts(data.data.counts);
+
+            const toast = document.getElementById('admin-approvals-toast');
+            if (toast) {
+                toast.className = 'p-3 rounded-xl text-xs font-bold bg-rose-50 text-rose-800 border border-rose-200 block mb-4';
+                toast.textContent = data.data.message || 'User expired and logged out.';
+                setTimeout(() => { toast.className = 'hidden'; }, 4000);
+            }
+        } else {
+            alert(data.data || 'Failed to expire user.');
+            if (btnEl) {
+                btnEl.disabled = false;
+                btnEl.innerHTML = origText;
+            }
+        }
+    } catch (err) {
+        alert('Network error while expiring user.');
+        if (btnEl) {
+            btnEl.disabled = false;
+            btnEl.innerHTML = origText;
+        }
+    }
+}
+
+// Admin Quick Status (Reactivate / Approve)
+async function facilityProAdminQuickStatus(userId, newStatus, btnEl) {
+    if (!userId || !newStatus) return;
+
+    const rowEl = document.getElementById(`user-row-${userId}`);
+    const origText = btnEl ? btnEl.innerHTML : '';
+    if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.innerHTML = '<span class="inline-block animate-spin">⏳</span> Processing...';
+    }
+
+    const currentPlan = rowEl ? (rowEl.dataset.userPlan || 'free') : 'free';
+
+    const formData = new FormData();
+    formData.append('action', 'facilitypro_admin_update_user_subscription');
+    formData.append('target_user_id', userId);
+    formData.append('action_type', 'change_plan');
+    formData.append('target_plan', currentPlan);
     formData.append('target_status', newStatus);
     formData.append('nonce', window.facilityProData?.nonce || '');
 
@@ -616,65 +752,64 @@ async function facilityProUpdateUserStatus(userId, newStatus, btnEl) {
         if (data.success) {
             const statusBadge = document.getElementById(`user-status-badge-${userId}`);
             const actionsCell = document.getElementById(`user-actions-${userId}`);
-            
+
             if (rowEl) {
                 rowEl.dataset.userStatus = newStatus;
             }
 
             if (statusBadge) {
-                if (newStatus === 'approved') {
-                    statusBadge.className = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300';
-                    statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Approved';
-                } else if (newStatus === 'rejected') {
-                    statusBadge.className = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300';
-                    statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Rejected';
+                if (currentPlan === 'pro') {
+                    statusBadge.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ✓ Active (Pro ₹399)</span>';
                 } else {
-                    statusBadge.className = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300';
-                    statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pending';
+                    statusBadge.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-300"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> ✓ Active (Free Plan)</span>';
                 }
             }
 
             if (actionsCell) {
-                let html = '';
-                if (newStatus === 'approved') {
-                    html = `<button onclick="facilityProUpdateUserStatus(${userId}, 'rejected', this)" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition-colors cursor-pointer">Revoke / Reject</button>`;
-                } else if (newStatus === 'rejected') {
-                    html = `<button onclick="facilityProUpdateUserStatus(${userId}, 'approved', this)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors shadow-xs cursor-pointer flex items-center gap-1"><span>✓</span> Approve</button>`;
-                } else {
-                    html = `<button onclick="facilityProUpdateUserStatus(${userId}, 'approved', this)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors shadow-xs cursor-pointer flex items-center gap-1"><span>✓</span> Approve</button> <button onclick="facilityProUpdateUserStatus(${userId}, 'rejected', this)" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition-colors cursor-pointer">Reject</button>`;
-                }
-                actionsCell.innerHTML = html;
+                actionsCell.innerHTML = `<button onclick="facilityProAdminExpireUser(${userId}, this)" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 hover:border-rose-300 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1" title="Instantly force logout and terminate access across all devices"><span>⛔</span> Expire &amp; Logout</button>`;
             }
 
-            const pendingCounter = document.getElementById('sidebar-pending-counter');
-            if (pendingCounter && data.data.pending_count !== undefined) {
-                pendingCounter.textContent = `${data.data.pending_count} Pending`;
-                pendingCounter.className = data.data.pending_count > 0 ? 'px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500 text-white animate-pulse' : 'px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-200 text-slate-600';
-            }
+            facilityProUpdateAdminCounts(data.data.counts);
 
             const toast = document.getElementById('admin-approvals-toast');
             if (toast) {
                 toast.className = 'p-3 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 block mb-4';
-                toast.textContent = data.data.message || 'Status updated.';
+                toast.textContent = data.data.message || 'User activated.';
                 setTimeout(() => { toast.className = 'hidden'; }, 4000);
             }
         } else {
-            alert(data.data || 'Failed to update user status.');
+            alert(data.data || 'Failed to update user.');
             if (btnEl) {
                 btnEl.disabled = false;
-                btnEl.innerHTML = originalText;
+                btnEl.innerHTML = origText;
             }
         }
     } catch (err) {
-        alert('Network error while updating status.');
+        alert('Network error.');
         if (btnEl) {
             btnEl.disabled = false;
-            btnEl.innerHTML = originalText;
+            btnEl.innerHTML = origText;
         }
     }
 }
 
-// Filter Users in Approvals Tab
+// Helper to update KPI counter numbers
+function facilityProUpdateAdminCounts(counts) {
+    if (!counts) return;
+    if (document.getElementById('stat-total-count')) document.getElementById('stat-total-count').textContent = counts.total || 0;
+    if (document.getElementById('stat-free-count')) document.getElementById('stat-free-count').textContent = counts.free || 0;
+    if (document.getElementById('stat-pro-count')) document.getElementById('stat-pro-count').textContent = counts.pro || 0;
+    if (document.getElementById('stat-expired-count')) document.getElementById('stat-expired-count').textContent = counts.expired || 0;
+    if (document.getElementById('stat-pending-count')) document.getElementById('stat-pending-count').textContent = counts.pending || 0;
+
+    const pendingCounter = document.getElementById('sidebar-pending-counter');
+    if (pendingCounter && counts.pending !== undefined) {
+        pendingCounter.textContent = `${counts.pending} Pending`;
+        pendingCounter.className = counts.pending > 0 ? 'px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500 text-white animate-pulse' : 'px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-200 text-slate-600';
+    }
+}
+
+// Filter Users in Approvals Tab (All / Free / Pro / Expired / Pending)
 function facilityProFilterUsers(filterStatus) {
     document.querySelectorAll('.user-filter-btn').forEach(btn => {
         if (btn.dataset.statusFilter === filterStatus) {
@@ -686,7 +821,22 @@ function facilityProFilterUsers(filterStatus) {
 
     document.querySelectorAll('.user-approval-row').forEach(row => {
         const rowStatus = row.dataset.userStatus;
-        row.style.display = (filterStatus === 'all' || rowStatus === filterStatus) ? '' : 'none';
+        const rowPlan = row.dataset.userPlan;
+        
+        let match = false;
+        if (filterStatus === 'all') {
+            match = true;
+        } else if (filterStatus === 'free') {
+            match = (rowPlan === 'free' && rowStatus === 'approved');
+        } else if (filterStatus === 'pro') {
+            match = (rowPlan === 'pro' && rowStatus === 'approved');
+        } else if (filterStatus === 'expired') {
+            match = (rowStatus === 'expired' || rowStatus === 'rejected');
+        } else if (filterStatus === 'pending') {
+            match = (rowStatus === 'pending');
+        }
+
+        row.style.display = match ? '' : 'none';
     });
 }
 

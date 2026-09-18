@@ -2759,22 +2759,99 @@ function facilitypro_hero_shortcode($atts) {
 
                 </div>
 
-                <!-- Right Trust Column / Award Seal -->
-                <div class="hidden lg:flex lg:col-span-4 flex-col items-center justify-center space-y-4">
-                    <div class="relative p-6 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-center max-w-xs shadow-2xl">
-                        <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-tr from-amber-400 to-amber-200 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/20 mb-3">
-                            <i data-lucide="award" class="w-9 h-9 stroke-[2] text-amber-900"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white tracking-tight">100% Verified MEP Engineers</h3>
-                        <p class="text-xs text-slate-300 mt-1 leading-relaxed">
-                            Licensed Professional Engineers (PE), ASHRAE Fellows, NFPA CFPS &amp; IEEE Senior Members.
-                        </p>
+                <!-- Right Interactive AI Diagnostics HUD -->
+                <div class="hidden lg:flex lg:col-span-4 flex-col justify-center">
+                    <div class="relative bg-slate-900/75 backdrop-blur-xl rounded-3xl border border-white/20 p-5 shadow-2xl space-y-4 max-w-sm w-full">
                         
-                        <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-center gap-3 text-xs text-amber-300 font-semibold">
-                            <span class="flex items-center gap-1"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> 24/7 Active</span>
-                            <span>&bull;</span>
-                            <span class="flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Verified Credentials</span>
+                        <!-- HUD Header -->
+                        <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                            <div class="flex items-center gap-2">
+                                <span class="relative flex h-2.5 w-2.5">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                                </span>
+                                <span class="text-[11px] font-black tracking-wider uppercase text-slate-200">Live AI Diagnostic HUD</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-full bg-[#0077c8]/30 border border-sky-400/30 text-[10px] font-bold text-sky-300">&lt; 3s Reply</span>
                         </div>
+
+                        <!-- 4 Instant Diagnostic Launchers -->
+                        <div class="space-y-2 text-left">
+                            <button onclick="facilityProOpenConsultationModal('Centrifugal chiller condenser high approach temperature & surging under 85% load.', 'Er. Rajesh Sharma', 'hvac')" class="w-full p-2.5 rounded-2xl bg-white/5 hover:bg-white/15 border border-white/10 hover:border-sky-400/50 transition-all flex items-center justify-between group cursor-pointer text-left">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-300 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                        <i data-lucide="snowflake" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-sky-300 transition-colors">Chiller Approach &amp; Lift</div>
+                                        <div class="text-[10px] text-slate-400">ASHRAE 90.1 &bull; Auto Derivation</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all"></i>
+                            </button>
+
+                            <button onclick="facilityProOpenConsultationModal('Transformer Differential Protection (87T) Tripping on Inrush Current on cold energization.', 'Dr. Vikram Malhotra', 'electrical')" class="w-full p-2.5 rounded-2xl bg-white/5 hover:bg-white/15 border border-white/10 hover:border-amber-400/50 transition-all flex items-center justify-between group cursor-pointer text-left">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                        <i data-lucide="zap" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-amber-300 transition-colors">Transformer 87T Inrush</div>
+                                        <div class="text-[10px] text-slate-400">IS 2026 &bull; 2nd Harmonic Restraint</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all"></i>
+                            </button>
+
+                            <button onclick="facilityProOpenConsultationModal('NFPA 13 Wet Sprinkler Hydraulic Sizing & Fire Pump Head Calculation for Extra Hazard Group 1.', 'Er. Ananya Verma', 'firefighting')" class="w-full p-2.5 rounded-2xl bg-white/5 hover:bg-white/15 border border-white/10 hover:border-rose-400/50 transition-all flex items-center justify-between group cursor-pointer text-left">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-300 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                        <i data-lucide="flame" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-rose-300 transition-colors">NFPA 13 Sprinkler Demand</div>
+                                        <div class="text-[10px] text-slate-400">NBC Part 4 &bull; Hydraulic Density</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all"></i>
+                            </button>
+
+                            <button onclick="facilityProOpenConsultationModal('High-Rise Riser Water Hammer & Pressure Reducing Valve (PRV) Sizing for 28 stories.', 'Er. Amit Patel', 'plumbing')" class="w-full p-2.5 rounded-2xl bg-white/5 hover:bg-white/15 border border-white/10 hover:border-emerald-400/50 transition-all flex items-center justify-between group cursor-pointer text-left">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                        <i data-lucide="droplet" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-emerald-300 transition-colors">Booster &amp; Water Hammer</div>
+                                        <div class="text-[10px] text-slate-400">Joukowsky &bull; PRV Staging</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all"></i>
+                            </button>
+                        </div>
+
+                        <!-- HUD Metrics Footer -->
+                        <div class="pt-3 border-t border-white/10 grid grid-cols-3 gap-2 text-center">
+                            <div class="p-1.5 rounded-xl bg-white/5">
+                                <div class="text-sm font-black text-amber-300">15k+</div>
+                                <div class="text-[9px] text-slate-400 font-semibold">Solved</div>
+                            </div>
+                            <div class="p-1.5 rounded-xl bg-white/5">
+                                <div class="text-sm font-black text-sky-300">50+</div>
+                                <div class="text-[9px] text-slate-400 font-semibold">SOPs</div>
+                            </div>
+                            <div class="p-1.5 rounded-xl bg-white/5">
+                                <div class="text-sm font-black text-emerald-300">99.9%</div>
+                                <div class="text-[9px] text-slate-400 font-semibold">Compliance</div>
+                            </div>
+                        </div>
+
+                        <!-- Direct Launch Button -->
+                        <button onclick="facilityProOpenConsultationModal()" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0077c8] to-[#005a96] hover:from-[#0088e6] hover:to-[#0077c8] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 cursor-pointer transition-all">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-amber-300"></i>
+                            <span>Ask Custom AI Query</span>
+                        </button>
+
                     </div>
                 </div>
 

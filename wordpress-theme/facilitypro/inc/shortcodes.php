@@ -1240,8 +1240,13 @@ function facilitypro_dashboard_shortcode($atts) {
             return ob_get_clean();
         }
 
-        // 2. PENDING USER VIEW (Waiting for Admin approval)
+        // 2. PENDING USER VIEW (Waiting for Admin approval / Payment verification)
         if (!$is_admin && $account_status === 'pending') {
+            $admin_phone = get_option('facilitypro_emergency_phone', '+91 98765 43210');
+            $clean_phone = preg_replace('/[^0-9]/', '', $admin_phone);
+            if (empty($clean_phone)) $clean_phone = '919876543210';
+            $wa_msg = urlencode("Hi FacilityPro Admin, I have registered as " . $display_name . " (" . $plant_name . ") with email " . $current_user->user_email . " and completed my Pro Membership payment. Please approve my account.");
+            $wa_url = "https://wa.me/" . $clean_phone . "?text=" . $wa_msg;
             ?>
             <div class="facilitypro-pending-review max-w-3xl mx-auto my-8 bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-amber-200">
                 <!-- Icon & Status Header -->
@@ -1255,12 +1260,27 @@ function facilitypro_dashboard_shortcode($atts) {
                     </div>
                     <h1 class="text-2xl sm:text-3xl font-black text-slate-900">Welcome, <?php echo esc_html($display_name); ?></h1>
                     <p class="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
-                        Your registration for <strong><?php echo esc_html($plant_name); ?></strong> has been received. Our Admin team will review and approve your account shortly before granting access to diagnostic calculators and SOPs.
+                        Your registration for <strong><?php echo esc_html($plant_name); ?></strong> has been received. Our Admin team will review and approve your account shortly before granting access to diagnostic calculators, SOPs, and premium files.
                     </p>
                 </div>
 
+                <!-- Fast WhatsApp Payment Confirmation CTA -->
+                <div class="my-6 p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="space-y-1 text-center sm:text-left">
+                        <div class="inline-flex items-center gap-1.5 text-xs font-black text-emerald-800">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span>Fast Track Activation (₹399/mo Pro Membership)</span>
+                        </div>
+                        <p class="text-xs text-slate-600">Completed your subscription payment? Send payment screenshot or transaction ID directly to Admin on WhatsApp for 1-minute instant activation.</p>
+                    </div>
+                    <a href="<?php echo esc_url($wa_url); ?>" target="_blank" rel="noopener noreferrer" class="shrink-0 px-5 py-3 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl text-xs font-black transition-all shadow-md shadow-emerald-500/20 flex items-center gap-2 cursor-pointer hover:scale-105 active:scale-95">
+                        <i data-lucide="message-circle" class="w-4 h-4"></i>
+                        <span>Send Payment on WhatsApp</span>
+                    </a>
+                </div>
+
                 <!-- Verification Progress / Steps -->
-                <div class="my-8 p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                <div class="my-6 p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
                     <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider">Approval Sequence:</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                         <div class="p-3.5 bg-white rounded-xl border border-emerald-200 flex items-center gap-2.5">
@@ -1273,7 +1293,7 @@ function facilitypro_dashboard_shortcode($atts) {
                         <div class="p-3.5 bg-white rounded-xl border border-amber-300 shadow-sm flex items-center gap-2.5">
                             <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-black text-[11px] shrink-0">⏳</span>
                             <div>
-                                <div class="font-bold text-slate-900">2. Admin Review</div>
+                                <div class="font-bold text-slate-900">2. Admin Verification</div>
                                 <div class="text-[10px] text-amber-600 font-semibold">In Verification Queue</div>
                             </div>
                         </div>
@@ -1302,7 +1322,7 @@ function facilitypro_dashboard_shortcode($atts) {
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200">
                     <div class="text-xs text-slate-500 text-center sm:text-left">
                         Need urgent approval for a critical plant emergency? 
-                        <a href="tel:+919876543210" class="text-[#0077c8] font-bold block sm:inline sm:ml-1">Call Admin (+91 98765 43210)</a>
+                        <a href="tel:<?php echo esc_attr($clean_phone); ?>" class="text-[#0077c8] font-bold block sm:inline sm:ml-1">Call Admin (<?php echo esc_html($admin_phone); ?>)</a>
                     </div>
                     <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
                         <button onclick="location.reload()" class="px-4 py-2.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5">
